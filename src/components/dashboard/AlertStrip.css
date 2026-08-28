@@ -1,0 +1,22 @@
+.alert-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--amber-bg);
+  border: 1px solid #EDD9AE;
+  color: var(--amber-strong);
+  padding: 9px 14px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.alert-strip b {
+  font-weight: 600;
+  color: var(--amber);
+}
+
+.alert-strip .sep {
+  color: #D9BE8C;
+}

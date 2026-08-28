@@ -1,0 +1,137 @@
+.ds-top-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 1fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.ds-score-card {
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ds-score-value {
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.ds-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  color: var(--border);
+}
+
+.ds-stars .on {
+  color: var(--amber);
+}
+
+.ds-score-meta {
+  font-size: 10.5px;
+  color: var(--text-3);
+  margin-top: 4px;
+}
+
+.ds-metric-card {
+  padding: 14px 15px;
+}
+
+.ds-metric-label {
+  font-size: 11px;
+  color: var(--text-2);
+  margin-bottom: 8px;
+}
+
+.ds-metric-value {
+  font-size: 19px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.ds-metric-value.green { color: var(--green); }
+.ds-metric-value.blue { color: var(--blue); }
+.ds-metric-value.amber { color: var(--amber); }
+
+.ds-metric-bar {
+  width: 100%;
+  height: 5px;
+  border-radius: 4px;
+  background: var(--panel-2);
+  overflow: hidden;
+}
+
+.ds-metric-fill {
+  height: 100%;
+  border-radius: 4px;
+}
+
+.ds-metric-fill.green { background: var(--green); }
+.ds-metric-fill.blue { background: var(--blue); }
+.ds-metric-fill.amber { background: var(--amber); }
+
+.ds-reviews-panel {
+  margin-top: 16px;
+}
+
+.ds-reviews-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.ds-review-row {
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.ds-review-row:last-child {
+  border-bottom: none;
+}
+
+.ds-review-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.ds-review-broker {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.ds-review-load {
+  background: none;
+  border: none;
+  color: var(--blue);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11.5px;
+  cursor: pointer;
+}
+
+.ds-review-date {
+  margin-left: auto;
+  font-size: 10.5px;
+  color: var(--text-3);
+}
+
+.ds-review-text {
+  font-size: 12px;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+@media (max-width: 1200px) {
+  .ds-top-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .ds-top-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

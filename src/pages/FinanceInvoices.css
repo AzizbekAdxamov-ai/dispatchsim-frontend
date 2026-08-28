@@ -1,0 +1,5 @@
+.invoice-days-past-due {
+  font-size: 10.5px;
+  color: var(--red);
+  margin-top: 2px;
+}

@@ -1,0 +1,111 @@
+import { Routes, Route } from 'react-router-dom'
+import { MotionConfig } from 'framer-motion'
+import { AuthProvider } from './context/AuthContext'
+import ProtectedRoute from './components/ProtectedRoute'
+import RoleHome from './components/RoleHome'
+import AppShell from './components/layout/AppShell'
+import FleetShell from './components/layout/FleetShell'
+import Login from './pages/Login'
+import Register from './pages/Register'
+import Tracking from './pages/Tracking'
+import Loads from './pages/Loads'
+import LoadDetail from './pages/LoadDetail'
+import Alerts from './pages/Alerts'
+import Documents from './pages/Documents'
+import DispatchStatus from './pages/DispatchStatus'
+import Settings from './pages/Settings'
+import Drivers from './pages/Drivers'
+import DriverDetail from './pages/DriverDetail'
+import BrokerChat from './pages/BrokerChat'
+import FleetDashboard from './pages/FleetDashboard'
+import TruckDetail from './pages/TruckDetail'
+import FleetMaintenance from './pages/FleetMaintenance'
+import FleetAlerts from './pages/FleetAlerts'
+import FleetDocuments from './pages/FleetDocuments'
+import FleetSettings from './pages/FleetSettings'
+import Pending from './pages/Pending'
+import AdminShell from './components/layout/AdminShell'
+import AdminUsers from './pages/AdminUsers'
+import AdminInvites from './pages/AdminInvites'
+import FinanceShell from './components/layout/FinanceShell'
+import FinanceDashboard from './pages/FinanceDashboard'
+import FinanceInvoices from './pages/FinanceInvoices'
+import InvoiceDetail from './pages/InvoiceDetail'
+import FinanceSettlements from './pages/FinanceSettlements'
+import FinanceExpenses from './pages/FinanceExpenses'
+import FinanceSettings from './pages/FinanceSettings'
+
+export default function App() {
+  return (
+    <MotionConfig reducedMotion="user">
+      <AuthProvider>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/pending" element={<ProtectedRoute><Pending /></ProtectedRoute>} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <AppShell />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<RoleHome />} />
+            <Route path="loads" element={<Loads />} />
+            <Route path="loads/:id" element={<LoadDetail />} />
+            <Route path="tracking" element={<Tracking />} />
+            <Route path="drivers" element={<Drivers />} />
+            <Route path="drivers/:id" element={<DriverDetail />} />
+            <Route path="broker-chat" element={<BrokerChat />} />
+            <Route path="alerts" element={<Alerts />} />
+            <Route path="documents" element={<Documents />} />
+            <Route path="dispatch-status" element={<DispatchStatus />} />
+            <Route path="settings" element={<Settings />} />
+          </Route>
+          <Route
+            path="/fleet"
+            element={
+              <ProtectedRoute allow={['fleet-manager']}>
+                <FleetShell />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<FleetDashboard />} />
+            <Route path="trucks/:id" element={<TruckDetail />} />
+            <Route path="maintenance" element={<FleetMaintenance />} />
+            <Route path="alerts" element={<FleetAlerts />} />
+            <Route path="documents" element={<FleetDocuments />} />
+            <Route path="settings" element={<FleetSettings />} />
+          </Route>
+          <Route
+            path="/finance"
+            element={
+              <ProtectedRoute allow={['finance']}>
+                <FinanceShell />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<FinanceDashboard />} />
+            <Route path="invoices" element={<FinanceInvoices />} />
+            <Route path="invoices/:id" element={<InvoiceDetail />} />
+            <Route path="settlements" element={<FinanceSettlements />} />
+            <Route path="expenses" element={<FinanceExpenses />} />
+            <Route path="settings" element={<FinanceSettings />} />
+          </Route>
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute requireAdmin>
+                <AdminShell />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<AdminUsers />} />
+            <Route path="invites" element={<AdminInvites />} />
+          </Route>
+        </Routes>
+      </AuthProvider>
+    </MotionConfig>
+  )
+}

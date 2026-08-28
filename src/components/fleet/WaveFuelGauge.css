@@ -1,0 +1,75 @@
+.fuel-widget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.fuel-widget .widget-title,
+.fuel-widget .widget-sub {
+  align-self: flex-start;
+}
+
+.fuel-tank {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--panel-3);
+  border: 2px solid var(--border);
+  flex-shrink: 0;
+}
+
+.fuel-tank svg {
+  position: absolute;
+  inset: 0;
+  width: 200%;
+  height: 100%;
+}
+
+.wave1 {
+  animation: fuelWaveMove 3.2s linear infinite;
+  opacity: 0.55;
+}
+
+.wave2 {
+  animation: fuelWaveMove 4.5s linear infinite reverse;
+  opacity: 0.85;
+}
+
+@keyframes fuelWaveMove {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.fuel-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.fuel-pct {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.fuel-sub {
+  font-size: 9.5px;
+  color: var(--text-2);
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.fuel-caption {
+  margin-top: 12px;
+  font-size: 11px;
+  color: var(--text-2);
+  text-align: center;
+}
+
+.fuel-caption b {
+  color: var(--text);
+}

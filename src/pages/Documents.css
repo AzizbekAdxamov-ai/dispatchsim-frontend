@@ -1,0 +1,101 @@
+.doc-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.doc-row:last-child {
+  border-bottom: none;
+}
+
+.doc-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--panel-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--text-2);
+  flex-shrink: 0;
+}
+
+.doc-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.doc-name {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.doc-meta {
+  font-size: 10.5px;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+
+.doc-related {
+  flex-shrink: 0;
+  min-width: 90px;
+}
+
+.doc-related-link {
+  background: none;
+  border: none;
+  color: var(--blue);
+  font-size: 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  cursor: pointer;
+}
+
+.doc-related-tag {
+  font-size: 10.5px;
+  color: var(--text-2);
+  background: var(--panel-2);
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+
+.doc-status {
+  flex-shrink: 0;
+  font-size: 10.5px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+.doc-status.ready {
+  background: var(--green-bg);
+  color: var(--green-strong);
+}
+
+.doc-status.pending {
+  background: var(--panel-2);
+  color: var(--text-3);
+}
+
+.doc-status.expiring {
+  background: var(--amber-bg);
+  color: var(--amber-strong);
+}
+
+.doc-action {
+  flex-shrink: 0;
+  width: 44px;
+  text-align: right;
+  font-size: 11.5px;
+  color: var(--blue);
+  cursor: pointer;
+}
+
+.doc-action.disabled {
+  color: var(--text-3);
+  cursor: default;
+}

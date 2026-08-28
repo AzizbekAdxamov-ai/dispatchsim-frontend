@@ -1,0 +1,49 @@
+.tire-row {
+  display: flex;
+  justify-content: space-around;
+}
+
+.tire-item {
+  text-align: center;
+}
+
+.tire-ring {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  margin: 0 auto 8px;
+}
+
+.tire-ring svg {
+  transform: rotate(-90deg);
+}
+
+.tire-ring circle {
+  fill: none;
+  stroke-width: 7;
+}
+
+.tire-bg {
+  stroke: var(--panel-3);
+}
+
+.tire-fg {
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1.1s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.tire-pct {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tire-lbl {
+  font-size: 10px;
+  color: var(--text-2);
+}

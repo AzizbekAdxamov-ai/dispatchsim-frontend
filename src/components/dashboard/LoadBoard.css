@@ -1,0 +1,93 @@
+.load-board table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.load-board th {
+  text-align: left;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-3);
+  font-weight: 500;
+  padding: 9px 16px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.load-board td {
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 12.5px;
+  vertical-align: middle;
+}
+
+.load-board tr:last-child td {
+  border-bottom: none;
+}
+
+.load-board tr.row:hover {
+  background: var(--panel-2);
+  cursor: pointer;
+}
+
+.load-id {
+  color: var(--text-2);
+}
+
+.row-primary-link {
+  display: inline-block;
+  color: inherit;
+  border-radius: 4px;
+}
+
+.row-primary-link:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.route {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.route .arrow {
+  color: var(--text-3);
+  font-weight: 400;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 5px;
+}
+
+.badge .dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
+.badge.ontime { background: var(--green-bg); color: var(--green-strong); }
+.badge.ontime .dot { background: var(--green); }
+
+.badge.warn { background: var(--amber-bg); color: var(--amber-strong); }
+.badge.warn .dot { background: var(--amber); }
+
+.badge.crit { background: var(--red-bg); color: var(--red-strong); }
+.badge.crit .dot { background: var(--red); }
+
+.badge.neutral { background: var(--panel-2); color: var(--text-2); }
+.badge.neutral .dot { background: var(--text-3); }
+
+.badge.done { background: var(--blue-dim); color: var(--blue-strong); }
+.badge.done .dot { background: var(--blue); }
+
+.rate {
+  font-weight: 500;
+}

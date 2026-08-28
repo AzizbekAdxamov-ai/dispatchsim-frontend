@@ -1,0 +1,50 @@
+.fleet-summary-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.fleet-summary-card {
+  background: var(--panel);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  padding: 13px 15px;
+}
+
+.fleet-summary-label {
+  font-size: 11px;
+  color: var(--text-2);
+  margin-bottom: 6px;
+}
+
+.fleet-summary-value {
+  font-size: 21px;
+  font-weight: 600;
+}
+
+.fleet-summary-value.green { color: var(--green); }
+.fleet-summary-value.amber { color: var(--amber); }
+.fleet-summary-value.red { color: var(--red); }
+
+.truck-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+@media (max-width: 1150px) {
+  .fleet-summary-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .truck-card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .truck-card-grid {
+    grid-template-columns: 1fr;
+  }
+}

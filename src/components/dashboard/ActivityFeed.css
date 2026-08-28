@@ -1,0 +1,37 @@
+.activity-feed-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.activity-feed-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.activity-feed-item:last-child {
+  border-bottom: none;
+}
+
+.activity-feed-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--blue);
+  flex-shrink: 0;
+}
+
+.activity-feed-text {
+  flex: 1;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.activity-feed-time {
+  font-size: 10.5px;
+  color: var(--text-3);
+  flex-shrink: 0;
+  font-family: 'IBM Plex Mono', monospace;
+}

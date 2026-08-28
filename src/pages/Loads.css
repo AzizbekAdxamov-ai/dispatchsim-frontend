@@ -1,0 +1,80 @@
+.loads-route-sub {
+  font-size: 10.5px;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+
+.loads-driver-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.loads-driver-chip.unassigned {
+  color: var(--text-3);
+}
+
+.loads-driver-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--panel-3);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.loads-chevron {
+  color: var(--text-3);
+  font-size: 14px;
+  text-align: right;
+}
+
+.loads-equip-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.loads-equip-filter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.loads-equip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.loads-equip-btn:hover {
+  background: var(--panel-2);
+}
+
+.loads-equip-btn.active {
+  background: var(--panel-3);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.loads-equip-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

@@ -1,0 +1,869 @@
+/* =========================================================
+   CARGO LAYOUT
+   ========================================================= */
+
+.cargo-layout {
+  /*
+    Cargo Layout follows the app's light/dark theme like every
+    other panel, keeping only the purple accent as its distinct
+    brand color for the selected slot/card state.
+  */
+  --cargo-bg: var(--panel);
+  --cargo-border: var(--border-soft);
+  --cargo-text: var(--text);
+  --cargo-text-2: var(--text-2);
+  --cargo-text-3: var(--text-3);
+  --cargo-accent: #6E3FF3;
+  --cargo-accent-bg: rgba(110, 63, 243, 0.16);
+  --cargo-slot-bg: var(--panel-2);
+  --cargo-slot-border: var(--border-soft);
+  --cargo-red: var(--red);
+  --cargo-red-bg: var(--red-bg);
+  --cargo-amber: var(--amber);
+  --cargo-amber-bg: var(--amber-bg);
+  --cargo-blue: var(--blue);
+  --cargo-blue-bg: var(--blue-dim);
+  --cargo-gray: var(--text-3);
+  --cargo-gray-bg: var(--panel-3);
+
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+
+  background: var(--cargo-bg);
+  color: var(--cargo-text);
+  border: 2px solid var(--cargo-border);
+}
+
+.cargo-layout .panel-head {
+  border-bottom: 2px solid var(--cargo-border);
+}
+
+.cargo-layout .panel-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--cargo-text);
+}
+
+.cargo-loaded-badge {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--cargo-red);
+  background: var(--cargo-red-bg);
+  padding: 3px 9px;
+  border-radius: 9px;
+}
+
+
+/* =========================================================
+   CAPACITY
+   ========================================================= */
+
+.cargo-capacity-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+
+  padding: 14px 16px;
+
+  border-bottom: 2px solid var(--cargo-border);
+}
+
+.cargo-capacity {
+  min-width: 0;
+}
+
+.cargo-capacity-label {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+
+  font-size: 12px;
+  color: var(--cargo-text);
+
+  margin-bottom: 7px;
+}
+
+.cargo-capacity-name {
+  margin-left: auto;
+
+  font-size: 10.5px;
+  color: var(--cargo-text-3);
+
+  white-space: nowrap;
+}
+
+.cargo-capacity-bar {
+  width: 100%;
+  height: 5px;
+
+  border-radius: 4px;
+
+  background: var(--cargo-slot-bg);
+
+  overflow: hidden;
+}
+
+.cargo-capacity-fill {
+  height: 100%;
+
+  border-radius: 4px;
+
+  transition: width 0.25s ease;
+}
+
+.cargo-capacity-fill.amber {
+  background: var(--cargo-amber);
+}
+
+.cargo-capacity-fill.red {
+  background: var(--cargo-red);
+}
+
+.cargo-capacity-fill.green {
+  background: var(--green);
+}
+
+
+/* =========================================================
+   MAIN BODY
+   ========================================================= */
+
+.cargo-body {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.72fr)
+    minmax(285px, 1fr);
+
+  min-height: 380px;
+
+  min-width: 0;
+}
+
+
+/* =========================================================
+   TRUCK COLUMN
+   ========================================================= */
+
+.cargo-truck-col {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+
+  padding: 16px;
+
+  border-right: 2px solid var(--cargo-border);
+}
+
+
+/* =========================================================
+   TRUCK CONTAINER
+   ========================================================= */
+
+/*
+   truck-side.png: 2048 x 724
+
+   Aspect ratio is preserved so the truck does not
+   become stretched or oversized.
+*/
+
+.cargo-truck-box {
+  position: relative;
+
+  width: 100%;
+
+  aspect-ratio: 2048 / 724;
+
+  min-width: 0;
+  min-height: 0;
+
+  background: var(--cargo-slot-bg);
+
+  border: 2px solid var(--cargo-slot-border);
+
+  border-radius: 10px;
+
+  overflow: hidden;
+
+  padding: 0;
+}
+
+
+/* =========================================================
+   TRUCK IMAGE
+   ========================================================= */
+
+.cargo-truck-img {
+  position: absolute;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: contain;
+
+  object-position: center;
+
+  user-select: none;
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   CARGO GRID
+   ========================================================= */
+
+/*
+   Verified trailer interior bounds for the current
+   truck-side.png (2048 x 724). All four sides are
+   pinned in percent (not width/height) so the grid
+   stays inside the trailer regardless of container size.
+
+   10 cards: 5 columns x 2 rows
+*/
+
+.cargo-grid-overlay {
+  position: absolute;
+
+  top: 20%;
+  left: 34%;
+  right: 5%;
+  bottom: 50%;
+
+  box-sizing: border-box;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr));
+
+  grid-template-rows:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 5px;
+
+  min-width: 0;
+  min-height: 0;
+}
+
+
+/* =========================================================
+   CARGO CARD
+   ========================================================= */
+
+.cargo-card {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+  min-height: 0;
+
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: flex-start;
+  justify-content: center;
+
+  gap: 3px;
+
+  padding: 5px 7px;
+
+  border: 2px solid var(--cargo-slot-border);
+  border-radius: 10px;
+
+  background: var(--cargo-slot-bg);
+
+  color: var(--cargo-text);
+
+  font-size: 9px;
+  line-height: 1.1;
+
+  cursor: pointer;
+
+  overflow: hidden;
+
+  user-select: none;
+
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    filter 0.15s ease;
+}
+
+
+/* =========================================================
+   CARD HOVER
+   ========================================================= */
+
+.cargo-card:hover {
+  transform: translateY(-1px);
+
+  filter: brightness(0.98);
+}
+
+
+/* =========================================================
+   SELECTED CARD
+   ========================================================= */
+
+.cargo-card.selected {
+  border-color: var(--cargo-accent);
+  background: var(--cargo-accent-bg);
+
+  transform: none;
+}
+
+
+/* =========================================================
+   CARGO ID
+   ========================================================= */
+
+.cargo-card-id {
+  display: block;
+
+  width: 100%;
+
+  min-width: 0;
+
+  font-family: 'IBM Plex Mono', monospace;
+
+  font-size: 9px;
+
+  line-height: 1.1;
+
+  font-weight: 600;
+
+  color: var(--cargo-text);
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   PRIORITY LABEL
+   ========================================================= */
+
+.cargo-card-priority {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+
+  max-width: 100%;
+
+  font-size: 7.5px;
+
+  line-height: 1.1;
+
+  font-weight: 500;
+
+  padding: 1px 5px;
+
+  border-radius: 8px;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   PRIORITY COLORS
+   ========================================================= */
+
+.priority-critical {
+  color: var(--cargo-red);
+  background: var(--cargo-red-bg);
+}
+
+.priority-high {
+  color: var(--cargo-amber);
+  background: var(--cargo-amber-bg);
+}
+
+.priority-normal {
+  color: var(--cargo-blue);
+  background: var(--cargo-blue-bg);
+}
+
+.priority-low {
+  color: var(--cargo-gray);
+  background: var(--cargo-gray-bg);
+}
+
+
+/* =========================================================
+   NAVIGATION ARROWS
+   ========================================================= */
+
+.cargo-nav-arrows {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  margin-top: 13px;
+}
+
+.cargo-nav-arrows button {
+  width: 28px;
+  height: 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  border: 1px solid var(--cargo-slot-border);
+
+  background: var(--cargo-bg);
+
+  color: var(--cargo-text-2);
+
+  font-size: 15px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    color 0.15s ease,
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.cargo-nav-arrows button:hover {
+  color: var(--cargo-text);
+
+  background: var(--cargo-slot-bg);
+}
+
+.cargo-rotate-dot {
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+
+  background: var(--cargo-text-3);
+}
+
+.cargo-rotate-dot.active {
+  background: var(--cargo-accent);
+}
+
+
+/* =========================================================
+   RIGHT DETAIL PANEL
+   ========================================================= */
+
+.cargo-detail {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  min-height: 0;
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   SHIPMENT LIST
+   ========================================================= */
+
+.cargo-detail-list {
+  display: flex;
+  flex-direction: column;
+
+  max-height: 150px;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  border-bottom: 1px solid var(--cargo-border);
+
+  scrollbar-width: thin;
+}
+
+.cargo-detail-row {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 9px 14px;
+
+  border: none;
+
+  border-bottom: 1px solid var(--cargo-border);
+
+  background: none;
+
+  font-size: 11.5px;
+
+  color: var(--cargo-text-2);
+
+  cursor: pointer;
+
+  text-align: left;
+
+  min-width: 0;
+}
+
+.cargo-detail-row:last-child {
+  border-bottom: none;
+}
+
+.cargo-detail-row:hover {
+  background: var(--cargo-slot-bg);
+}
+
+.cargo-detail-row.active {
+  background: var(--cargo-accent-bg);
+
+  color: var(--cargo-text);
+}
+
+.cargo-detail-row .mono {
+  min-width: 0;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   PRIORITY DOT
+   ========================================================= */
+
+.badge-dot {
+  flex: 0 0 auto;
+
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+}
+
+.badge-dot.priority-critical {
+  background: var(--cargo-red);
+}
+
+.badge-dot.priority-high {
+  background: var(--cargo-amber);
+}
+
+.badge-dot.priority-normal {
+  background: var(--cargo-blue);
+}
+
+.badge-dot.priority-low {
+  background: var(--cargo-text-3);
+}
+
+.cargo-detail-row-priority {
+  margin-left: auto;
+
+  font-size: 10.5px;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   DETAIL CARD
+   ========================================================= */
+
+.cargo-detail-card {
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+
+  padding: 14px 16px;
+
+  min-width: 0;
+  min-height: 0;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.cargo-detail-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  min-width: 0;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  color: var(--cargo-text);
+}
+
+.cargo-detail-card-head .mono {
+  min-width: 0;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+.priority-badge {
+  flex: 0 0 auto;
+
+  font-size: 10.5px;
+
+  font-weight: 500;
+
+  padding: 2px 8px;
+
+  border-radius: 9px;
+}
+
+.cargo-detail-card-label {
+  font-size: 12px;
+
+  color: var(--cargo-text-2);
+
+  margin-top: -4px;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   DETAIL GRID
+   ========================================================= */
+
+.cargo-detail-grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+
+  gap: 10px;
+
+  padding-top: 4px;
+
+  border-top: 1px solid var(--cargo-border);
+}
+
+.cargo-detail-grid > div {
+  min-width: 0;
+}
+
+.cargo-detail-key {
+  font-size: 10px;
+
+  color: var(--cargo-text-3);
+
+  margin-bottom: 2px;
+}
+
+.cargo-detail-val {
+  min-width: 0;
+
+  font-size: 12px;
+
+  color: var(--cargo-text);
+
+  font-weight: 500;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   RISK
+   ========================================================= */
+
+.cargo-risk {
+  min-width: 0;
+}
+
+.cargo-risk-label {
+  display: flex;
+
+  justify-content: space-between;
+
+  gap: 10px;
+
+  font-size: 11.5px;
+
+  color: var(--cargo-text-2);
+
+  margin-bottom: 5px;
+}
+
+
+/* =========================================================
+   FRAGILE
+   ========================================================= */
+
+.cargo-fragile-note {
+  font-size: 11px;
+
+  color: var(--cargo-amber);
+
+  background: var(--cargo-amber-bg);
+
+  border-radius: 7px;
+
+  padding: 8px 10px;
+
+  line-height: 1.4;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1100px) {
+
+  .cargo-body {
+    grid-template-columns:
+      minmax(0, 1.55fr)
+      minmax(260px, 1fr);
+  }
+
+  .cargo-truck-col {
+    padding: 12px;
+  }
+
+  .cargo-grid-overlay {
+    gap: 4px;
+  }
+
+  .cargo-card {
+    padding: 4px 5px;
+  }
+
+  .cargo-card-id {
+    font-size: 8px;
+  }
+
+  .cargo-card-priority {
+    font-size: 7.5px;
+
+    padding: 1px 5px;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+  .cargo-capacity-row {
+    grid-template-columns: 1fr;
+
+    gap: 12px;
+  }
+
+  .cargo-body {
+    grid-template-columns: 1fr;
+  }
+
+  .cargo-truck-col {
+    border-right: none;
+
+    border-bottom: 1px solid var(--cargo-border);
+
+    padding: 12px;
+  }
+
+  .cargo-grid-overlay {
+    gap: 3px;
+  }
+
+  .cargo-detail {
+    min-height: 300px;
+  }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  .cargo-truck-col {
+    padding: 8px;
+  }
+
+  .cargo-truck-box {
+    border-radius: 7px;
+  }
+
+  .cargo-grid-overlay {
+    gap: 2px;
+  }
+
+  .cargo-card {
+    padding: 2px 3px;
+
+    border-radius: 4px;
+  }
+
+  .cargo-card-id {
+    font-size: 7px;
+  }
+
+  .cargo-card-priority {
+    font-size: 6.5px;
+
+    padding: 1px 3px;
+  }
+
+  .cargo-detail-card {
+    padding: 12px;
+  }
+
+  .cargo-detail-row {
+    padding: 8px 12px;
+  }
+}

@@ -1,0 +1,200 @@
+.admin-user-email {
+  font-size: 11px;
+  color: var(--text-3);
+  margin-top: 1px;
+}
+
+.admin-manage-btn {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.admin-manage-btn:hover {
+  border-color: var(--blue);
+  color: var(--text);
+}
+
+.admin-notice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--green-bg);
+  color: var(--green-strong);
+  border: 1px solid var(--green);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 12.5px;
+  margin-bottom: 14px;
+}
+
+.admin-notice-close {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.75;
+}
+
+.admin-notice-close:hover {
+  opacity: 1;
+}
+
+.admin-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.admin-pager-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.admin-pager-btn:hover:not(:disabled) {
+  border-color: var(--blue);
+  color: var(--text);
+}
+
+.admin-pager-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.admin-pager-status {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.admin-checkbox-col {
+  width: 34px;
+  text-align: center;
+}
+
+.admin-checkbox-col input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--blue);
+  cursor: pointer;
+}
+
+.admin-role-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.admin-bulk-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}
+
+.admin-bulk-count {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.admin-bulk-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  flex: 1;
+}
+
+.admin-bulk-role-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-2);
+  cursor: pointer;
+}
+
+.admin-bulk-role-check input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--blue);
+  cursor: pointer;
+}
+
+.admin-bulk-error {
+  flex-basis: 100%;
+  font-size: 12px;
+  color: var(--red-strong);
+}
+
+.admin-bulk-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.admin-bulk-clear {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.admin-bulk-clear:hover {
+  border-color: var(--text-3);
+  color: var(--text);
+}
+
+.admin-bulk-assign {
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.admin-bulk-assign:hover:not(:disabled) {
+  opacity: 0.92;
+}
+
+.admin-bulk-assign:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

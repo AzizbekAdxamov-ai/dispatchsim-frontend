@@ -1,0 +1,98 @@
+.call-widget {
+  position: fixed;
+  bottom: 22px;
+  right: 26px;
+  width: 290px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 12px 28px rgba(58, 50, 41, 0.18);
+  z-index: 100;
+}
+
+.call-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.call-ring {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--blue-dim);
+  color: var(--blue-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 600;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.call-ring::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 2px solid var(--blue);
+  opacity: 0.5;
+  animation: call-pulse 1.6s ease-out infinite;
+}
+
+@keyframes call-pulse {
+  0% { transform: scale(0.9); opacity: 0.6; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+
+.call-info {
+  flex: 1;
+}
+
+.call-label {
+  font-size: 10.5px;
+  color: var(--text-3);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.call-name {
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 1px;
+}
+
+.call-sub {
+  font-size: 11.5px;
+  color: var(--text-2);
+  margin-top: 1px;
+}
+
+.call-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.call-btn {
+  flex: 1;
+  padding: 9px 0;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+}
+
+.call-btn.decline {
+  background: var(--red-bg);
+  color: var(--red-strong);
+}
+
+.call-btn.accept {
+  background: var(--green);
+  color: var(--panel);
+}

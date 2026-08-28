@@ -1,0 +1,19 @@
+.alerts-type-tag {
+  font-size: 10px;
+  color: var(--text-3);
+  background: var(--panel-2);
+  padding: 1px 7px;
+  border-radius: 8px;
+}
+
+.alerts-time {
+  margin-left: auto;
+  font-size: 10.5px;
+  color: var(--text-3);
+}
+
+.alerts-page .alert-queue-actions button.load-link {
+  font-size: 11px;
+  padding: 0 8px;
+  width: auto;
+}

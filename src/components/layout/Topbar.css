@@ -1,0 +1,88 @@
+.topbar {
+  height: 52px;
+  border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 20px;
+  background: var(--bg);
+  flex-shrink: 0;
+}
+
+.topbar-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.tz-strip {
+  display: flex;
+  gap: 14px;
+  margin-left: 8px;
+}
+
+.tz-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.tz-time {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.tz-zone {
+  font-size: 9.5px;
+  color: var(--text-3);
+  letter-spacing: 0.3px;
+}
+
+.topbar-spacer {
+  flex: 1;
+}
+
+.topbar-icons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-2);
+  cursor: pointer;
+  position: relative;
+  font-size: 15px;
+  border: 1px solid transparent;
+  background: none;
+}
+
+.icon-btn:hover {
+  background: var(--panel-2);
+  border-color: var(--border-soft);
+  color: var(--text);
+}
+
+.icon-dot {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--red);
+  border: 1.5px solid var(--bg);
+}
+
+/* Placement-specific spacing for WorkspaceSwitcher inside the topbar; the
+   component's own look (trigger, popover, items) lives in WorkspaceSwitcher.css. */
+.workspace-switcher {
+  border-left: 1px solid var(--border-soft);
+  padding-left: 10px;
+  margin-right: 4px;
+}

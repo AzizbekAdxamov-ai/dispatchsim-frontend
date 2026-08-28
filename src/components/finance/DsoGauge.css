@@ -1,0 +1,75 @@
+.dso-widget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.dso-widget .widget-title,
+.dso-widget .widget-sub {
+  align-self: flex-start;
+}
+
+.dso-gauge {
+  position: relative;
+  width: 180px;
+  flex-shrink: 0;
+}
+
+.dso-gauge svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.dso-arc-bg {
+  fill: none;
+  stroke: var(--panel-3);
+  stroke-linecap: round;
+}
+
+.dso-arc-fg {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.dso-target-tick {
+  stroke: var(--text-3);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.dso-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 2px;
+  pointer-events: none;
+}
+
+.dso-value {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.dso-unit {
+  font-size: 10px;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+
+.dso-caption {
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--text-2);
+}
+
+.dso-caption b {
+  color: var(--text);
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 500;
+}
