@@ -11,6 +11,7 @@ import {
   Star,
   Gear,
   ShieldCheck,
+  MagnifyingGlass,
 } from '@phosphor-icons/react'
 import { useAuth } from '../../context/AuthContext'
 import { roleLabel } from '../../data/roleRoutes'
@@ -19,6 +20,7 @@ import './Sidebar.css'
 const DEFAULT_NAV_ITEMS = [
   { to: '/', icon: SquaresFour, label: 'Dashboard', end: true },
   { to: '/loads', icon: Package, label: 'Loads', badge: 12 },
+  { to: '/load-board', icon: MagnifyingGlass, label: 'Load board' },
   { to: '/tracking', icon: Truck, label: 'Tracking' },
   { to: '/drivers', icon: SteeringWheel, label: 'Drivers' },
   { to: '/broker-chat', icon: ChatCircleText, label: 'Broker chat' },

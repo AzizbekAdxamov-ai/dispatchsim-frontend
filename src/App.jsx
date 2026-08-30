@@ -34,6 +34,7 @@ import InvoiceDetail from './pages/InvoiceDetail'
 import FinanceSettlements from './pages/FinanceSettlements'
 import FinanceExpenses from './pages/FinanceExpenses'
 import FinanceSettings from './pages/FinanceSettings'
+import LoadBoard from './pages/LoadBoard'
 
 export default function App() {
   return (
@@ -54,6 +55,7 @@ export default function App() {
             <Route index element={<RoleHome />} />
             <Route path="loads" element={<Loads />} />
             <Route path="loads/:id" element={<LoadDetail />} />
+            <Route path="load-board" element={<LoadBoard />} />
             <Route path="tracking" element={<Tracking />} />
             <Route path="drivers" element={<Drivers />} />
             <Route path="drivers/:id" element={<DriverDetail />} />

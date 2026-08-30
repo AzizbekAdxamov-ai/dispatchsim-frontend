@@ -16,6 +16,7 @@ const TITLES = {
   '/documents': 'Documents',
   '/dispatch-status': 'Dispatch status',
   '/settings': 'Settings',
+  '/load-board': 'Load board',
 }
 
 const INCOMING_CALL = {
@@ -31,8 +32,10 @@ export default function AppShell() {
 
   const title =
     TITLES[location.pathname] ??
-    (location.pathname.startsWith('/loads/')
+    (    location.pathname.startsWith('/loads/')
       ? 'Load details'
+      : location.pathname === '/load-board'
+      ? 'Load board'
       : location.pathname.startsWith('/drivers/')
       ? 'Driver details'
       : 'Dashboard')

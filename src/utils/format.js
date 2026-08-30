@@ -161,3 +161,13 @@ export function formatRating(x10) {
   if (isNil(x10)) return '—'
   return (x10 / 10).toFixed(1)
 }
+
+export function formatRatePerMile(rateUsd, distanceMi) {
+  if (isNil(rateUsd) || isNil(distanceMi) || distanceMi === 0) return '—'
+  return `$${(rateUsd / distanceMi).toFixed(2)}/mi`
+}
+
+export function formatDeadhead(mi) {
+  if (isNil(mi)) return '—'
+  return `${Math.round(mi).toLocaleString('en-US')} mi`
+}
