@@ -19,12 +19,12 @@ import './Sidebar.css'
 
 const DEFAULT_NAV_ITEMS = [
   { to: '/', icon: SquaresFour, label: 'Dashboard', end: true },
-  { to: '/loads', icon: Package, label: 'Loads', badge: 12 },
+  { to: '/loads', icon: Package, label: 'Loads' },
   { to: '/load-board', icon: MagnifyingGlass, label: 'Load board' },
   { to: '/tracking', icon: Truck, label: 'Tracking' },
   { to: '/drivers', icon: SteeringWheel, label: 'Drivers' },
   { to: '/broker-chat', icon: ChatCircleText, label: 'Broker chat' },
-  { to: '/alerts', icon: Warning, label: 'Alerts', badge: 3 },
+  { to: '/alerts', icon: Warning, label: 'Alerts' },
   { to: '/documents', icon: FileText, label: 'Documents' },
   { to: '/dispatch-status', icon: Star, label: 'Dispatch status' },
   { to: '/settings', icon: Gear, label: 'Settings' },

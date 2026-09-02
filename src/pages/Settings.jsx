@@ -65,7 +65,7 @@ export default function Settings() {
               </div>
               <div className="settings-field">
                 <label htmlFor="settings-company">Company / team name</label>
-                <input id="settings-company" value={company} readOnly placeholder="Nova Freight LLC" />
+                <input id="settings-company" value={company} readOnly placeholder="Company name" />
               </div>
               <div className="settings-field">
                 <label>Workspaces</label>

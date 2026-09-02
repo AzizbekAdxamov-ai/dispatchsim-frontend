@@ -1,0 +1,73 @@
+.hr-filter-select {
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--text);
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+}
+
+.hr-filter-select:focus {
+  border-color: var(--accent);
+}
+
+.hr-endorsements {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.hr-endorsement-tag {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 10.5px;
+  background: var(--surface-2);
+  color: var(--text-2);
+}
+
+.hr-no-endorsement {
+  color: var(--text-3);
+}
+
+.hr-days-until {
+  color: var(--text-3);
+  font-size: 11px;
+}
+
+.hr-refreshing-indicator {
+  font-size: 11px;
+  opacity: 0.5;
+}
+
+.hr-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 0;
+}
+
+.hr-pagination button {
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--text);
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.hr-pagination button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.hr-page-info {
+  font-size: 12px;
+  color: var(--text-2);
+}

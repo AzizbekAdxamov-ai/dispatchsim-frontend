@@ -95,7 +95,7 @@ export default function Register() {
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="John Miller"
+              placeholder="Full name"
             />
           </div>
           <div className="login-field">
@@ -105,7 +105,7 @@ export default function Register() {
               required
               value={company}
               onChange={(e) => setCompany(e.target.value)}
-              placeholder="Nova Freight LLC"
+              placeholder="Company name"
             />
           </div>
           <div className="login-field">

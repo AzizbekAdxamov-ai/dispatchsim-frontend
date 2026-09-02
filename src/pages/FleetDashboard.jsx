@@ -1,7 +1,5 @@
 import { motion } from 'framer-motion'
-import AlertStrip from '../components/dashboard/AlertStrip'
 import TruckCard from '../components/fleet/TruckCard'
-import { fleetAlerts } from '../data/fleetData'
 import { listTrucks } from '../api/fleet'
 import { useResource } from '../hooks/useResource'
 import './FleetDashboard.css'
@@ -19,18 +17,12 @@ const card = {
 export default function FleetDashboard() {
   const { data, error, loading } = useResource((signal) => listTrucks(signal), [])
 
-  // fleetAlerts is out of scope this round (FleetAlerts.jsx is not
-  // touched) — the alert strip stays mock-backed.
-  const alertItems = fleetAlerts.map((a) => ({ strong: a.truckId, text: a.title }))
-
   const trucks = data?.trucks ?? []
   const counts = data?.meta?.counts
   const avgFuelPct = data?.meta?.avgFuelPct
 
   return (
     <>
-      <AlertStrip items={alertItems} />
-
       <div className="page-head">
         <div>
           <div className="page-title">Fleet overview</div>

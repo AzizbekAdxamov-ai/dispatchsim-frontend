@@ -98,11 +98,11 @@ export default function FinanceSettings() {
 
               <div className="settings-field">
                 <label htmlFor="fis-name">Full name</label>
-                <input id="fis-name" value={name} readOnly placeholder="Alex Rivera" />
+                <input id="fis-name" value={name} readOnly placeholder="Full name" />
               </div>
               <div className="settings-field">
                 <label htmlFor="fis-company">Company name</label>
-                <input id="fis-company" value={company} readOnly placeholder="Nova Freight LLC" />
+                <input id="fis-company" value={company} readOnly placeholder="Company name" />
               </div>
             </div>
           </div>

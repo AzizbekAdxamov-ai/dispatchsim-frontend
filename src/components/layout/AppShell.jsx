@@ -19,11 +19,15 @@ const TITLES = {
   '/load-board': 'Load board',
 }
 
+// Placeholder call widget. The broker is invented (see backend migration
+// 013_brokers.sql) — a fabricated call must never be attributed to a real
+// company. This is the last piece of hardcoded content in the shell; it gets
+// replaced by a real broker conversation when broker chat lands.
 const INCOMING_CALL = {
-  initials: 'CL',
-  name: 'Coyote Logistics',
+  initials: 'CF',
+  name: 'Copperfield Freight Group',
   sub: 'Broker — load #4472',
-  opening: "Hey, this is Coyote Logistics calling about load #4472. Are you still good for the Atlanta pickup tomorrow morning?",
+  opening: "Hey, this is Copperfield Freight Group calling about load #4472. Are you still good for the Atlanta pickup tomorrow morning?",
 }
 
 export default function AppShell() {

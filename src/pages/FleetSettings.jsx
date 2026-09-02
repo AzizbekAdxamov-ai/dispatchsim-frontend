@@ -80,11 +80,11 @@ export default function FleetSettings() {
 
               <div className="settings-field">
                 <label htmlFor="fs-name">Full name</label>
-                <input id="fs-name" value={name} readOnly placeholder="John Miller" />
+                <input id="fs-name" value={name} readOnly placeholder="Full name" />
               </div>
               <div className="settings-field">
                 <label htmlFor="fs-company">Company name</label>
-                <input id="fs-company" value={company} readOnly placeholder="Nova Freight LLC" />
+                <input id="fs-company" value={company} readOnly placeholder="Company name" />
               </div>
             </div>
           </div>

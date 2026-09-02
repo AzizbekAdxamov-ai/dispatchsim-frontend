@@ -165,7 +165,14 @@ export default function Drivers() {
                 ))}
               </AnimatePresence>
             )}
-            {!loading && !error && filtered.length === 0 && (
+            {!loading && !error && filtered.length === 0 && enriched.length === 0 && (
+              <tr>
+                <td colSpan={8} className="page-empty">
+                  No drivers in the fleet — hire candidates from the HR applicant market.
+                </td>
+              </tr>
+            )}
+            {!loading && !error && filtered.length === 0 && enriched.length > 0 && (
               <tr>
                 <td colSpan={8} className="page-empty">No drivers match this filter.</td>
               </tr>

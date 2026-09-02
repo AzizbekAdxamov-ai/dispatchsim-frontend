@@ -1,5 +1,8 @@
+import { useEffect, useState } from 'react'
 import { MagnifyingGlass } from '@phosphor-icons/react'
 import { EQUIPMENT_TYPES, EQUIPMENT_ORDER } from '../../data/equipmentTypes'
+import { listCities } from '../../api/loadBoard'
+import { ZONE_ORDER, ZONE_LABEL } from '../../data/zones'
 
 const SORT_OPTIONS = [
   { key: 'posted', label: 'Newest' },
@@ -16,11 +19,32 @@ const US_STATES = [
 ]
 
 export default function PostingFilters({ filters, onChange }) {
-  const { equipmentType, originState, sort, search } = filters
+  const { equipmentType, originState, originZone, destinationZone, sort, search, fromCity, fromState } = filters
+  const [cities, setCities] = useState([])
+
+  useEffect(() => {
+    let cancelled = false
+    listCities(new AbortController().signal).then((data) => {
+      if (!cancelled) setCities(data)
+    }).catch(() => {}) // silent — cities are static
+    return () => { cancelled = true }
+  }, [])
 
   function set(key, value) {
     onChange({ ...filters, [key]: value })
   }
+
+  function handleCityChange(e) {
+    const val = e.target.value
+    if (!val) {
+      onChange({ ...filters, fromCity: undefined, fromState: undefined })
+    } else {
+      const [city, state] = val.split('|')
+      onChange({ ...filters, fromCity: city, fromState: state })
+    }
+  }
+
+  const cityValue = fromCity && fromState ? `${fromCity}|${fromState}` : ''
 
   return (
     <div className="lb-filters">
@@ -64,6 +88,20 @@ export default function PostingFilters({ filters, onChange }) {
         <div className="lb-filter-group">
           <select
             className="lb-select"
+            value={cityValue}
+            onChange={handleCityChange}
+            aria-label="Deadhead from city"
+          >
+            <option value="">Deadhead — fleet</option>
+            {cities.map((c) => (
+              <option key={`${c.city}|${c.state}`} value={`${c.city}|${c.state}`}>
+                {c.city}, {c.state}
+              </option>
+            ))}
+          </select>
+
+          <select
+            className="lb-select"
             value={originState || ''}
             onChange={(e) => set('originState', e.target.value || undefined)}
             aria-label="Origin state"
@@ -71,6 +109,30 @@ export default function PostingFilters({ filters, onChange }) {
             <option value="">All states</option>
             {US_STATES.map((s) => (
               <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+
+          <select
+            className="lb-select"
+            value={originZone || ''}
+            onChange={(e) => set('originZone', e.target.value || undefined)}
+            aria-label="Origin zone"
+          >
+            <option value="">All origin zones</option>
+            {ZONE_ORDER.map((z) => (
+              <option key={z} value={z}>From {ZONE_LABEL[z]}</option>
+            ))}
+          </select>
+
+          <select
+            className="lb-select"
+            value={destinationZone || ''}
+            onChange={(e) => set('destinationZone', e.target.value || undefined)}
+            aria-label="Destination zone"
+          >
+            <option value="">All destination zones</option>
+            {ZONE_ORDER.map((z) => (
+              <option key={z} value={z}>To {ZONE_LABEL[z]}</option>
             ))}
           </select>
 

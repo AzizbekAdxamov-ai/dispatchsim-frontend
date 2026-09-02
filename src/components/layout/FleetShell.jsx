@@ -1,20 +1,21 @@
 import { Outlet, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Truck, Wrench, Warning, FileText, Gear } from '@phosphor-icons/react'
+import { Truck, Wrench, Warning, FileText, Gear, Storefront } from '@phosphor-icons/react'
 import Sidebar from './Sidebar'
 import Topbar from './Topbar'
-import { fleetAlerts } from '../../data/fleetData'
 
 const FLEET_NAV_ITEMS = [
   { to: '/fleet', icon: Truck, label: 'Fleet overview', end: true },
+  { to: '/fleet/market', icon: Storefront, label: 'Truck market' },
   { to: '/fleet/maintenance', icon: Wrench, label: 'Maintenance' },
-  { to: '/fleet/alerts', icon: Warning, label: 'Alerts', badge: fleetAlerts.length },
+  { to: '/fleet/alerts', icon: Warning, label: 'Alerts' },
   { to: '/fleet/documents', icon: FileText, label: 'Documents' },
   { to: '/fleet/settings', icon: Gear, label: 'Settings' },
 ]
 
 const TITLES = {
   '/fleet': 'Fleet overview',
+  '/fleet/market': 'Truck market',
   '/fleet/maintenance': 'Maintenance',
   '/fleet/alerts': 'Alerts',
   '/fleet/documents': 'Documents',

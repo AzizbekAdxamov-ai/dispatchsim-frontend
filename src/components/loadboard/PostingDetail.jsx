@@ -42,10 +42,18 @@ export default function PostingDetail({ posting, onClose, onBooked, onExpired })
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [result, setResult] = useState(null)
+  const [confirmed, setConfirmed] = useState(false)
 
   if (!posting) return null
 
   const eq = EQUIPMENT_TYPES[posting.equipmentType]
+
+  // C and D rated brokers get one extra click before booking. This is a
+  // company-policy speed bump, not a verdict: the panel states the rating and
+  // the payment days and lets the dispatcher decide. Booking is never blocked
+  // — the lesson lands later, when finance ages the receivable.
+  const needsBrokerConfirm =
+    posting.brokerCreditRating === 'C' || posting.brokerCreditRating === 'D'
 
   const needsAdvisory =
     posting.deadheadMi != null && posting.deadheadMi > 250 ||
@@ -202,14 +210,39 @@ export default function PostingDetail({ posting, onClose, onBooked, onExpired })
           )}
         </div>
 
+        {posting.brokerMcNumber && (
+          <div className="lb-broker-card">
+            <div className="lb-broker-card-head">Broker</div>
+            <dl className="lb-broker-facts">
+              <div><dt>Company</dt><dd>{posting.broker}</dd></div>
+              <div><dt>Contact</dt><dd>{posting.brokerContactName}</dd></div>
+              <div><dt>MC number</dt><dd className="mono">{posting.brokerMcNumber}</dd></div>
+              <div><dt>Credit rating</dt><dd className="mono">{posting.brokerCreditRating}</dd></div>
+              <div><dt>Pays in</dt><dd className="mono">{posting.brokerDaysToPay} days</dd></div>
+            </dl>
+          </div>
+        )}
+
         <div className="lb-detail-footer">
+          {needsBrokerConfirm && !confirmed && !result && (
+            <p className="lb-broker-confirm">
+              {posting.broker} is rated {posting.brokerCreditRating} and pays in{' '}
+              {posting.brokerDaysToPay} days. The invoice will age accordingly.
+            </p>
+          )}
           <button
             type="button"
             className="lb-book-btn"
-            onClick={handleBook}
+            onClick={needsBrokerConfirm && !confirmed ? () => setConfirmed(true) : handleBook}
             disabled={busy || result}
           >
-            {busy ? 'Booking…' : result ? 'Booked' : 'Book load'}
+            {busy
+              ? 'Booking…'
+              : result
+              ? 'Booked'
+              : needsBrokerConfirm && !confirmed
+              ? 'Book anyway'
+              : 'Book load'}
           </button>
         </div>
       </motion.div>

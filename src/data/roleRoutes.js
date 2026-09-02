@@ -21,6 +21,7 @@ export const ROLE_LABEL = {
 export const ROLE_HOME = {
   'fleet-manager': '/fleet',
   finance: '/finance',
+  hr: '/hr',
 }
 
 export function roleHomePath(roleKey) {

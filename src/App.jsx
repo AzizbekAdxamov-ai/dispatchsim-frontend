@@ -18,6 +18,7 @@ import Drivers from './pages/Drivers'
 import DriverDetail from './pages/DriverDetail'
 import BrokerChat from './pages/BrokerChat'
 import FleetDashboard from './pages/FleetDashboard'
+import TruckMarket from './pages/TruckMarket'
 import TruckDetail from './pages/TruckDetail'
 import FleetMaintenance from './pages/FleetMaintenance'
 import FleetAlerts from './pages/FleetAlerts'
@@ -35,6 +36,10 @@ import FinanceSettlements from './pages/FinanceSettlements'
 import FinanceExpenses from './pages/FinanceExpenses'
 import FinanceSettings from './pages/FinanceSettings'
 import LoadBoard from './pages/LoadBoard'
+import HrShell from './components/layout/HrShell'
+import HrApplicants from './pages/HrApplicants'
+import HrApplicantDetail from './pages/HrApplicantDetail'
+import HrDrivers from './pages/HrDrivers'
 
 export default function App() {
   return (
@@ -74,6 +79,7 @@ export default function App() {
             }
           >
             <Route index element={<FleetDashboard />} />
+            <Route path="market" element={<TruckMarket />} />
             <Route path="trucks/:id" element={<TruckDetail />} />
             <Route path="maintenance" element={<FleetMaintenance />} />
             <Route path="alerts" element={<FleetAlerts />} />
@@ -94,6 +100,18 @@ export default function App() {
             <Route path="settlements" element={<FinanceSettlements />} />
             <Route path="expenses" element={<FinanceExpenses />} />
             <Route path="settings" element={<FinanceSettings />} />
+          </Route>
+          <Route
+            path="/hr"
+            element={
+              <ProtectedRoute allow={['hr']}>
+                <HrShell />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<HrApplicants />} />
+            <Route path="applicants/:id" element={<HrApplicantDetail />} />
+            <Route path="drivers" element={<HrDrivers />} />
           </Route>
           <Route
             path="/admin"

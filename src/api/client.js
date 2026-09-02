@@ -1,4 +1,8 @@
-const BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:4000'
+// Exported so non-JSON endpoints (the rate confirmation PDF) hit the same
+// origin as everything else. A relative fetch would land on the Vite dev
+// server instead of the API and 404 every time.
+export const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:4000'
+const BASE = API_BASE
 
 const TOKEN_KEY = 'dispatchsim.token'
 

@@ -39,8 +39,21 @@ function deadheadClass(mi) {
   return 'lb-dh-red'
 }
 
+const STORAGE_KEY = 'lb-filters'
+
+function loadSavedFilters() {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY)
+    return raw ? JSON.parse(raw) : null
+  } catch { return null }
+}
+
+function saveFilters(filters) {
+  try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(filters)) } catch {}
+}
+
 export default function LoadBoard() {
-  const [filters, setFilters] = useState({ sort: 'posted' })
+  const [filters, setFilters] = useState(() => ({ sort: 'posted', ...loadSavedFilters() }))
   const [selected, setSelected] = useState(null)
 
   const fetchPostings = useCallback(
@@ -49,6 +62,10 @@ export default function LoadBoard() {
         {
           equipmentType: filters.equipmentType,
           originState: filters.originState,
+          originZone: filters.originZone,
+          destinationZone: filters.destinationZone,
+          fromCity: filters.fromCity,
+          fromState: filters.fromState,
           sort: filters.sort,
           limit: PAGE_SIZE,
         },
@@ -56,14 +73,23 @@ export default function LoadBoard() {
       )
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [filters.equipmentType, filters.originState, filters.sort],
+    [filters.equipmentType, filters.originState, filters.originZone, filters.destinationZone, filters.fromCity, filters.fromState, filters.sort],
   )
 
   const { data, error, loading, refetch } = useResource(fetchPostings, [
     filters.equipmentType,
     filters.originState,
+    filters.originZone,
+    filters.destinationZone,
+    filters.fromCity,
+    filters.fromState,
     filters.sort,
   ])
+
+  function handleFiltersChange(f) {
+    setFilters(f)
+    saveFilters(f)
+  }
 
   const postings = useMemo(() => {
     if (!data?.postings) return []
@@ -97,7 +123,7 @@ export default function LoadBoard() {
         </div>
       </div>
 
-      <PostingFilters filters={filters} onChange={setFilters} />
+      <PostingFilters filters={filters} onChange={handleFiltersChange} />
 
       <div className="lb-result-count">
         {loading ? '…' : `${postings.length} posting${postings.length !== 1 ? 's' : ''}`}
@@ -109,7 +135,11 @@ export default function LoadBoard() {
             <tr>
               <th>Age</th>
               <th>Route</th>
-              <th>Deadhead</th>
+              <th>{data?.meta?.deadheadFrom?.kind === 'location'
+                ? `Deadhead — ${data.meta.deadheadFrom.city}, ${data.meta.deadheadFrom.state}`
+                : data?.meta?.deadheadFrom?.kind === 'driver'
+                  ? `Deadhead — ${data.meta.deadheadFrom.driverName}`
+                  : 'Deadhead'}</th>
               <th>Equipment</th>
               <th>Rate</th>
               <th>$/mi</th>

@@ -235,3 +235,48 @@
   opacity: 0.5;
   cursor: default;
 }
+
+/* Broker profile card. Facts only — no colour coding by rating, no warning
+   icon. A dispatcher has to read the rating and the payment days and make
+   the call; a red badge would make that judgement for them. */
+.lb-broker-card {
+  border-top: 1px solid var(--line, rgba(0, 0, 0, 0.08));
+  padding: 14px 18px 4px;
+}
+
+.lb-broker-card-head {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-2, #6b6b6b);
+  margin-bottom: 8px;
+}
+
+.lb-broker-facts {
+  margin: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.lb-broker-facts > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.lb-broker-facts dt {
+  color: var(--text-2, #6b6b6b);
+}
+
+.lb-broker-facts dd {
+  margin: 0;
+  text-align: right;
+}
+
+.lb-broker-confirm {
+  margin: 0 0 10px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--text-2, #6b6b6b);
+}
