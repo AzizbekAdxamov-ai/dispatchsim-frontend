@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { X, Warning, CheckCircle } from '@phosphor-icons/react'
-import { ApiError } from '../../api/client'
-import { bookPosting } from '../../api/loadBoard'
+import { X, Warning, ChatCircleText } from '@phosphor-icons/react'
+import { listChecks } from '../../api/brokerCheck'
+import { useResource } from '../../hooks/useResource'
 import { EQUIPMENT_TYPES } from '../../data/equipmentTypes'
 import {
   formatPlace,
@@ -17,67 +17,32 @@ import {
 } from '../../utils/format'
 import './PostingDetail.css'
 
-const WARNING_TEXT = {
-  'no-matching-equipment': 'No truck in the fleet is set up for this trailer type.',
-  'no-available-driver': 'No driver is free for this pickup right now.',
-  'tight-pickup-window': 'The nearest driver may not reach this pickup within their remaining hours.',
+function formatCheckedAt(iso) {
+  if (!iso) return ''
+  return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 }
 
-const ERROR_MESSAGES = {
-  POSTING_TAKEN: 'This load was already booked by another dispatcher.',
-  POSTING_EXPIRED: 'This posting has expired.',
-  POSTING_NOT_FOUND: 'This posting is no longer available.',
-}
-
-function loadErrorMessage(err) {
-  if (err instanceof ApiError) {
-    if (err.code === 'NETWORK_ERROR') return 'Cannot reach the server.'
-    if (ERROR_MESSAGES[err.code]) return ERROR_MESSAGES[err.code]
-    return err.message || 'Something went wrong. Please try again.'
-  }
-  return 'Something went wrong. Please try again.'
-}
-
-export default function PostingDetail({ posting, onClose, onBooked, onExpired }) {
-  const [busy, setBusy] = useState(false)
-  const [error, setError] = useState('')
-  const [result, setResult] = useState(null)
-  const [confirmed, setConfirmed] = useState(false)
+export default function PostingDetail({ posting, onClose }) {
+  // The dispatcher's own lookup journal. Matched by MC number rather than
+  // fetched per posting, because it is small (100 rows) and this way the
+  // panel needs no new endpoint. A broker they have never run shows
+  // nothing at all — not a warning, not a nudge, just the link.
+  const fetchChecks = useCallback(async (signal) => await listChecks(signal), [])
+  const { data: checkData } = useResource(fetchChecks, [])
 
   if (!posting) return null
 
   const eq = EQUIPMENT_TYPES[posting.equipmentType]
 
-  // C and D rated brokers get one extra click before booking. This is a
-  // company-policy speed bump, not a verdict: the panel states the rating and
-  // the payment days and lets the dispatcher decide. Booking is never blocked
-  // — the lesson lands later, when finance ages the receivable.
-  const needsBrokerConfirm =
-    posting.brokerCreditRating === 'C' || posting.brokerCreditRating === 'D'
+  const myCheck = posting.brokerMcNumber
+    ? (checkData?.checks ?? []).find(
+        (c) => c.mcNumber === posting.brokerMcNumber && c.brokerId != null,
+      )
+    : null
 
   const needsAdvisory =
     posting.deadheadMi != null && posting.deadheadMi > 250 ||
     posting.nearestDriver == null
-
-  async function handleBook() {
-    setBusy(true)
-    setError('')
-    setResult(null)
-    try {
-      const res = await bookPosting(posting.id)
-      setResult(res)
-      onBooked?.(res)
-    } catch (err) {
-      if (err?.name === 'AbortError') return
-      const code = err instanceof ApiError ? err.code : null
-      if (code === 'POSTING_TAKEN' || code === 'POSTING_EXPIRED') {
-        onExpired?.(code)
-      }
-      setError(loadErrorMessage(err))
-    } finally {
-      setBusy(false)
-    }
-  }
 
   return (
     <motion.div
@@ -179,71 +144,49 @@ export default function PostingDetail({ posting, onClose, onBooked, onExpired })
             </div>
           )}
 
-          {error && (
-            <div className="lb-detail-error">
-              <Warning size={15} weight="fill" />
-              <span>{error}</span>
-            </div>
-          )}
-
-          {result && (
-            <div className="lb-detail-success">
-              <CheckCircle size={15} weight="fill" />
-              <div>
-                <div>Load <span className="mono">{result.load?.id}</span> created.</div>
-                <Link
-                  to={`/loads/${result.load?.id}`}
-                  className="lb-detail-link"
-                  onClick={onClose}
-                >
-                  View load →
-                </Link>
-                {result.warnings?.length > 0 && (
-                  <ul className="lb-detail-warnings">
-                    {result.warnings.map((w, i) => (
-                      <li key={i}>{WARNING_TEXT[w] || w}</li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </div>
-          )}
         </div>
 
         {posting.brokerMcNumber && (
           <div className="lb-broker-card">
             <div className="lb-broker-card-head">Broker</div>
+            {/* Company, contact, MC number. No credit rating and no payment
+                days: printing them here would be the program passing a
+                verdict, and it would remove any reason to ever run the
+                number. The rating still decides the load's payment terms
+                at booking — it just is not handed over unasked. */}
             <dl className="lb-broker-facts">
               <div><dt>Company</dt><dd>{posting.broker}</dd></div>
               <div><dt>Contact</dt><dd>{posting.brokerContactName}</dd></div>
               <div><dt>MC number</dt><dd className="mono">{posting.brokerMcNumber}</dd></div>
-              <div><dt>Credit rating</dt><dd className="mono">{posting.brokerCreditRating}</dd></div>
-              <div><dt>Pays in</dt><dd className="mono">{posting.brokerDaysToPay} days</dd></div>
             </dl>
+
+            {myCheck ? (
+              <div className="lb-broker-check">
+                You ran this MC on {formatCheckedAt(myCheck.checkedAt)}:{' '}
+                <span className="mono">{myCheck.creditRating}</span>, pays in{' '}
+                <span className="mono">{myCheck.daysToPay}</span> days.
+              </div>
+            ) : (
+              <Link to="/broker-check" className="lb-broker-check-link" onClick={onClose}>
+                Run this MC number →
+              </Link>
+            )}
           </div>
         )}
 
+        {/* No booking button. A load starts with a conversation: you talk
+            to the broker, settle a rate, they send the rate confirmation,
+            you read it and sign it. That last step is what creates the
+            load — see acceptRateCon in api/brokerChat.js. */}
         <div className="lb-detail-footer">
-          {needsBrokerConfirm && !confirmed && !result && (
-            <p className="lb-broker-confirm">
-              {posting.broker} is rated {posting.brokerCreditRating} and pays in{' '}
-              {posting.brokerDaysToPay} days. The invoice will age accordingly.
-            </p>
-          )}
-          <button
-            type="button"
+          <Link
+            to={`/broker-chat?posting=${encodeURIComponent(posting.id)}`}
             className="lb-book-btn"
-            onClick={needsBrokerConfirm && !confirmed ? () => setConfirmed(true) : handleBook}
-            disabled={busy || result}
+            onClick={onClose}
           >
-            {busy
-              ? 'Booking…'
-              : result
-              ? 'Booked'
-              : needsBrokerConfirm && !confirmed
-              ? 'Book anyway'
-              : 'Book load'}
-          </button>
+            <ChatCircleText size={15} weight="fill" />
+            Contact broker
+          </Link>
         </div>
       </motion.div>
     </motion.div>

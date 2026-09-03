@@ -215,6 +215,15 @@
 }
 
 .lb-book-btn {
+  /* Rendered as a <Link> since 2026-09-02 — it opens the broker thread
+     rather than submitting anything, so it needs the layout an <a> does
+     not get for free. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  text-decoration: none;
+  box-sizing: border-box;
   width: 100%;
   padding: 10px 16px;
   border-radius: 8px;
@@ -279,4 +288,25 @@
   font-size: 12.5px;
   line-height: 1.45;
   color: var(--text-2, #6b6b6b);
+}
+
+/* The dispatcher's own lookup, shown only if they made one. Reads as a
+   note they left themselves, not as the program volunteering a rating. */
+.lb-broker-check {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-soft);
+  font-size: 11.5px;
+  color: var(--text-2);
+}
+
+.lb-broker-check-link {
+  display: inline-block;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-soft);
+  width: 100%;
+  font-size: 11.5px;
+  color: var(--accent);
+  text-decoration: none;
 }

@@ -425,3 +425,107 @@
   border-left: 2px solid var(--text-2, #6b6b6b);
   color: var(--text-1, #2a2a2a);
 }
+
+/* ------------------------------------------------------------------ */
+/* Rate confirmation, waiting state and the accepted bar (2026-09-02)  */
+/* ------------------------------------------------------------------ */
+
+/* The rate confirmation is not a chat bubble. It is the document the
+   whole conversation was heading towards, so it sits full width and
+   reads like paper rather than like something the broker said. */
+.bc-ratecon {
+  align-self: stretch;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-2);
+  padding: 12px 14px;
+}
+
+.bc-ratecon-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-2);
+  margin-bottom: 7px;
+}
+
+.bc-ratecon-body {
+  font-size: 12.5px;
+  margin-bottom: 11px;
+}
+
+.bc-ratecon-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.bc-accept-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: var(--accent);
+  color: var(--accent-contrast, #fff);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bc-accept-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Says that a reply is coming, never how long it will take. A countdown
+   would hand back the one thing the delay is there to teach: that you
+   cannot sit and wait, you go work another load. */
+.bc-waiting {
+  align-self: flex-start;
+  font-size: 11.5px;
+  color: var(--text-3);
+  font-style: italic;
+  padding: 2px 4px;
+}
+
+.bc-agreed-sub {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-3);
+}
+
+.bc-booked-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--panel-3);
+  border-radius: 8px;
+  margin-bottom: 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.bc-booked-link {
+  margin-left: auto;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 11.5px;
+}
+
+.bc-booked-warnings {
+  margin: 0 0 10px;
+  padding-left: 18px;
+  font-size: 11.5px;
+  color: var(--text-2);
+}
+
+.bc-booked-warnings li {
+  margin-bottom: 3px;
+}

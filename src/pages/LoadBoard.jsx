@@ -76,15 +76,24 @@ export default function LoadBoard() {
     [filters.equipmentType, filters.originState, filters.originZone, filters.destinationZone, filters.fromCity, filters.fromState, filters.sort],
   )
 
-  const { data, error, loading, refetch } = useResource(fetchPostings, [
-    filters.equipmentType,
-    filters.originState,
-    filters.originZone,
-    filters.destinationZone,
-    filters.fromCity,
-    filters.fromState,
-    filters.sort,
-  ])
+  // Polled rather than refetched on demand: with the booking button gone
+  // the board has no action of its own to react to, but postings still
+  // drip on and expire underneath it, and a load booked in a broker
+  // thread has to disappear from here without a manual reload.
+  // `loading` stays false during a poll, so the list does not flash.
+  const { data, error, loading } = useResource(
+    fetchPostings,
+    [
+      filters.equipmentType,
+      filters.originState,
+      filters.originZone,
+      filters.destinationZone,
+      filters.fromCity,
+      filters.fromState,
+      filters.sort,
+    ],
+    { pollMs: 30000 },
+  )
 
   function handleFiltersChange(f) {
     setFilters(f)
@@ -104,15 +113,9 @@ export default function LoadBoard() {
     )
   }, [data, filters.search])
 
-  function handleBooked() {
-    setSelected(null)
-    refetch()
-  }
-
-  function handleExpired() {
-    setSelected(null)
-    refetch()
-  }
+  // handleBooked/handleExpired are gone with the booking button. A load is
+  // created in the broker thread now, so the board has nothing to react to
+  // beyond its own polling.
 
   return (
     <>
@@ -203,6 +206,11 @@ export default function LoadBoard() {
                       <td>{p.broker}</td>
                       <td className="mono">{formatDateTime(p.expiresAt)}</td>
                       <td>
+                        {/* This never booked anything -- it opens the detail
+                            panel, same as clicking the row. Labelling it
+                            "Book" was already loose; now that a load only
+                            exists once a rate confirmation is signed, it
+                            would be a straight lie. */}
                         <button
                           type="button"
                           className="lb-book-mini"
@@ -211,7 +219,7 @@ export default function LoadBoard() {
                             setSelected(p)
                           }}
                         >
-                          Book
+                          Open
                         </button>
                       </td>
                     </motion.tr>
@@ -233,8 +241,6 @@ export default function LoadBoard() {
           <PostingDetail
             posting={selected}
             onClose={() => setSelected(null)}
-            onBooked={handleBooked}
-            onExpired={handleExpired}
           />
         )}
       </AnimatePresence>

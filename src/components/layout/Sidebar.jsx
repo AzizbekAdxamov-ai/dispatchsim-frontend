@@ -24,6 +24,7 @@ const DEFAULT_NAV_ITEMS = [
   { to: '/tracking', icon: Truck, label: 'Tracking' },
   { to: '/drivers', icon: SteeringWheel, label: 'Drivers' },
   { to: '/broker-chat', icon: ChatCircleText, label: 'Broker chat' },
+  { to: '/broker-check', icon: ShieldCheck, label: 'Broker check' },
   { to: '/alerts', icon: Warning, label: 'Alerts' },
   { to: '/documents', icon: FileText, label: 'Documents' },
   { to: '/dispatch-status', icon: Star, label: 'Dispatch status' },

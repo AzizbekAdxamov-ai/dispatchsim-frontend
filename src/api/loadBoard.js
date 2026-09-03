@@ -32,9 +32,8 @@ export function getPosting(id, { fromCity, fromState } = {}, signal) {
   return api.get(`/load-board/${encodeURIComponent(id)}${qs ? `?${qs}` : ''}`, { auth: true, signal })
 }
 
-export function bookPosting(id, { driverId } = {}, signal) {
-  return api.post(`/load-board/${encodeURIComponent(id)}/book`, { driverId }, { auth: true, signal })
-}
+// bookPosting is gone (2026-09-02). A load is created by accepting the
+// broker's rate confirmation — see acceptRateCon in api/brokerChat.js.
 
 export function listCities(signal) {
   return api.get('/load-board/cities', { auth: true, signal })

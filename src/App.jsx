@@ -17,6 +17,7 @@ import Settings from './pages/Settings'
 import Drivers from './pages/Drivers'
 import DriverDetail from './pages/DriverDetail'
 import BrokerChat from './pages/BrokerChat'
+import BrokerCheck from './pages/BrokerCheck'
 import FleetDashboard from './pages/FleetDashboard'
 import TruckMarket from './pages/TruckMarket'
 import TruckDetail from './pages/TruckDetail'
@@ -65,6 +66,7 @@ export default function App() {
             <Route path="drivers" element={<Drivers />} />
             <Route path="drivers/:id" element={<DriverDetail />} />
             <Route path="broker-chat" element={<BrokerChat />} />
+            <Route path="broker-check" element={<BrokerCheck />} />
             <Route path="alerts" element={<Alerts />} />
             <Route path="documents" element={<Documents />} />
             <Route path="dispatch-status" element={<DispatchStatus />} />
