@@ -32,12 +32,13 @@ function ageLabel(iso) {
   return `${days}d ${hrs % 24}h`
 }
 
-function deadheadClass(mi) {
-  if (mi == null) return ''
-  if (mi <= 100) return 'lb-dh-green'
-  if (mi <= 250) return 'lb-dh-amber'
-  return 'lb-dh-red'
-}
+// Deadhead is stated, not graded. It used to be painted green under 100
+// miles, amber under 250 and red beyond — the program deciding, on the
+// dispatcher's behalf, which runs were worth making, eight lines away from
+// the comment explaining why the broker's credit rating is deliberately
+// withheld from the same card. The number is the fact; what it is worth
+// depends on the rate, the lane and who is sitting where, and that
+// judgement belongs to the student.
 
 const STORAGE_KEY = 'lb-filters'
 
@@ -187,7 +188,7 @@ export default function LoadBoard() {
                         </div>
                         <div className="lb-route-sub">{formatDistance(p.distanceMi)}</div>
                       </td>
-                      <td className={'mono ' + deadheadClass(p.deadheadMi)}>
+                      <td className="mono">
                         {formatDeadhead(p.deadheadMi)}
                       </td>
                       <td>

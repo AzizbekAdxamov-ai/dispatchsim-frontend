@@ -14,6 +14,19 @@ export function listLoads({ status, equipmentType, search, page, limit } = {}, s
   return api.get(`/loads${qs ? `?${qs}` : ''}`, { auth: true, signal })
 }
 
+// Put a driver on a booked load and start the clock. The truck is not
+// sent — the server uses whichever truck that driver is assigned to, so
+// the client cannot pair a driver with someone else's truck.
+export function dispatchLoad(id, driverId, signal) {
+  return api.post(`/loads/${encodeURIComponent(id)}/dispatch`, { driverId }, { auth: true, signal })
+}
+
+// Take the load back off the driver. Only before delivery — a delivered
+// load has an invoice against it and cash has already moved.
+export function cancelDispatch(id, signal) {
+  return api.post(`/loads/${encodeURIComponent(id)}/cancel`, {}, { auth: true, signal })
+}
+
 export function getLoad(id, signal) {
   return api.get(`/loads/${encodeURIComponent(id)}`, { auth: true, signal })
 }

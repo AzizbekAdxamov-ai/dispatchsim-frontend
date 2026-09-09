@@ -18,8 +18,10 @@ import Drivers from './pages/Drivers'
 import DriverDetail from './pages/DriverDetail'
 import BrokerChat from './pages/BrokerChat'
 import BrokerCheck from './pages/BrokerCheck'
+import CashLedger from './pages/CashLedger'
 import FleetDashboard from './pages/FleetDashboard'
 import TruckMarket from './pages/TruckMarket'
+import TruckListingDetail from './pages/TruckListingDetail'
 import TruckDetail from './pages/TruckDetail'
 import FleetMaintenance from './pages/FleetMaintenance'
 import FleetAlerts from './pages/FleetAlerts'
@@ -67,6 +69,7 @@ export default function App() {
             <Route path="drivers/:id" element={<DriverDetail />} />
             <Route path="broker-chat" element={<BrokerChat />} />
             <Route path="broker-check" element={<BrokerCheck />} />
+            <Route path="cash" element={<CashLedger />} />
             <Route path="alerts" element={<Alerts />} />
             <Route path="documents" element={<Documents />} />
             <Route path="dispatch-status" element={<DispatchStatus />} />
@@ -82,6 +85,7 @@ export default function App() {
           >
             <Route index element={<FleetDashboard />} />
             <Route path="market" element={<TruckMarket />} />
+            <Route path="market/:id" element={<TruckListingDetail />} />
             <Route path="trucks/:id" element={<TruckDetail />} />
             <Route path="maintenance" element={<FleetMaintenance />} />
             <Route path="alerts" element={<FleetAlerts />} />
@@ -101,6 +105,7 @@ export default function App() {
             <Route path="invoices/:id" element={<InvoiceDetail />} />
             <Route path="settlements" element={<FinanceSettlements />} />
             <Route path="expenses" element={<FinanceExpenses />} />
+            <Route path="cashflow" element={<CashLedger />} />
             <Route path="settings" element={<FinanceSettings />} />
           </Route>
           <Route

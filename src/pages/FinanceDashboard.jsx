@@ -33,7 +33,7 @@ export default function FinanceDashboard() {
     return { overview, invoiceCounts: invoicesPage.meta.counts, settlements: settlements.settlements }
   }, [])
 
-  const { data, error, loading } = useResource(fetchAll, [])
+  const { data, error, loading } = useResource(fetchAll, [], { pollMs: 20000 })
 
   if (loading) return <div className="page-empty">Loading financial overview…</div>
   if (error) return <div className="page-empty">Could not load the financial overview — {error.message}</div>

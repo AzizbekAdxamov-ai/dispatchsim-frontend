@@ -34,7 +34,7 @@ export default function InvoiceDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
 
-  const { data: invoice, error, loading } = useResource((signal) => getInvoice(id, signal), [id])
+  const { data: invoice, error, loading } = useResource((signal) => getInvoice(id, signal), [id], { pollMs: 20000 })
 
   if (loading) {
     return <div className="panel invoice-detail-missing"><p>Loading invoice…</p></div>

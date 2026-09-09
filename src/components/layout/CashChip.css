@@ -1,0 +1,44 @@
+/* No colour by value. A negative balance is shown with a minus sign and
+   nothing else -- the credit line is a legitimate tool, not a failure
+   state, and painting it red would be the program passing judgment on a
+   decision the student is meant to weigh themselves. */
+.cash-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 5px 11px;
+  border-radius: 7px;
+  border: 1px solid var(--border-soft);
+  background: var(--panel-2);
+  text-decoration: none;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.cash-chip:hover {
+  background: var(--panel-3);
+}
+
+.cash-chip-label {
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-3);
+}
+
+.cash-chip-value {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cash-chip-sub {
+  font-size: 10.5px;
+  color: var(--text-3);
+}
+
+/* Shown when the balance could not be read. States that it is unknown
+   rather than removing the number from the page. */
+.cash-chip-error {
+  cursor: default;
+  opacity: 0.65;
+}

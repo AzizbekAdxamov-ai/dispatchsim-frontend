@@ -3,12 +3,14 @@ import { Phone, Envelope } from '@phosphor-icons/react'
 import { FLEET_STATUS_LABEL } from '../data/fleetData'
 import { getTruck } from '../api/fleet'
 import { useResource } from '../hooks/useResource'
+import AssignDriverPanel from '../components/fleet/AssignDriverPanel'
 import { formatMiles, formatMonthDay, formatWeekday, formatMoney } from '../utils/format'
 import WaveFuelGauge from '../components/fleet/WaveFuelGauge'
 import CostDonut from '../components/fleet/CostDonut'
 import TireRing from '../components/fleet/TireRing'
 import FuelTrendChart from '../components/fleet/FuelTrendChart'
 import WeeklyDistanceChart from '../components/fleet/WeeklyDistanceChart'
+import '../components/dashboard/Panel.css'
 import '../components/fleet/FleetWidgets.css'
 import './TruckDetail.css'
 
@@ -38,7 +40,7 @@ export default function TruckDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
 
-  const { data: truck, error, loading } = useResource((signal) => getTruck(id, signal), [id])
+  const { data: truck, error, loading, refetch } = useResource((signal) => getTruck(id, signal), [id], { pollMs: 30000 })
 
   if (loading) {
     return <div className="panel truck-detail-missing"><p>Loading truck…</p></div>
@@ -115,6 +117,17 @@ export default function TruckDetail() {
           </button>
         </div>
       </div>
+
+      {/* A truck with nobody in it cannot move freight, and until now there
+          was no way to change that anywhere in the app: the assign endpoint
+          existed but nothing called it. This is the step between buying a
+          truck and dispatching a load. */}
+      {!truck.driver && (
+        <div className="panel" style={{ marginBottom: 16 }}>
+          <div className="panel-head"><div className="panel-title">No driver in this truck</div></div>
+          <AssignDriverPanel truckId={truck.id} onAssigned={refetch} />
+        </div>
+      )}
 
       <div className="truck-stat-mini-row">
         <div className="truck-stat-mini">

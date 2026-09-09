@@ -133,6 +133,20 @@ export default function AdminUsers() {
     setTimeout(() => setNotice(''), 6000)
   }
 
+  async function handleDelete(user) {
+    if (!window.confirm(`Delete ${user.name} (${user.email})? This cannot be undone.`)) return
+    try {
+      await api.del(`/admin/users/${user.id}`, { auth: true })
+      setNotice(`${user.name} has been deleted.`)
+      fetchUsers()
+      setTimeout(() => setNotice(''), 6000)
+    } catch (err) {
+      const msg = err instanceof ApiError ? err.message : 'Delete failed.'
+      setNotice(msg)
+      setTimeout(() => setNotice(''), 6000)
+    }
+  }
+
   function toggleSelected(id) {
     setSelected((prev) => {
       const next = new Set(prev)
@@ -276,6 +290,7 @@ export default function AdminUsers() {
         <UserTable
           users={users}
           onManage={handleManage}
+          onDelete={handleDelete}
           selectedIds={selected}
           onToggle={toggleSelected}
           onToggleAll={toggleSelectAll}

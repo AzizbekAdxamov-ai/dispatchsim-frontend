@@ -1,10 +1,7 @@
-import { useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import Sidebar from './Sidebar'
 import Topbar from './Topbar'
-import CallWidget from '../widgets/CallWidget'
-import CallChat from '../widgets/CallChat'
 
 const TITLES = {
   '/': 'Dashboard',
@@ -17,22 +14,12 @@ const TITLES = {
   '/dispatch-status': 'Dispatch status',
   '/settings': 'Settings',
   '/load-board': 'Load board',
-}
-
-// Placeholder call widget. The broker is invented (see backend migration
-// 013_brokers.sql) — a fabricated call must never be attributed to a real
-// company. This is the last piece of hardcoded content in the shell; it gets
-// replaced by a real broker conversation when broker chat lands.
-const INCOMING_CALL = {
-  initials: 'CF',
-  name: 'Copperfield Freight Group',
-  sub: 'Broker — load #4472',
-  opening: "Hey, this is Copperfield Freight Group calling about load #4472. Are you still good for the Atlanta pickup tomorrow morning?",
+  '/broker-check': 'Broker check',
+  '/cash': 'Cash',
 }
 
 export default function AppShell() {
   const location = useLocation()
-  const [callState, setCallState] = useState('ringing')
 
   const title =
     TITLES[location.pathname] ??
@@ -48,11 +35,8 @@ export default function AppShell() {
     <div className="app" style={{ position: 'relative', display: 'flex', minHeight: '100vh' }}>
       <Sidebar />
       <div className="main" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-        <Topbar
-          title={title}
-          onPhoneClick={() => setCallState((s) => (s === 'ringing' ? 'ringing' : 'ringing'))}
-        />
-        <div className="content" style={{ padding: '20px 24px 100px', overflowY: 'auto' }}>
+        <Topbar title={title} />
+        <div className="content" style={{ padding: '20px 24px 20px', overflowY: 'auto' }}>
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}
@@ -67,19 +51,6 @@ export default function AppShell() {
         </div>
       </div>
 
-      <AnimatePresence>
-        {callState === 'ringing' && (
-          <CallWidget
-            key="call-widget"
-            call={INCOMING_CALL}
-            onAccept={() => setCallState('active')}
-            onDecline={() => setCallState('ended')}
-          />
-        )}
-        {callState === 'active' && (
-          <CallChat key="call-chat" call={INCOMING_CALL} onEnd={() => setCallState('ended')} />
-        )}
-      </AnimatePresence>
     </div>
   )
 }

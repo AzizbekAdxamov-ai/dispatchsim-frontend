@@ -1,12 +1,14 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
-import { Envelope, Phone, FileText, Check, Warning } from '@phosphor-icons/react'
+import { Check, Warning } from '@phosphor-icons/react'
 import { STATUS_LABEL } from '../data/mockData'
 import { EQUIPMENT_TYPES, formatEquipment } from '../data/equipmentTypes'
 import { useTheme } from '../theme/ThemeProvider'
-import { getLoad } from '../api/loads'
+import { getLoad, cancelDispatch } from '../api/loads'
+import { ApiError } from '../api/client'
+import DispatchPanel from '../components/loads/DispatchPanel'
 import { useResource } from '../hooks/useResource'
 import { formatMoney, formatWeight, formatDateTime, formatCdl, formatHos, formatPlace, formatDistance } from '../utils/format'
 import '../components/dashboard/Panel.css'
@@ -47,7 +49,17 @@ export default function LoadDetail() {
   const pageRef = useRef(null)
   const { theme } = useTheme()
 
-  const { data: load, error, loading } = useResource((signal) => getLoad(id, signal), [id])
+  // Polled: a load in transit is delivered by a background tick, not by
+  // anything on this page, so without this the status would sit stale
+  // until the user reloaded.
+  // Undoing a dispatch. A load sent to the wrong driver used to have no
+  // way back — 'ontime' led only to the tick, and the tick only to 'done'.
+  const [cancelling, setCancelling] = useState(false)
+  const [cancelError, setCancelError] = useState('')
+
+  const { data: load, error, loading, refetch } = useResource(
+    (signal) => getLoad(id, signal), [id], { pollMs: 15000 },
+  )
 
   useGSAP(() => {
     if (!load) return
@@ -105,6 +117,25 @@ export default function LoadDetail() {
       ? `Driver has ${formatHos(load.driver.hosRemainingMin)} left before mandatory rest`
       : null
 
+  async function handleCancel() {
+    if (cancelling) return
+    setCancelError('')
+    setCancelling(true)
+    try {
+      await cancelDispatch(id)
+      refetch()
+    } catch (err) {
+      if (err?.name === 'AbortError') return
+      setCancelError(
+        err instanceof ApiError && err.code === 'LOAD_NOT_CANCELLABLE'
+          ? 'This load has already been delivered.'
+          : err?.message || 'Could not take the load back.',
+      )
+    } finally {
+      setCancelling(false)
+    }
+  }
+
   return (
     <div ref={pageRef}>
       <div className="load-detail-crumbs">
@@ -126,14 +157,12 @@ export default function LoadDetail() {
             {originLabel} <b>→</b> {destinationLabel} &nbsp;·&nbsp; <b>{formatDistance(load.distanceMi)}</b> &nbsp;·&nbsp; {load.broker}
           </div>
         </div>
-        <div className="load-detail-actions">
-          <button className="load-detail-btn" disabled={!load.driver}>
-            <Envelope size={14} aria-hidden="true" /> Message driver
-          </button>
-          <button className="load-detail-btn primary">
-            <Phone size={14} aria-hidden="true" /> Call broker
-          </button>
-        </div>
+        {/* "Message driver" and "Call broker" lived here with no onClick
+            and no endpoint behind either of them — one of twenty-two dead
+            controls an audit found across the app on 2026-09-08. A button
+            that looks live and does nothing teaches a student that the
+            software is broken, which is the one lesson this is not for.
+            They come back when there is something behind them. */}
       </div>
 
       <div className="load-detail-timeline">
@@ -216,12 +245,31 @@ export default function LoadDetail() {
                     <Link to={'/drivers/' + load.driver.id} className="row-primary-link">{load.driver.name}</Link>
                   </div>
                   <div className="ld-driver-meta">{formatCdl(load.driver.cdlClass, load.driver.cdlNumber)} · {formatHos(load.driver.hosRemainingMin)} HOS</div>
+                  {load.status !== 'done' && (
+                    <button
+                      type="button"
+                      className="ld-cancel-btn"
+                      disabled={cancelling}
+                      onClick={handleCancel}
+                    >
+                      {cancelling ? 'Cancelling…' : 'Take load back'}
+                    </button>
+                  )}
+                  {cancelError && <div className="ld-cancel-error" role="alert">{cancelError}</div>}
                 </div>
-                <div className="ld-driver-actions">
-                  <button className="ld-icon-btn-sm" aria-label="Call driver"><Phone size={14} aria-hidden="true" /></button>
-                  <button className="ld-icon-btn-sm" aria-label="Message driver"><Envelope size={14} aria-hidden="true" /></button>
-                </div>
+                {/* Call and Message are gone: neither had a handler, and a
+                    control that looks live and does nothing is worse than
+                    no control. What belongs here is the one action that
+                    actually exists — taking the load back. */}
               </div>
+            ) : load.status === 'neutral' ? (
+              /* A booked load with nobody on it. Until this existed, a load
+                 accepted from a rate confirmation sat here forever: nothing
+                 dispatched it, so it never delivered and never got paid.
+                 Only drivers who have a truck can be picked — hiring and
+                 buying are two separate decisions, and the empty list is
+                 what says so. */
+              <DispatchPanel load={load} onDispatched={refetch} />
             ) : (
               <div className="ld-driver-empty">No driver assigned yet.</div>
             )}

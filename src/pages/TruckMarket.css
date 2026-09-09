@@ -1,0 +1,32 @@
+/* A failed purchase has to say so on the page. It used to end at
+   console.error, which is invisible to the person who pressed the
+   button. */
+.tm-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 13px;
+  border-radius: 7px;
+  background: var(--panel-3);
+  border: 1px solid var(--border-soft);
+  color: var(--text);
+  font-size: 12.5px;
+  margin-bottom: 16px;
+}
+
+/* Listing photo in the market table. Small enough that the row still
+   reads as a row, big enough to tell a flatbed from a tanker without
+   opening anything. */
+.tm-photo-col {
+  width: 92px;
+  padding-right: 0 !important;
+}
+
+.tm-thumb {
+  width: 84px;
+  height: 46px;
+  object-fit: contain;
+  display: block;
+  border-radius: 5px;
+  background: var(--panel-2);
+}

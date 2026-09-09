@@ -47,7 +47,7 @@ export default function DriverDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
 
-  const { data: driver, error, loading } = useResource((signal) => getDriver(id, signal), [id])
+  const { data: driver, error, loading } = useResource((signal) => getDriver(id, signal), [id], { pollMs: 20000 })
 
   if (loading) {
     return <div className="panel driver-detail-missing"><p>Loading driver…</p></div>

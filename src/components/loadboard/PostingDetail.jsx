@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { X, Warning, ChatCircleText } from '@phosphor-icons/react'
+import { X, ChatCircleText } from '@phosphor-icons/react'
 import { listChecks } from '../../api/brokerCheck'
 import { useResource } from '../../hooks/useResource'
 import { EQUIPMENT_TYPES } from '../../data/equipmentTypes'
@@ -40,9 +40,11 @@ export default function PostingDetail({ posting, onClose }) {
       )
     : null
 
-  const needsAdvisory =
-    posting.deadheadMi != null && posting.deadheadMi > 250 ||
-    posting.nearestDriver == null
+  // Only the fact survives. The long-deadhead branch used to add "driver
+  // may not reach pickup in time" above 250 miles — a guess dressed as a
+  // warning, on a panel that withholds the broker's credit rating for
+  // exactly the opposite reason.
+  const needsAdvisory = posting.nearestDriver == null
 
   return (
     <motion.div
@@ -135,12 +137,7 @@ export default function PostingDetail({ posting, onClose }) {
 
           {needsAdvisory && (
             <div className="lb-advisory">
-              <Warning size={15} weight="fill" />
-              <span>
-                {posting.nearestDriver == null
-                  ? 'No available driver near this origin.'
-                  : 'Long deadhead — driver may not reach pickup in time.'}
-              </span>
+              <span>No available driver near this origin.</span>
             </div>
           )}
 

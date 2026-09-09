@@ -13,7 +13,7 @@ function formatDate(value) {
   return dateFormatter.format(date)
 }
 
-export default function UserTable({ users, onManage, selectedIds, onToggle, onToggleAll }) {
+export default function UserTable({ users, onManage, onDelete, selectedIds, onToggle, onToggleAll }) {
   const headerCheckboxRef = useRef(null)
 
   const selectedCount = users.reduce((n, u) => (selectedIds.has(u.id) ? n + 1 : n), 0)
@@ -107,6 +107,9 @@ export default function UserTable({ users, onManage, selectedIds, onToggle, onTo
                 <td>
                   <button type="button" className="admin-manage-btn" onClick={() => onManage(user)}>
                     Manage
+                  </button>
+                  <button type="button" className="admin-manage-btn" style={{ marginLeft: 6, color: 'var(--danger, #ef4444)' }} onClick={() => onDelete(user)}>
+                    Delete
                   </button>
                 </td>
               </motion.tr>

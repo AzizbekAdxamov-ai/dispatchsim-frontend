@@ -45,7 +45,7 @@ export default function FinanceInvoices() {
     [activeTab.status, search],
   )
 
-  const { data, error, loading } = useResource(fetchInvoices, [activeTab.status, search])
+  const { data, error, loading } = useResource(fetchInvoices, [activeTab.status, search], { pollMs: 20000 })
 
   const invoices = data?.invoices ?? []
   const counts = data?.meta?.counts

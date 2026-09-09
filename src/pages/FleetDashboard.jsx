@@ -15,7 +15,7 @@ const card = {
 }
 
 export default function FleetDashboard() {
-  const { data, error, loading } = useResource((signal) => listTrucks(signal), [])
+  const { data, error, loading } = useResource((signal) => listTrucks(signal), [], { pollMs: 30000 })
 
   const trucks = data?.trucks ?? []
   const counts = data?.meta?.counts

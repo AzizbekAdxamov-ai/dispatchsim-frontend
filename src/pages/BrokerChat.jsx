@@ -76,6 +76,7 @@ export default function BrokerChat() {
   const [downloading, setDownloading] = useState(false)
   const [accepting, setAccepting] = useState(false)
   const [acceptWarnings, setAcceptWarnings] = useState([])
+  const threadEndRef = useRef(null)
 
   const fetchConversations = useCallback(async (signal) => {
     return await listConversations(signal)
@@ -123,6 +124,17 @@ export default function BrokerChat() {
   const conversations = data?.conversations ?? []
   const selected = conversations.find((c) => c.id === selectedId)
   const messages = thread?.messages ?? []
+
+  // Auto-scroll has to live BELOW `messages`, not above it. `const` is not
+  // hoisted the way `function` is -- reading it earlier in the component
+  // body throws "Cannot access 'messages' before initialization", which
+  // takes the whole app down to a blank page rather than just breaking
+  // this panel.
+  useEffect(() => {
+    if (messages.length > 0) {
+      threadEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [messages.length])
   const awaitingReply = thread?.awaitingReply ?? false
   // The conversation from the thread endpoint is fresher than the list's
   // copy, which can be up to 15 seconds behind.
@@ -311,6 +323,7 @@ export default function BrokerChat() {
                   Waiting on {selected.brokerContactName || selected.brokerName}…
                 </div>
               )}
+              <div ref={threadEndRef} />
             </div>
 
             <div className="bc-thread-footer">

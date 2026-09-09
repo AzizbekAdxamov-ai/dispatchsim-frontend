@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Moon, Sun, Phone, Envelope, Bell } from '@phosphor-icons/react'
+import { Moon, Sun, Envelope, Bell } from '@phosphor-icons/react'
 import { useTheme } from '../../theme/ThemeProvider'
 import WorkspaceSwitcher from './WorkspaceSwitcher'
+import CashChip from './CashChip'
 import './Topbar.css'
 
 const ZONES = [
@@ -19,7 +20,7 @@ function formatTime(tz) {
   }).format(new Date())
 }
 
-export default function Topbar({ title, onPhoneClick }) {
+export default function Topbar({ title }) {
   const [, setTick] = useState(0)
   const { theme, toggleTheme } = useTheme()
 
@@ -40,13 +41,11 @@ export default function Topbar({ title, onPhoneClick }) {
         ))}
       </div>
       <div className="topbar-spacer"></div>
+      <CashChip />
       <WorkspaceSwitcher />
       <div className="topbar-icons">
         <button className="icon-btn" onClick={toggleTheme} aria-label="Toggle theme">
           {theme === 'dark' ? <Moon size={17} weight="fill" /> : <Sun size={17} weight="fill" />}
-        </button>
-        <button className="icon-btn" onClick={onPhoneClick} aria-label="Calls">
-          <Phone size={17} /><span className="icon-dot"></span>
         </button>
         <button className="icon-btn" aria-label="Messages">
           <Envelope size={17} />

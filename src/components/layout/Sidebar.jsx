@@ -11,6 +11,7 @@ import {
   Star,
   Gear,
   ShieldCheck,
+  CurrencyDollar,
   MagnifyingGlass,
 } from '@phosphor-icons/react'
 import { useAuth } from '../../context/AuthContext'
@@ -25,6 +26,7 @@ const DEFAULT_NAV_ITEMS = [
   { to: '/drivers', icon: SteeringWheel, label: 'Drivers' },
   { to: '/broker-chat', icon: ChatCircleText, label: 'Broker chat' },
   { to: '/broker-check', icon: ShieldCheck, label: 'Broker check' },
+  { to: '/cash', icon: CurrencyDollar, label: 'Cash' },
   { to: '/alerts', icon: Warning, label: 'Alerts' },
   { to: '/documents', icon: FileText, label: 'Documents' },
   { to: '/dispatch-status', icon: Star, label: 'Dispatch status' },

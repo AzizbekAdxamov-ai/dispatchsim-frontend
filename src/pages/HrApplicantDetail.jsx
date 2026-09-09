@@ -49,6 +49,12 @@ export default function HrApplicantDetail() {
           case 'FORBIDDEN':
             setHireError('You need the HR role to hire applicants.')
             break
+          // Hiring costs money now (DOT physical, drug screen,
+          // orientation). The server names the numbers, so its wording is
+          // kept rather than replaced with something vaguer.
+          case 'INSUFFICIENT_FUNDS':
+            setHireError(err.message)
+            break
           default:
             setHireError(err.message)
         }

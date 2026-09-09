@@ -4,11 +4,12 @@ import '../dashboard/Panel.css'
 import '../dashboard/Charts.css'
 import '../dashboard/LoadBoard.css'
 
-function marginBadgeClass(marginPct) {
-  if (marginPct > 15) return 'ontime'
-  if (marginPct >= 5) return 'warn'
-  return 'crit'
-}
+// Margin is stated, not graded. It used to be badged in the same green /
+// amber / red the app uses for load status, so a load the dispatcher
+// deliberately ran at 4% -- to reposition a truck, to keep a driver
+// working -- was stamped in the colour that elsewhere means "Delayed".
+// The percentage is the fact; whether it was the right call depends on
+// what else was on the board that day.
 
 export default function LoadProfitTable({ loads }) {
   const navigate = useNavigate()
@@ -51,7 +52,7 @@ export default function LoadProfitTable({ loads }) {
                 <td className="rate mono">{formatMoney(load.rateUsd)}</td>
                 <td className="mono">{formatMoney(cost)}</td>
                 <td>
-                  <span className={'badge ' + marginBadgeClass(load.marginPct)}>
+                  <span className="mono">
                     <span className="dot"></span>
                     {load.marginPct}%
                   </span>

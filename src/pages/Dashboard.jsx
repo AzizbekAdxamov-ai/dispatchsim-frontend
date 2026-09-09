@@ -5,7 +5,6 @@ import DriverPanel from '../components/dashboard/DriverPanel'
 import OnTimeChart from '../components/dashboard/OnTimeChart'
 import UtilizationChart from '../components/dashboard/UtilizationChart'
 
-import CargoLayout from '../components/dashboard/CargoLayout/CargoLayout'
 import DriverBoard from '../components/drivers/DriverBoard'
 import { getDashboard } from '../api/stats'
 import { listLoads } from '../api/loads'
@@ -33,7 +32,7 @@ export default function Dashboard() {
     return { stats, loads: loadsRes.loads, drivers: driversRes.drivers }
   }, [])
 
-  const { data, error, loading } = useResource(fetchAll, [])
+  const { data, error, loading } = useResource(fetchAll, [], { pollMs: 20000 })
 
   if (loading) return <div className="page-empty">Loading dashboard…</div>
   if (error) return <div className="page-empty">Could not load the dashboard — {error.message}</div>
@@ -75,7 +74,14 @@ export default function Dashboard() {
       </div>
 
       <div style={{ marginTop: 16 }}>
-        <CargoLayout />
+        {/* CargoLayout was removed here on 2026-09-08. It rendered ten
+            hardcoded shipments from cargoData.js — named clients, invented
+            shipment numbers, a "Fully loaded" truck — on the dashboard of a
+            company that might own nothing, and graded each one with a
+            coloured "Risk score" bar. Two rules broken at once: the app
+            shows only what the student has actually built, and it states
+            facts rather than passing judgement. There is no cargo-item
+            model behind it to rewire to, so it goes rather than lies. */}
       </div>
     </>
   )

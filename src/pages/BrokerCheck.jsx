@@ -36,7 +36,7 @@ export default function BrokerCheck() {
   const [result, setResult] = useState(null)
 
   const fetchChecks = useCallback(async (signal) => await listChecks(signal), [])
-  const { data, loading, refetch } = useResource(fetchChecks, [])
+  const { data, loading, error: logError, refetch } = useResource(fetchChecks, [])
   const checks = data?.checks ?? []
 
   async function handleCheck() {
@@ -116,12 +116,20 @@ export default function BrokerCheck() {
           <span className="panel-count">{checks.length}</span>
         </div>
         {loading && <div className="page-empty">Loading…</div>}
-        {!loading && checks.length === 0 && (
+        {/* A failed request used to render "Nothing checked yet" — the
+            page stating, as a fact about the dispatcher's own work, the
+            opposite of what it actually knew. */}
+        {!loading && logError && (
+          <div className="page-empty" style={{ padding: 24 }}>
+            Could not load the lookup log.
+          </div>
+        )}
+        {!loading && !logError && checks.length === 0 && (
           <div className="page-empty" style={{ padding: 24 }}>
             Nothing checked yet.
           </div>
         )}
-        {!loading && checks.length > 0 && (
+        {!loading && !logError && checks.length > 0 && (
           <table className="bk-table">
             <thead>
               <tr>

@@ -48,7 +48,7 @@ export default function Drivers() {
   const [tab, setTab] = useState('all')
   const [query, setQuery] = useState('')
 
-  const { data, error, loading } = useResource((signal) => listDrivers(signal), [])
+  const { data, error, loading } = useResource((signal) => listDrivers(signal), [], { pollMs: 20000 })
 
   const enriched = useMemo(() => {
     if (!data) return []

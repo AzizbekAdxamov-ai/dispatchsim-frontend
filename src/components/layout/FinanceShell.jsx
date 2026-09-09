@@ -1,6 +1,6 @@
 import { Outlet, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Receipt, Invoice, UsersThree, CurrencyDollar, Gear } from '@phosphor-icons/react'
+import { Receipt, Invoice, UsersThree, CurrencyDollar, Gear, Bank } from '@phosphor-icons/react'
 import Sidebar from './Sidebar'
 import Topbar from './Topbar'
 import { getOverview } from '../../api/finance'
@@ -11,6 +11,7 @@ const TITLES = {
   '/finance/invoices': 'Invoices',
   '/finance/settlements': 'Driver settlements',
   '/finance/expenses': 'Expenses',
+  '/finance/cashflow': 'Cash flow',
   '/finance/settings': 'Settings',
 }
 
@@ -29,6 +30,7 @@ export default function FinanceShell() {
     { to: '/finance/invoices', icon: Invoice, label: 'Invoices', badge: pastDueCount },
     { to: '/finance/settlements', icon: UsersThree, label: 'Driver settlements' },
     { to: '/finance/expenses', icon: CurrencyDollar, label: 'Expenses' },
+    { to: '/finance/cashflow', icon: Bank, label: 'Cash flow' },
     { to: '/finance/settings', icon: Gear, label: 'Settings' },
   ]
 
