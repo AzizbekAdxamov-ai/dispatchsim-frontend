@@ -68,16 +68,10 @@
   color: var(--text);
 }
 
-.icon-dot {
-  position: absolute;
-  top: 5px;
-  right: 6px;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--red);
-  border: 1.5px solid var(--bg);
-}
+/* .icon-dot is gone. It painted a red dot on the notification bell
+   unconditionally -- from the first render, forever, whether or not
+   anything had happened. The bell now shows a count of conditions that are
+   actually true; see AlertsBell.css. */
 
 /* Placement-specific spacing for WorkspaceSwitcher inside the topbar; the
    component's own look (trigger, popover, items) lives in WorkspaceSwitcher.css. */

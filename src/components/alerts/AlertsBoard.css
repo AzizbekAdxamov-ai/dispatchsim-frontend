@@ -1,0 +1,18 @@
+.alerts-page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.alerts-page .panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+/* What the simulator does not measure. Stated plainly rather than left for
+   the student to infer from an empty list. */
+.alerts-note {
+  font-size: 12px;
+  color: var(--text-3);
+  line-height: 1.5;
+}

@@ -15,8 +15,8 @@ import { formatMoney, formatWeekday } from '../utils/format'
 import '../components/dashboard/Panel.css'
 
 // The driver-summary side panel is a compact preview (see DriverPanel),
-// not the full roster — Drivers.jsx is the full list. Capped the same way
-// AlertQueue's dashboard instance already caps itself (`limit={3}`).
+// not the full roster — Drivers.jsx is the full list, and this is capped
+// the same way the top-bar alert panel is (AlertsBell's PANEL_LIMIT).
 const DRIVER_PANEL_LIMIT = 6
 // LoadBoard here is a "what's moving right now" preview, not the full
 // board (Loads.jsx is that) — capped for the same reason.

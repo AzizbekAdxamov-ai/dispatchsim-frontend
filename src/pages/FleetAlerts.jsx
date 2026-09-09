@@ -1,34 +1,30 @@
-import { Bell } from '@phosphor-icons/react'
-import '../components/dashboard/Panel.css'
-import '../components/dashboard/AlertQueue.css'
-import './PageHeader.css'
-import './Alerts.css'
+import AlertsBoard from '../components/alerts/AlertsBoard'
+
+// The fleet manager's board.
+//
+// This page used to promise alerts for tyre wear, overdue maintenance and
+// low fuel. All three read columns that nothing writes at runtime --
+// trucks.fuel_pct is set once at purchase, tire_front_pct and
+// tire_rear_pct never change, and maintenance_records has no writer
+// outside the seed. Those alerts could not have fired, in the same way
+// lateness could not fire before promised_eta_at existed, and an empty
+// screen would have read as "the fleet is fine".
+//
+// So the page shows the fleet conditions the data can actually answer, and
+// says which ones it cannot.
+const FLEET_FAMILIES = ['driver.idle', 'driver.no-truck', 'listing.leaving']
 
 export default function FleetAlerts() {
   return (
-    <div className="alerts-page">
-      <div className="page-head">
-        <div>
-          <div className="page-title">Alerts</div>
-          <div className="page-sub">Open items that need a fleet manager&apos;s attention</div>
-        </div>
-      </div>
-
-      <div className="page-tabs">
-        <button className="page-tab active">All <span className="page-tab-count">0</span></button>
-      </div>
-
-      <div className="panel">
-        <div className="alert-queue-list">
-          <div className="alert-queue-empty">
-            <Bell size={32} weight="thin" style={{ opacity: 0.3 }} />
-            <div style={{ marginTop: 12 }}>No fleet alerts.</div>
-            <div style={{ fontSize: 12, opacity: 0.5, marginTop: 4 }}>
-              Alerts will appear when tires need replacement, maintenance is overdue, or fuel is low.
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <AlertsBoard
+      title="Alerts"
+      sub="Fleet conditions that are true right now."
+      families={FLEET_FAMILIES}
+      note={
+        'Not yet tracked: fuel level, tyre wear and maintenance intervals. ' +
+        'Those columns exist but nothing updates them while the simulator runs, ' +
+        'so an alert built on them would never fire.'
+      }
+    />
   )
 }

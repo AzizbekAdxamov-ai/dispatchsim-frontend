@@ -1,0 +1,88 @@
+.alert-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.alert-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.alert-row:last-child { border-bottom: none; }
+.alert-row:hover { background: var(--panel-2); }
+
+.alert-row-body { flex: 1; min-width: 0; }
+
+.alert-row-title {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.35;
+}
+
+.alert-row-detail {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Money at stake. Same weight as everything else on the row — it orders
+   the list, it does not shout. */
+.alert-row-stake {
+  font-size: 12px;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.alert-row-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.alert-row-link,
+.alert-row-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: none;
+  color: var(--text-3);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.alert-row-link:hover,
+.alert-row-btn:hover:not(:disabled) {
+  background: var(--panel-3);
+  border-color: var(--border-soft);
+  color: var(--text);
+}
+
+.alert-row-btn:disabled { opacity: 0.4; cursor: default; }
+
+.alert-list-empty {
+  padding: 28px 14px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+/* Not styled as a warning. It states that the list may be short for a
+   reason that has nothing to do with the company being in good shape. */
+.alert-degraded {
+  padding: 9px 14px;
+  font-size: 12px;
+  color: var(--text-2);
+  background: var(--panel-2);
+  border-bottom: 1px solid var(--border-soft);
+}
