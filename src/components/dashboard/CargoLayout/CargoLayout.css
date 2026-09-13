@@ -867,3 +867,74 @@
     padding: 8px 12px;
   }
 }
+/* ---------------------------------------------------------------------
+   Real data (2026-09-10)
+   ---------------------------------------------------------------------
+   The panel came back with loads behind it instead of a hardcoded file.
+   The classes below replace the ones that described invented fields:
+   .cargo-card-priority, .priority-*, .cargo-risk and .cargo-fragile-note
+   are no longer rendered by the component. They are left in the file
+   above rather than cut out, because the truck box, the grid overlay and
+   the detail-card layout are the same design and share those rules'
+   neighbours.
+
+   Nothing here is coloured by severity. A load running behind says so in
+   words; how bad that is, is the dispatcher's call, not the stylesheet's. */
+
+.cargo-card-commodity {
+  display: block;
+  font-size: 10px;
+  line-height: 1.25;
+  color: var(--text-2);
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cargo-detail-row-lane {
+  color: var(--text-3);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cargo-detail-status {
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.cargo-detail-card-head a.mono {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.cargo-detail-card-head a.mono:hover { text-decoration: underline; }
+
+.cargo-payload {
+  margin-top: 12px;
+}
+
+.cargo-payload-label {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-2);
+  margin-bottom: 6px;
+}
+
+/* One neutral fill. The old bars were amber and red by default, which
+   told the student a full trailer was a problem — a legally loaded
+   45,000 lb flatbed is just a loaded flatbed. */
+.cargo-payload .cargo-capacity-fill {
+  background: var(--accent);
+}
+
+.cargo-empty {
+  padding: 28px 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-3);
+}

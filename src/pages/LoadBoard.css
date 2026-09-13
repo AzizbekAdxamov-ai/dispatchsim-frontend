@@ -101,3 +101,11 @@
   outline: 2px solid var(--blue);
   outline-offset: 2px;
 }
+
+/* "Call for rate". Not styled as a warning or a gap — a posting without a
+   printed price is an ordinary thing on a real board, and the broker is
+   expecting the call. */
+.lb-ask {
+  color: var(--text-3);
+  font-style: normal;
+}

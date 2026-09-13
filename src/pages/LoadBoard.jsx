@@ -201,8 +201,19 @@ export default function LoadBoard() {
                           p.equipmentType
                         )}
                       </td>
-                      <td className="rate mono">{formatMoney(p.rateUsd)}</td>
-                      <td className="mono">{formatRatePerMile(p.rateUsd, p.distanceMi)}</td>
+                      {/* "Call for rate" — about one posting in ten goes up
+                          without a price, the way they do on a real board.
+                          The broker has a number and will negotiate from
+                          it; the only way to learn it is to open the chat
+                          and ask, which is the job. The server sends
+                          rateUsd as NULL for these, so there is no figure
+                          here to leak. */}
+                      <td className="rate mono">
+                        {p.rateHidden ? <span className="lb-ask">Call for rate</span> : formatMoney(p.rateUsd)}
+                      </td>
+                      <td className="mono">
+                        {p.rateHidden ? <span className="lb-ask">—</span> : formatRatePerMile(p.rateUsd, p.distanceMi)}
+                      </td>
                       <td className="mono">{formatDateTime(p.pickupAt)}</td>
                       <td>{p.broker}</td>
                       <td className="mono">{formatDateTime(p.expiresAt)}</td>

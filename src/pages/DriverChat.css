@@ -1,0 +1,184 @@
+.dc-page {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 14px;
+  height: calc(100vh - 130px);
+  min-height: 0;
+}
+
+.dc-list,
+.dc-thread {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--panel);
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.dc-list-head {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+/* overflow-y on a flex child needs min-height:0 above it, or the child
+   grows instead of scrolling. A missing brace in BrokerChat.css silently
+   discarded exactly this rule once, and the only way to keep chatting was
+   to zoom the browser out. */
+.dc-list-body,
+.dc-thread-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.dc-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  border: none;
+  border-bottom: 1px solid var(--border-soft);
+  background: none;
+  cursor: pointer;
+}
+
+.dc-item:hover { background: var(--panel-2); }
+.dc-item.active { background: var(--panel-3); }
+
+.dc-item-name {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.dc-item-last {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dc-thread-head {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.dc-thread-name { font-size: 14px; color: var(--text); }
+.dc-thread-sub { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+
+/* The money, next to the conversation about it. Deliberately not styled as
+   a warning: the amount and the days are the message. */
+.dc-standing {
+  padding: 9px 16px;
+  border-bottom: 1px solid var(--border-soft);
+  background: var(--panel-2);
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.dc-standing-link {
+  margin-left: 8px;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.dc-standing-link:hover { text-decoration: underline; }
+
+.dc-thread-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dc-msg {
+  max-width: 70%;
+  padding: 9px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.dc-msg.dispatcher {
+  align-self: flex-end;
+  background: var(--accent);
+  color: var(--bg);
+  border-bottom-right-radius: 4px;
+}
+
+.dc-msg.driver {
+  align-self: flex-start;
+  background: var(--panel-3);
+  color: var(--text);
+  border-bottom-left-radius: 4px;
+}
+
+.dc-waiting {
+  align-self: flex-start;
+  font-size: 12px;
+  color: var(--text-3);
+  padding: 4px 2px;
+}
+
+.dc-thread-footer {
+  border-top: 1px solid var(--border-soft);
+  padding: 10px 14px;
+}
+
+.dc-send-error {
+  font-size: 12px;
+  color: var(--red);
+  margin-bottom: 8px;
+}
+
+.dc-composer {
+  display: flex;
+  gap: 8px;
+}
+
+.dc-input {
+  flex: 1;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--text);
+  font-size: 13px;
+}
+
+.dc-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.dc-send {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  border-radius: 8px;
+  border: none;
+  background: var(--accent);
+  color: var(--bg);
+  cursor: pointer;
+}
+
+.dc-send:disabled { opacity: 0.4; cursor: default; }
+
+.dc-empty {
+  padding: 14px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+@media (max-width: 860px) {
+  .dc-page { grid-template-columns: 1fr; height: auto; }
+}

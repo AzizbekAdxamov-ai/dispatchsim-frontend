@@ -41,6 +41,11 @@ export default function CashChip() {
 
   const negative = data.balance < 0
   const owed = data.outstandingUsd > 0
+  // Three states, three different facts. Under water is ordinary; past
+  // the line the lender has stopped advancing; insolvent means
+  // liabilities exceed assets. A dispatcher about to book a load needs to
+  // know which one, and the balance alone does not say.
+  const state = data.standing?.state
 
   return (
     <Link to="/cash" className="cash-chip" title="Company cash">
@@ -54,6 +59,16 @@ export default function CashChip() {
       {owed && (
         <span className="cash-chip-sub mono" title="Delivered, not yet paid">
           +{formatUsd(data.outstandingUsd)} owed
+        </span>
+      )}
+      {state === 'over_limit' && (
+        <span className="cash-chip-state" title="The lender has stopped advancing — no new loads, hires or trucks">
+          line used up
+        </span>
+      )}
+      {state === 'insolvent' && (
+        <span className="cash-chip-state" title="Liabilities exceed assets">
+          insolvent
         </span>
       )}
     </Link>

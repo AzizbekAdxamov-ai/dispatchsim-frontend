@@ -9,6 +9,7 @@ import { useTheme } from '../theme/ThemeProvider'
 import { getLoad, cancelDispatch } from '../api/loads'
 import { ApiError } from '../api/client'
 import DispatchPanel from '../components/loads/DispatchPanel'
+import RoadEventPanel from '../components/loads/RoadEventPanel'
 import { useResource } from '../hooks/useResource'
 import { formatMoney, formatWeight, formatDateTime, formatCdl, formatHos, formatPlace, formatDistance } from '../utils/format'
 import '../components/dashboard/Panel.css'
@@ -164,6 +165,11 @@ export default function LoadDetail() {
             software is broken, which is the one lesson this is not for.
             They come back when there is something behind them. */}
       </div>
+
+      {/* Above the timeline on purpose: while an event is open the truck
+          is not moving, so the timeline below it is describing a run that
+          has stopped. The decision comes first. */}
+      <RoadEventPanel loadId={load.id} onResolved={refetch} />
 
       <div className="load-detail-timeline">
         {load.timeline.map((step, i) => (

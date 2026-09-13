@@ -88,11 +88,18 @@ export default function PostingDetail({ posting, onClose }) {
           <div className="lb-detail-grid">
             <div className="lb-detail-field">
               <div className="lb-detail-label">Rate</div>
-              <div className="lb-detail-value mono">{formatMoney(posting.rateUsd)}</div>
+              {/* Stated, not hinted at. "Call for rate" is a fact about
+                  the posting, not a missing value — the broker knows the
+                  number and expects to be asked for it. */}
+              <div className="lb-detail-value mono">
+                {posting.rateHidden ? <span className="lb-ask">Call for rate</span> : formatMoney(posting.rateUsd)}
+              </div>
             </div>
             <div className="lb-detail-field">
               <div className="lb-detail-label">$/mi</div>
-              <div className="lb-detail-value mono">{formatRatePerMile(posting.rateUsd, posting.distanceMi)}</div>
+              <div className="lb-detail-value mono">
+                {posting.rateHidden ? <span className="lb-ask">—</span> : formatRatePerMile(posting.rateUsd, posting.distanceMi)}
+              </div>
             </div>
             <div className="lb-detail-field">
               <div className="lb-detail-label">Deadhead</div>

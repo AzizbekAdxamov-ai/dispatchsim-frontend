@@ -30,3 +30,20 @@ export function cancelDispatch(id, signal) {
 export function getLoad(id, signal) {
   return api.get(`/loads/${encodeURIComponent(id)}`, { auth: true, signal })
 }
+
+// Road events on one load: the history, and the open one with every
+// option priced. The prices come from the same function the server uses to
+// apply the choice, so the number on the button is the number charged.
+export function listLoadEvents(id, signal) {
+  return api.get(`/loads/${encodeURIComponent(id)}/events`, { auth: true, signal })
+}
+
+// Choose how to handle it. The ETA move, the money and the resolution land
+// in one transaction on the server.
+export function resolveLoadEvent(id, eventId, optionKey, signal) {
+  return api.post(
+    `/loads/${encodeURIComponent(id)}/events/${encodeURIComponent(eventId)}/resolve`,
+    { optionKey },
+    { auth: true, signal },
+  )
+}

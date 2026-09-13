@@ -66,11 +66,16 @@ export function clearToken() {
 }
 
 export class ApiError extends Error {
-  constructor(code, message, status) {
+  constructor(code, message, status, details) {
     super(message)
     this.name = 'ApiError'
     this.code = code
     this.status = status
+    // Some errors carry the answer, not just a label. DRIVER_REFUSED_WORK
+    // arrives with how much the driver is owed and how long they have
+    // waited; without this the UI could only say "not accepting work right
+    // now", which is a person's decision with the reason removed.
+    this.details = details ?? null
   }
 }
 
@@ -119,7 +124,7 @@ async function request(path, { method = 'GET', body, auth = false, signal } = {}
       onUnauthorized?.()
     }
 
-    throw new ApiError(code, message, res.status)
+    throw new ApiError(code, message, res.status, data?.error?.details)
   }
 
   return data

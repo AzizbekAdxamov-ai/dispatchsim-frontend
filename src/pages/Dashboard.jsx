@@ -1,4 +1,5 @@
 import { useCallback } from 'react'
+import CargoLayout from '../components/dashboard/CargoLayout/CargoLayout'
 import StatCards from '../components/dashboard/StatCards'
 import LoadBoard from '../components/dashboard/LoadBoard'
 import DriverPanel from '../components/dashboard/DriverPanel'
@@ -74,14 +75,20 @@ export default function Dashboard() {
       </div>
 
       <div style={{ marginTop: 16 }}>
-        {/* CargoLayout was removed here on 2026-09-08. It rendered ten
-            hardcoded shipments from cargoData.js — named clients, invented
-            shipment numbers, a "Fully loaded" truck — on the dashboard of a
-            company that might own nothing, and graded each one with a
-            coloured "Risk score" bar. Two rules broken at once: the app
-            shows only what the student has actually built, and it states
-            facts rather than passing judgement. There is no cargo-item
-            model behind it to rewire to, so it goes rather than lies. */}
+        {/* Back on 2026-09-10, with real loads behind it.
+            
+            It was removed two days earlier for rendering ten hardcoded
+            shipments — invented clients, invented shipment numbers, a
+            "Fully loaded" trailer on the dashboard of a company that might
+            own nothing, and a coloured "Risk score" grading each one. The
+            note left here then said there was no cargo model to rewire to.
+            That was true then and is not now: a dispatched load carries a
+            real commodity, a real weight, a real lane and a real trailer.
+            
+            `loads` is the same array the rest of this page already has, so
+            this costs no extra request and refreshes on the same 20-second
+            poll as everything else. */}
+        <CargoLayout loads={loads} />
       </div>
     </>
   )

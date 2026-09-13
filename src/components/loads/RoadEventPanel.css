@@ -1,0 +1,88 @@
+.rev-panel {
+  margin-bottom: 14px;
+}
+
+.rev-open {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  background: var(--panel-2);
+}
+
+.rev-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.rev-summary { font-size: 14px; color: var(--text); }
+.rev-place { font-size: 12px; color: var(--text-3); }
+
+/* Stated, not shouted. The consequence — a stopped truck — is the whole
+   message, and a red banner would be the program adding a verdict on top
+   of a fact that speaks for itself. */
+.rev-note {
+  font-size: 12px;
+  color: var(--text-2);
+  margin-top: 4px;
+}
+
+.rev-error {
+  font-size: 12px;
+  color: var(--red);
+  margin-top: 8px;
+}
+
+.rev-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* Every option looks the same. None is primary, none is greyed as unwise:
+   which one is right depends on facts the dispatcher has and the program
+   does not. */
+.rev-option {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  cursor: pointer;
+}
+
+.rev-option:hover:not(:disabled) { border-color: var(--accent); }
+.rev-option:disabled { opacity: 0.5; cursor: default; }
+
+.rev-option-label { font-size: 13px; color: var(--text); }
+.rev-option-cost { font-size: 12px; color: var(--text-2); }
+.rev-option-detail { font-size: 12px; color: var(--text-3); }
+
+.rev-history {
+  margin-top: 10px;
+  border-top: 1px solid var(--border-soft);
+  padding-top: 8px;
+}
+
+.rev-history-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--text-3);
+  padding: 3px 0;
+}
+
+.rev-history-cost { color: var(--text-2); }
+
+/* The retry in the error state. Same shape as an option button so the
+   panel does not suddenly grow a second visual language when it fails. */
+.rev-retry {
+  margin-top: 10px;
+  align-self: flex-start;
+  max-width: 160px;
+}

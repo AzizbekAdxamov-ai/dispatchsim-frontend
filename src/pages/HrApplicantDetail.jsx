@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { standingMessage } from '../utils/companyStanding'
 import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft, UserPlus } from '@phosphor-icons/react'
 import { getApplicant, hireApplicant } from '../api/hr'
@@ -54,6 +55,12 @@ export default function HrApplicantDetail() {
           // kept rather than replaced with something vaguer.
           case 'INSUFFICIENT_FUNDS':
             setHireError(err.message)
+            break
+          // A driver is a recurring wage, not a one-off fee. These two say
+          // where the company stands rather than just declining.
+          case 'CREDIT_LINE_EXHAUSTED':
+          case 'COMPANY_INSOLVENT':
+            setHireError(standingMessage(err) ?? err.message)
             break
           default:
             setHireError(err.message)

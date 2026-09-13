@@ -42,3 +42,14 @@
   cursor: default;
   opacity: 0.65;
 }
+
+/* The account's standing, next to its balance. Stated in words rather
+   than in a colour: "line used up" is a fact about the facility, and how
+   alarming that is depends on what is in the receivables column. */
+.cash-chip-state {
+  font-size: 11px;
+  color: var(--text-3);
+  border-left: 1px solid var(--border-soft);
+  padding-left: 8px;
+  margin-left: 2px;
+}

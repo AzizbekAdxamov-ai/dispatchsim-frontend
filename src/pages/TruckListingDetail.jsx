@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react'
+import { standingMessage } from '../utils/companyStanding'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { Warning, CheckCircle, ArrowLeft } from '@phosphor-icons/react'
 import { getTruckListing, buyTruckListing } from '../api/truckListings'
@@ -30,6 +31,11 @@ const ERRORS = {
 function buyErrorText(err) {
   const code = err instanceof ApiError ? err.code : null
   // INSUFFICIENT_FUNDS keeps the server's wording: it names the numbers.
+  // The lender declining is not the same as this purchase not
+  // fitting. standingMessage names both sides of the company's
+  // position; INSUFFICIENT_FUNDS names only this debit.
+  const standing = standingMessage(err)
+  if (standing) return standing
   if (code === 'INSUFFICIENT_FUNDS') return err.message
   return ERRORS[code] || err?.message || 'Something went wrong. Please try again.'
 }

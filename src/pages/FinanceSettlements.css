@@ -1,6 +1,9 @@
+/* Three cards now, not four: "Pending drivers" counted a status that
+   could only ever read 'pending'. auto-fit so the count can change again
+   without this rule quietly leaving a gap. */
 .finance-summary-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 12px;
   margin-bottom: 20px;
 }
@@ -48,3 +51,83 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* --- payroll as a decision (see FinanceSettlements.jsx) --------------- */
+
+.payroll-run {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.payroll-run:disabled {
+  background: var(--panel-2);
+  color: var(--text-3);
+  cursor: default;
+}
+
+.payroll-result {
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--panel-2);
+  border: 1px solid var(--border-soft);
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+/* Who is waiting. Not styled as an alarm — the amount and the number of
+   days are the whole message. */
+.payroll-drivers {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-bottom: 14px;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.payroll-driver {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 9px 14px;
+  background: var(--panel);
+  font-size: 13px;
+}
+
+.payroll-driver-name { color: var(--text); min-width: 160px; }
+.payroll-driver-owed { color: var(--text); }
+.payroll-driver-stage { color: var(--text-3); font-size: 12px; }
+
+.settlement-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.settlement-table th {
+  text-align: left;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-3);
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.settlement-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border-soft);
+  color: var(--text-2);
+}
+
+.settlement-table th.num,
+.settlement-table td.num { text-align: right; }
+
+.settlement-lane { color: var(--text-3); }

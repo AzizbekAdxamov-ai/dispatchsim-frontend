@@ -17,6 +17,7 @@ import Settings from './pages/Settings'
 import Drivers from './pages/Drivers'
 import DriverDetail from './pages/DriverDetail'
 import BrokerChat from './pages/BrokerChat'
+import DriverChat from './pages/DriverChat'
 import BrokerCheck from './pages/BrokerCheck'
 import CashLedger from './pages/CashLedger'
 import FleetDashboard from './pages/FleetDashboard'
@@ -68,6 +69,7 @@ export default function App() {
             <Route path="drivers" element={<Drivers />} />
             <Route path="drivers/:id" element={<DriverDetail />} />
             <Route path="broker-chat" element={<BrokerChat />} />
+            <Route path="driver-chat" element={<DriverChat />} />
             <Route path="broker-check" element={<BrokerCheck />} />
             <Route path="cash" element={<CashLedger />} />
             <Route path="alerts" element={<Alerts />} />
