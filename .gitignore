@@ -24,5 +24,8 @@ dist-ssr
 *.sw?
 
 # Environment variables
-.env
-.env.local
+# Har qanday .env — nomi qanday bo'lishidan qat'i nazar. Backend'da
+# `.env` va `.env.local` ro'yxati `.env.bak-20260902` ni o'tkazib
+# yuborgan va u jonli kalitlar bilan git kuzatuviga tushgan edi.
+.env*
+!.env.example
