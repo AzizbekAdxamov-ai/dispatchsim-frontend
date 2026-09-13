@@ -1,11 +1,11 @@
 import { Van, Snowflake, Stack, TruckTrailer, Drop, Truck } from '@phosphor-icons/react'
-import truckDryVan from '../assets/truck-side.png'
+import truckDryVan from '../assets/truck-side.webp'
 import truckDryVanNight from '../assets/truck-side-night.png' 
 import truckReefer from '../assets/truck-slate.png'
 import truckFlatbed from '../assets/truck-flatbed-slate.png'
 import truckStepDeck from '../assets/truck-lowboy-slate.png'
 import truckTanker from '../assets/truck-tanker-slate.png'
-import truckPowerOnly from '../assets/truck-power-only.png'
+import truckPowerOnly from '../assets/truck-power-only.webp'
 
 // Single source of truth for equipment type → label/icon/image.
 // image is deliberately theme-independent: each type has exactly one

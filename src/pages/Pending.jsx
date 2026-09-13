@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
 import { roleHomePath } from '../data/roleRoutes'
 import { ApiError } from '../api/client'
-import truckBg from '../assets/truck-bg.png'
+import truckBg from '../assets/truck-bg.webp'
 import './Login.css'
 import './Pending.css'
 

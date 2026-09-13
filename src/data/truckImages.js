@@ -10,10 +10,10 @@ import truckSlate from '../assets/truck-slate.png'
 import truckFlatbed from '../assets/truck-flatbed-slate.png'
 import truckLowboy from '../assets/truck-lowboy-slate.png'
 import truckTanker from '../assets/truck-tanker-slate.png'
-import truckPowerOnly from '../assets/truck-power-only.png'
-import truckSide from '../assets/truck-side.png'
+import truckPowerOnly from '../assets/truck-power-only.webp'
+import truckSide from '../assets/truck-side.webp'
 import truckSideNight from '../assets/truck-side-night.png'
-import truckFront from '../assets/truck-front.png'
+import truckFront from '../assets/truck-front.webp'
 
 // Three angles per listing: the tractor with the trailer it is set up for,
 // then two views of the tractor itself. Enough to look at, few enough that
