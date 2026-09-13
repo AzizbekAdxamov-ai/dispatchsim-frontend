@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { standingMessage } from '../utils/companyStanding'
+import { chatLimitMessage } from '../utils/chatBudget.js'
 import { Link, useSearchParams } from 'react-router-dom'
 import { ChatCircle, DownloadSimple, FileText, CheckCircle } from '@phosphor-icons/react'
 import {
@@ -34,11 +36,17 @@ function actionErrorText(err) {
   const code = err instanceof ApiError ? err.code : null
   switch (code) {
     case 'CHAT_DAILY_LIMIT':
-      return "You've hit today's message limit. It resets tomorrow."
+      return chatLimitMessage(err) ?? err.message
     case 'CHAT_UNAVAILABLE':
       return 'The broker cannot be reached right now. Try again in a moment.'
     case 'RATE_OUT_OF_BAND':
       return err.message
+    // Accepting a rate confirmation is what books the load, so this is
+    // where a company past its line finds out it cannot take the freight.
+    // The broker is not refusing — the lender is.
+    case 'CREDIT_LINE_EXHAUSTED':
+    case 'COMPANY_INSOLVENT':
+      return standingMessage(err) ?? err.message
     case 'POSTING_TAKEN':
       return 'This load has already been booked by someone else.'
     case 'POSTING_EXPIRED':
