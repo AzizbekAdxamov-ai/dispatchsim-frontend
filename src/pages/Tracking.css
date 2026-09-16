@@ -7,6 +7,21 @@
   gap: 10px;
 }
 
+/* empty board: icon, headline and hint sized here -- never inline styles */
+.tracking-empty-icon {
+  opacity: 0.3;
+}
+
+.tracking-empty-title {
+  margin-top: 12px;
+}
+
+.tracking-empty-sub {
+  font-size: 12px;
+  opacity: 0.5;
+  margin-top: 4px;
+}
+
 /* refresh indicator: a quiet dot that lights up while a poll is in flight */
 .tracking-refresh {
   width: 7px;
@@ -131,11 +146,17 @@
   background: none;
   border: none;
   border-bottom: 1px solid var(--border-soft);
-  padding: 13px 16px;
+  padding: 12px 16px;
   cursor: pointer;
   font-family: inherit;
   color: inherit;
   transition: background 0.15s ease;
+}
+
+/* keyboard focus lands on the whole row; inset so it hugs the row edges */
+.tracking-row:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
 }
 
 .tracking-row:last-child {

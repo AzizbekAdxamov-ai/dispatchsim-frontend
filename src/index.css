@@ -27,6 +27,13 @@ button {
   font-family: inherit;
 }
 
+/* one keyboard-focus rule for every interactive element; components may
+   re-tune offset, but focus must never be invisible */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 a {
   color: inherit;
   text-decoration: none;

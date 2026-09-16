@@ -74,9 +74,9 @@ export default function Tracking() {
       {!loading && !error && loads.length === 0 && (
         <div className="panel">
           <div className="page-empty">
-            <MapPin size={32} weight="thin" style={{ opacity: 0.3 }} />
-            <div style={{ marginTop: 12 }}>No active shipments to track.</div>
-            <div style={{ fontSize: 12, opacity: 0.5, marginTop: 4 }}>
+            <MapPin size={32} weight="thin" className="tracking-empty-icon" />
+            <div className="tracking-empty-title">No active shipments to track.</div>
+            <div className="tracking-empty-sub">
               Dispatch a load to see it move here.
             </div>
           </div>
