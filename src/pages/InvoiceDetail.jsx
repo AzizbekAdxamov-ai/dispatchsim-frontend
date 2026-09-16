@@ -1,8 +1,10 @@
+import { useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { DownloadSimple, PaperPlaneTilt } from '@phosphor-icons/react'
 import { INVOICE_STATUS_LABEL, PAYMENT_TERMS } from '../data/financeData'
-import { EQUIPMENT_TYPES, formatEquipment } from '../data/equipmentTypes'
+import { EQUIPMENT_TYPES } from '../data/equipmentTypes'
 import { getInvoice } from '../api/finance'
+import { downloadInvoicePdf } from '../api/documents'
 import { useResource } from '../hooks/useResource'
 import { formatMoney, formatDate, formatPlace, formatWeight, formatDateTime, formatDistance } from '../utils/format'
 import '../components/dashboard/Panel.css'
@@ -33,6 +35,7 @@ function daysOutstanding(invoice) {
 export default function InvoiceDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const [downloading, setDownloading] = useState(false)
 
   const { data: invoice, error, loading } = useResource((signal) => getInvoice(id, signal), [id], { pollMs: 20000 })
 
@@ -62,6 +65,16 @@ export default function InvoiceDetail() {
   const equip = load ? EQUIPMENT_TYPES[load.equipmentType] : null
   const outstanding = daysOutstanding(invoice)
 
+  async function handleDownload() {
+    if (downloading) return
+    setDownloading(true)
+    try {
+      await downloadInvoicePdf(invoice.id)
+    } finally {
+      setDownloading(false)
+    }
+  }
+
   return (
     <div>
       <div className="invoice-detail-crumbs">
@@ -82,8 +95,8 @@ export default function InvoiceDetail() {
           <div className="invoice-detail-meta">{invoice.broker}</div>
         </div>
         <div className="invoice-detail-actions">
-          <button className="invoice-detail-btn">
-            <DownloadSimple size={14} aria-hidden="true" /> Download PDF
+          <button className="invoice-detail-btn" disabled={downloading} onClick={handleDownload}>
+            <DownloadSimple size={14} aria-hidden="true" /> {downloading ? 'Preparing…' : 'Download PDF'}
           </button>
           <button className="invoice-detail-btn primary">
             <PaperPlaneTilt size={14} aria-hidden="true" />

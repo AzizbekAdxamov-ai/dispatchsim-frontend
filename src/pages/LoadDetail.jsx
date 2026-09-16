@@ -7,6 +7,7 @@ import { STATUS_LABEL } from '../data/mockData'
 import { EQUIPMENT_TYPES, formatEquipment } from '../data/equipmentTypes'
 import { useTheme } from '../theme/ThemeProvider'
 import { getLoad, cancelDispatch } from '../api/loads'
+import { downloadBol, downloadPod } from '../api/documents'
 import { ApiError } from '../api/client'
 import DispatchPanel from '../components/loads/DispatchPanel'
 import RoadEventPanel from '../components/loads/RoadEventPanel'
@@ -200,10 +201,34 @@ export default function LoadDetail() {
 
           <div className="panel">
             <div className="panel-head"><div className="panel-title">Documents</div></div>
-            {/* Document generation/upload is out of scope this round (see
-                CLAUDE.md's C13 mock-trim plan) — every load shows the same
-                empty state rather than fabricated per-load files. */}
-            <div className="ld-driver-empty">No documents uploaded yet.</div>
+            {/* Generated from the load's own events, not uploaded: the BOL
+                exists once the run started, the POD once it ended. A
+                document that certifies an event that has not happened is
+                refused by the API, so each action gates on the same fact. */}
+            {load.dispatchedAt ? (
+              <div className="ld-docs-row">
+                <button
+                  type="button"
+                  className="ld-doc-btn"
+                  onClick={() => downloadBol(load.id)}
+                  title="Bill of lading — the shipper's paperwork for freight going ON the truck"
+                >
+                  BOL · Bill of lading
+                </button>
+                {load.deliveredAt && (
+                  <button
+                    type="button"
+                    className="ld-doc-btn"
+                    onClick={() => downloadPod(load.id)}
+                    title="Proof of delivery — signed when the freight came OFF the truck"
+                  >
+                    POD · Proof of delivery
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="ld-driver-empty">Paperwork appears once the load is dispatched.</div>
+            )}
           </div>
 
           <div className="panel">

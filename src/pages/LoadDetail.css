@@ -350,6 +350,31 @@
   color: var(--text-3);
 }
 
+.ld-docs-row {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  flex-wrap: wrap;
+}
+
+.ld-doc-btn {
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.ld-doc-btn:hover {
+  background: var(--panel-3);
+  color: var(--text);
+  border-color: var(--blue);
+}
+
 .ld-track-body {
   padding: 16px;
 }
