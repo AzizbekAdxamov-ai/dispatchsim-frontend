@@ -1,37 +1,32 @@
-.tracking-toolbar {
+/* Tracking board: fleet map + on-the-road list + detail strip.
+   Every color through tokens only -- the map recolors when the theme flips. */
+
+.tracking-head-meta {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 18px;
+  gap: 10px;
 }
 
-.tracking-range {
-  display: flex;
-  gap: 8px;
+/* refresh indicator: a quiet dot that lights up while a poll is in flight */
+.tracking-refresh {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: background 0.3s ease;
 }
 
-.tracking-range-btn {
-  background: var(--panel);
-  border: 1px solid var(--border-soft);
-  border-radius: 7px;
-  padding: 7px 12px;
-  font-size: 12px;
-  color: var(--text-2);
-  cursor: pointer;
+.tracking-refresh.on {
+  background: var(--blue);
+}
+
+.tracking-open-events {
+  margin-left: auto;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-}
-
-.tracking-new-btn {
-  background: var(--text);
-  color: var(--bg);
-  border: none;
-  border-radius: 8px;
-  padding: 9px 16px;
-  font-size: 12.5px;
-  font-weight: 600;
-  cursor: pointer;
+  gap: 5px;
+  font-size: 11.5px;
+  color: var(--amber);
 }
 
 .tracking-grid {
@@ -41,253 +36,320 @@
   align-items: start;
 }
 
-.tracking-col-main,
-.tracking-col-side {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
+/* --- Map --- */
 
-/* shipment card */
-.tracking-shipment-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px;
-  gap: 16px;
-  overflow: hidden;
-}
-
-.tracking-shipment-label {
-  font-size: 10.5px;
-  color: var(--text-3);
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-}
-
-.tracking-shipment-value {
-  font-size: 18px;
-  font-weight: 600;
-  margin-top: 2px;
-  margin-bottom: 14px;
-}
-
-.tracking-stat-grid {
-  display: grid;
-  grid-template-columns: repeat(2, auto);
-  gap: 10px 24px;
-}
-
-.tracking-stat {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.tracking-stat-icon {
-  width: 26px;
-  height: 26px;
-  border-radius: 7px;
-  background: var(--panel-2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  flex-shrink: 0;
-}
-
-.tracking-stat-val {
-  font-size: 12.5px;
-  color: var(--text);
-  font-weight: 500;
-}
-
-.tracking-truck-img {
-  width: 220px;
-  height: auto;
-  flex-shrink: 0;
-  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.18));
-}
-
-/* route card */
-.tracking-route-meta {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--border-soft);
-  flex-wrap: wrap;
-}
-
-.tracking-route-meta-key {
-  font-size: 10px;
-  color: var(--text-3);
-  margin-bottom: 2px;
-}
-
-.tracking-route-meta-val {
-  font-size: 12.5px;
-  color: var(--text);
-  font-weight: 500;
-}
-
-.tracking-status-badge {
-  margin-left: auto;
-  text-transform: capitalize;
-}
-
-.tracking-timeline {
-  padding: 16px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.tracking-timeline-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.tracking-timeline-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  margin-top: 4px;
-  flex-shrink: 0;
-}
-
-.tracking-timeline-dot.done { background: var(--green); }
-.tracking-timeline-dot.pending { background: var(--amber); }
-
-.tracking-timeline-body {
-  flex: 1;
-}
-
-.tracking-timeline-label {
-  font-size: 10.5px;
-  color: var(--text-3);
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
-.tracking-timeline-place {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text);
-  margin-top: 1px;
-}
-
-.tracking-timeline-time {
-  font-size: 11.5px;
-  color: var(--text-2);
-  flex-shrink: 0;
-}
-
-/* map card */
 .tracking-map {
   position: relative;
-  height: 260px;
+  padding: 8px;
 }
 
 .tracking-map-svg {
   width: 100%;
-  height: 100%;
+  height: auto;
   display: block;
+}
+
+.tracking-us-land {
+  fill: var(--panel-2);
+  stroke: var(--border);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+
+.tracking-us-lake {
+  fill: var(--bg);
+  stroke: var(--border-soft);
+  stroke-width: 0.8;
+}
+
+.tracking-lane {
+  fill: none;
+  stroke: var(--text-3);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  opacity: 0.5;
+  transition: opacity 0.2s ease, stroke 0.2s ease;
+}
+
+.tracking-lane:hover {
+  opacity: 0.85;
+  cursor: pointer;
+}
+
+.tracking-lane.late {
+  stroke: var(--red);
+  opacity: 0.55;
+}
+
+.tracking-lane.selected {
+  stroke: var(--blue);
+  stroke-width: 2.2;
+  opacity: 1;
+}
+
+.tracking-lane.selected.late {
+  stroke: var(--red);
+}
+
+.tracking-endpoint {
+  fill: var(--panel);
+  stroke: var(--text-2);
+  stroke-width: 1.5;
+}
+
+.tracking-fleet-dot {
+  fill: var(--blue);
+  stroke: var(--panel);
+  stroke-width: 1.5;
+  cursor: pointer;
+  transition: fill 0.15s ease;
+}
+
+.tracking-fleet-dot:hover {
+  fill: var(--blue-strong);
+}
+
+.tracking-fleet-dot.late {
+  fill: var(--red);
+}
+
+.tracking-fleet-dot.late:hover {
+  fill: var(--red-strong);
+}
+
+/* --- List --- */
+
+.tracking-list {
+  max-height: 560px;
+  overflow-y: auto;
+}
+
+.tracking-row {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border-soft);
+  padding: 13px 16px;
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
+  transition: background 0.15s ease;
+}
+
+.tracking-row:last-child {
+  border-bottom: none;
+}
+
+.tracking-row:hover {
   background: var(--panel-2);
 }
 
-.tracking-map-controls {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+.tracking-row.selected {
+  background: var(--panel-2);
+  box-shadow: inset 2px 0 0 var(--blue);
 }
 
-.tracking-map-controls button {
-  width: 26px;
-  height: 26px;
-  border-radius: 6px;
-  border: 1px solid var(--border-soft);
-  background: var(--panel);
-  color: var(--text-2);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.tracking-row.selected.late {
+  box-shadow: inset 2px 0 0 var(--red);
 }
 
-/* contact card */
-.tracking-contact-card {
+.tracking-row-top {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 14px 16px;
+  justify-content: space-between;
+  margin-bottom: 5px;
 }
 
-.tracking-contact-avatar {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: var(--blue-dim);
-  color: var(--blue-strong);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
+.tracking-row-id {
+  font-size: 12.5px;
   font-weight: 600;
-  flex-shrink: 0;
 }
 
-.tracking-contact-body {
-  flex: 1;
+.tracking-row-route {
+  font-size: 12.5px;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.tracking-row-route .arrow {
+  color: var(--text-3);
+  margin: 0 5px;
+}
+
+.tracking-row-progress-track {
+  height: 4px;
+  border-radius: 3px;
+  background: var(--panel-3);
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.tracking-row-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--blue);
+}
+
+.tracking-row-progress-fill.late {
+  background: var(--red);
+}
+
+.tracking-row-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 7px;
+}
+
+.tracking-row-progress {
+  font-size: 11px;
+  color: var(--text-2);
+}
+
+.tracking-row-eta {
+  font-size: 11px;
+  color: var(--text-2);
+}
+
+.tracking-row.late .tracking-row-eta {
+  color: var(--red);
+}
+
+.tracking-row-unit {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11.5px;
+  color: var(--text-3);
+  gap: 8px;
+}
+
+.tracking-row-unit > span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   min-width: 0;
 }
 
-.tracking-contact-role {
+.tracking-row-nodriver {
+  color: var(--amber);
+}
+
+.tracking-row-rate {
+  flex-shrink: 0;
+}
+
+/* Stopped tag: a road event is open -- the truck is not moving until it is
+   answered (claimArrivedLoads skips it). Stated, not hidden. */
+.tracking-stopped-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 8px;
   font-size: 10.5px;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--amber);
+  background: var(--amber-bg);
+  border-radius: 6px;
+  padding: 2px 7px;
+}
+
+/* --- Detail strip --- */
+
+.tracking-detail {
+  grid-column: 1 / -1;
+}
+
+.tracking-detail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.tracking-detail-title {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.tracking-detail-link {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--blue);
+  text-decoration: none;
+}
+
+.tracking-detail-link:hover {
+  text-decoration: underline;
+}
+
+.tracking-detail-route {
+  font-size: 12.5px;
+  color: var(--text-2);
+  margin-top: 3px;
+}
+
+.tracking-detail-route .arrow {
+  margin: 0 5px;
   color: var(--text-3);
 }
 
-.tracking-contact-name {
-  font-size: 13px;
-  font-weight: 500;
+.tracking-detail-distance {
+  margin-left: 10px;
+  color: var(--text-3);
+}
+
+.tracking-detail-stats {
+  display: grid;
+  grid-template-columns: repeat(6, auto);
+  gap: 10px 28px;
+  padding: 14px 16px;
+}
+
+.tracking-detail-key {
+  font-size: 10px;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 2px;
+}
+
+.tracking-detail-val {
+  font-size: 12.5px;
   color: var(--text);
+  font-weight: 500;
 }
 
-.tracking-contact-actions {
-  display: flex;
-  gap: 6px;
-}
-
-.tracking-contact-actions button {
-  width: 30px;
-  height: 30px;
-  border-radius: 7px;
-  border: 1px solid var(--border-soft);
-  background: var(--panel);
-  color: var(--text-2);
-  cursor: pointer;
+.tracking-detail-stopped {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 8px;
+  padding: 11px 16px;
+  border-top: 1px solid var(--border-soft);
+  background: var(--amber-bg);
+  color: var(--amber-strong);
+  font-size: 12px;
 }
 
-.tracking-contact-actions button:hover {
-  background: var(--panel-2);
-  color: var(--text);
+.tracking-detail-stopped .tracking-detail-link {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--amber-strong);
 }
 
 @media (max-width: 980px) {
   .tracking-grid {
     grid-template-columns: 1fr;
   }
-  .tracking-shipment-card {
-    flex-direction: column;
-  }
-  .tracking-truck-img {
-    width: 70%;
+  .tracking-detail-stats {
+    grid-template-columns: repeat(3, auto);
   }
 }
