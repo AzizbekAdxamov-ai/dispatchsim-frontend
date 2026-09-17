@@ -1,5 +1,6 @@
-// The map layer: one SVG, the continental US, every in-transit lane drawn
-// on it, and the marker for the selected load pulsing at its position.
+// The map layer: one SVG, the continental US (with real state borders),
+// every in-transit lane drawn on it, and the marker for the selected load
+// pulsing at its position.
 //
 // Framer Motion handles the marker animation (position transitions, the
 // pulse ring) -- this is simple state animation, exactly the division of
@@ -8,11 +9,18 @@
 //
 // Hard rule respected: every color comes from CSS variables, so the map
 // recolors itself when the theme flips dark <-> cream.
+//
+// NATION_PATH and STATE_PATHS are generated (src/data/usMap.js, built by
+// scripts/build-us-map.mjs from us-atlas) -- do not hand-edit that data.
+// `project` here is built from that same file's PROJECTION_BOUNDS via
+// makeProject(), the one projector the build script also used, so the
+// boundaries and every truck/lane on top of them are always in agreement.
 
 import { motion } from 'framer-motion'
-import {
-  TRACKING_VIEWBOX, US_OUTLINE_PATH, LAKE_MICHIGAN_PATH, project, lanePathD,
-} from '../../utils/usProjection'
+import { TRACKING_VIEWBOX, makeProject, lanePathD } from '../../utils/usProjection'
+import { PROJECTION_BOUNDS, NATION_PATH, STATE_PATHS } from '../../data/usMap'
+
+const project = makeProject(PROJECTION_BOUNDS)
 
 // Marker radius in SVG units -- fixed because the viewBox scales it.
 const MARKER_R = 5.5
@@ -59,7 +67,7 @@ function pulsingMarker({ x, y, late }) {
   )
 }
 
-export default function TrackingMap({ loads, selected, onSelect }) {
+export default function TrackingMap({ loads, cities = [], selected, onSelect }) {
   const selectedLoad = loads.find((l) => l.id === selected) ?? null
 
   return (
@@ -69,13 +77,35 @@ export default function TrackingMap({ loads, selected, onSelect }) {
       role="img"
       aria-label="Map of in-transit loads across the continental United States"
     >
-      {/* land + water first, lanes and markers on top */}
-      <path className="tracking-us-land" d={US_OUTLINE_PATH} />
-      <path className="tracking-us-lake" d={LAKE_MICHIGAN_PATH} />
+      {/* land fill first (nation silhouette), state borders on top of
+          it, lanes and markers on top of those. Census boundaries already
+          cut out the Great Lakes as background, so no separate lake shape
+          is needed the way the hand-drawn outline required. */}
+      <path className="tracking-us-land" d={NATION_PATH} />
+      {STATE_PATHS.map((s) => (
+        <path key={s.id} className="tracking-us-state" d={s.d}>
+          <title>{s.name}</title>
+        </path>
+      ))}
+
+      {/* Standing city layer: the seed's closed set of freight hubs, drawn
+          whether or not anything is moving. The map is this page's subject,
+          not a backdrop that materialises with the first load -- and the
+          dots give every lane two endpoints the reader can recognise before
+          a truck is anywhere near them. Below the lanes on purpose: they are
+          ground, and the fleet is what sits on top of it. */}
+      {cities.map((c) => {
+        const p = project(c.lat, c.lon)
+        return (
+          <circle key={`${c.city}, ${c.state}`} cx={p.x} cy={p.y} r={1.6} className="tracking-city-dot">
+            <title>{`${c.city}, ${c.state}`}</title>
+          </circle>
+        )
+      })}
 
       {/* every lane at low emphasis; the selected one draws on top */}
       {loads.map((load) => {
-        const d = lanePathD(load.originPos, load.destinationPos)
+        const d = lanePathD(project, load.originPos, load.destinationPos)
         if (!d) return null
         const isSelected = load.id === selected
         return (

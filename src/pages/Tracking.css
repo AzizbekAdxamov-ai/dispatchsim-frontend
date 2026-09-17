@@ -44,6 +44,14 @@
   color: var(--amber);
 }
 
+/* Excluded-load count: a fact about the data (unmapped city / bad ETA
+   window), not a warning -- neutral text color, no amber/red. */
+.tracking-excluded-note {
+  font-size: 11.5px;
+  color: var(--text-3);
+  margin: -6px 0 16px;
+}
+
 .tracking-grid {
   display: grid;
   grid-template-columns: 1.7fr 1fr;
@@ -53,11 +61,114 @@
 
 /* --- Map --- */
 
+/* MapLibre's container needs a concrete pixel height (unlike the old SVG,
+   which was width: 100%, height: auto and let its viewBox set the aspect
+   ratio). 420px keeps the panel close to the old map's ~740:400 aspect at
+   a typical panel width, and lands close to the on-the-road list panel's
+   own height (.tracking-list's 560px max-height plus its head) so the two
+   side-by-side panels still read as one row instead of one dwarfing the
+   other. */
 .tracking-map {
   position: relative;
   padding: 8px;
+  height: 420px;
 }
 
+.fleet-map-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 6px;
+}
+
+/* Two classes, not one: MapLibre stamps its own `.maplibregl-map { position:
+   relative }` onto this same element (the map is created with this div as
+   its container), and that stylesheet loads inside the lazy FleetMap chunk
+   -- after this file in both dev and the production build. Equal specificity
+   would let the later rule win and collapse the container to height 0 (the
+   map's own overflow: hidden then clips the canvas entirely: an empty
+   panel, no error anywhere). Winning on specificity instead of import order
+   keeps that from ever coming back. */
+.fleet-map-wrap .fleet-map-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+/* Tile/style load failure -- stated, not swallowed into a console-only
+   error (see FleetMap.jsx's `error` handler). Neutral tone, no red/amber:
+   this is a fact about connectivity, not a verdict on the data, same
+   reasoning as .tracking-excluded-note above. */
+.tracking-map-tile-error {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+  background: var(--panel-2);
+  color: var(--text-3);
+  font-size: 12.5px;
+  pointer-events: none;
+}
+
+/* MapLibre's built-in attribution control (required, never removed -- see
+   FleetMap.jsx) ships its own light-chrome styling that clashes with the
+   dark theme. Restyled with our own tokens so it reads as part of the
+   panel in both themes rather than a pasted-on widget. */
+.tracking-map .maplibregl-ctrl-attrib {
+  background: var(--panel-2);
+  color: var(--text-3);
+  font-size: 10.5px;
+  border-radius: 4px;
+}
+
+.tracking-map .maplibregl-ctrl-attrib a {
+  color: var(--text-2);
+}
+
+.tracking-map .maplibregl-ctrl-attrib-button {
+  filter: none;
+}
+
+.tracking-map .maplibregl-popup-content {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: none;
+  font-size: 11.5px;
+  padding: 5px 9px;
+}
+
+.tracking-map .maplibregl-popup-tip {
+  border-top-color: var(--panel);
+  border-bottom-color: var(--panel);
+}
+
+/* Empty fleet: the message sits ON the map, not instead of it. .tracking-map
+   is already position: relative, so this overlays the outline without
+   changing the panel's height -- the page does not reflow when the last load
+   is delivered. pointer-events: none keeps the map itself clickable
+   underneath, which matters the moment a load appears mid-poll. */
+.tracking-map-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--text-3);
+  pointer-events: none;
+}
+
+/* --- Unused since the fleet map moved to MapLibre (FleetMap.jsx) ---
+   These rules styled the hand-drawn SVG map (TrackingMap.jsx). That
+   component is still in the tree -- Azizbek can decide at review time
+   whether to delete it and this block along with it -- so the rules stay
+   here rather than being silently dropped. Nothing in the current page
+   references these class names any more. */
 .tracking-map-svg {
   width: 100%;
   height: auto;
@@ -66,15 +177,27 @@
 
 .tracking-us-land {
   fill: var(--panel-2);
+  /* No stroke here on purpose: the outer coastline is just the outermost
+     state borders, so .tracking-us-state already draws it. A stroke on
+     this fill too would double every coastal edge. */
+}
+
+.tracking-us-state {
+  fill: none;
   stroke: var(--border);
-  stroke-width: 1;
+  stroke-width: 0.6;
   stroke-linejoin: round;
 }
 
-.tracking-us-lake {
-  fill: var(--bg);
-  stroke: var(--border-soft);
-  stroke-width: 0.8;
+/* Cities are on screen at all times, so they have to read as ground rather
+   than as fleet: close to the border ink, so they look like part of the
+   map's own drawing while still standing out against the finer state
+   lines now underneath them. The accent colours stay reserved for things
+   that move. Pointer events stay on so the <title> names the city on
+   hover; the lanes and fleet dots are drawn after these, so they win any
+   overlap. */
+.tracking-city-dot {
+  fill: var(--text-3);
 }
 
 .tracking-lane {
@@ -373,4 +496,34 @@
   .tracking-detail-stats {
     grid-template-columns: repeat(3, auto);
   }
+}
+
+/* Shown while the map chunk is still downloading. Same footprint as the
+   empty-fleet message so the panel does not change height when the map
+   arrives. */
+.tracking-map-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-3);
+}
+
+/* The tile-error notice has to outrank the empty-fleet overlay. Both are
+   absolutely positioned inside .tracking-map, and the empty overlay is
+   rendered after FleetMap in the DOM -- so without this, the one case that
+   matters most (no loads AND no map) showed "No active shipments" and said
+   nothing at all about the map having failed. That is the silent-failure
+   this project keeps having to dig back out. */
+.tracking-map-tile-error {
+  z-index: 2;
+}
+
+.tracking-map-tile-reason {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--text-3);
+  max-width: 90%;
+  word-break: break-word;
 }
