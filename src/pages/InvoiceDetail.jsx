@@ -36,6 +36,9 @@ export default function InvoiceDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [downloading, setDownloading] = useState(false)
+  // Same catch-and-offer-retry pattern as Documents.jsx's DocAction: a
+  // network blip or a 409 used to leave this click with no visible result.
+  const [downloadFailed, setDownloadFailed] = useState(false)
 
   const { data: invoice, error, loading } = useResource((signal) => getInvoice(id, signal), [id], { pollMs: 20000 })
 
@@ -67,9 +70,12 @@ export default function InvoiceDetail() {
 
   async function handleDownload() {
     if (downloading) return
+    setDownloadFailed(false)
     setDownloading(true)
     try {
       await downloadInvoicePdf(invoice.id)
+    } catch {
+      setDownloadFailed(true)
     } finally {
       setDownloading(false)
     }
@@ -95,8 +101,14 @@ export default function InvoiceDetail() {
           <div className="invoice-detail-meta">{invoice.broker}</div>
         </div>
         <div className="invoice-detail-actions">
-          <button className="invoice-detail-btn" disabled={downloading} onClick={handleDownload}>
-            <DownloadSimple size={14} aria-hidden="true" /> {downloading ? 'Preparing…' : 'Download PDF'}
+          <button
+            className={'invoice-detail-btn' + (downloadFailed ? ' failed' : '')}
+            disabled={downloading}
+            onClick={handleDownload}
+            title={downloadFailed ? 'Download failed — click to retry' : undefined}
+          >
+            <DownloadSimple size={14} aria-hidden="true" />
+            {downloading ? 'Preparing…' : downloadFailed ? 'Retry download' : 'Download PDF'}
           </button>
           <button className="invoice-detail-btn primary">
             <PaperPlaneTilt size={14} aria-hidden="true" />

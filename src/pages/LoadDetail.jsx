@@ -59,6 +59,23 @@ export default function LoadDetail() {
   const [cancelling, setCancelling] = useState(false)
   const [cancelError, setCancelError] = useState('')
 
+  // BOL/POD downloads used to fire and forget -- a network blip or a 409
+  // left the click with no visible result. Same catch-and-offer-retry
+  // pattern as Documents.jsx's DocAction, adapted to a single named button
+  // instead of a table row's icon slot.
+  const [bolDownload, setBolDownload] = useState({ busy: false, failed: false })
+  const [podDownload, setPodDownload] = useState({ busy: false, failed: false })
+
+  async function handleDocDownload(downloadFn, loadId, setState) {
+    setState({ busy: true, failed: false })
+    try {
+      await downloadFn(loadId)
+      setState({ busy: false, failed: false })
+    } catch {
+      setState({ busy: false, failed: true })
+    }
+  }
+
   const { data: load, error, loading, refetch } = useResource(
     (signal) => getLoad(id, signal), [id], { pollMs: 15000 },
   )
@@ -209,20 +226,26 @@ export default function LoadDetail() {
               <div className="ld-docs-row">
                 <button
                   type="button"
-                  className="ld-doc-btn"
-                  onClick={() => downloadBol(load.id)}
-                  title="Bill of lading — the shipper's paperwork for freight going ON the truck"
+                  className={'ld-doc-btn' + (bolDownload.failed ? ' failed' : '')}
+                  disabled={bolDownload.busy}
+                  onClick={() => handleDocDownload(downloadBol, load.id, setBolDownload)}
+                  title={bolDownload.failed
+                    ? 'Download failed — click to retry'
+                    : "Bill of lading — the shipper's paperwork for freight going ON the truck"}
                 >
-                  BOL · Bill of lading
+                  {bolDownload.busy ? 'BOL · Downloading…' : bolDownload.failed ? 'BOL · Retry download' : 'BOL · Bill of lading'}
                 </button>
                 {load.deliveredAt && (
                   <button
                     type="button"
-                    className="ld-doc-btn"
-                    onClick={() => downloadPod(load.id)}
-                    title="Proof of delivery — signed when the freight came OFF the truck"
+                    className={'ld-doc-btn' + (podDownload.failed ? ' failed' : '')}
+                    disabled={podDownload.busy}
+                    onClick={() => handleDocDownload(downloadPod, load.id, setPodDownload)}
+                    title={podDownload.failed
+                      ? 'Download failed — click to retry'
+                      : 'Proof of delivery — signed when the freight came OFF the truck'}
                   >
-                    POD · Proof of delivery
+                    {podDownload.busy ? 'POD · Downloading…' : podDownload.failed ? 'POD · Retry download' : 'POD · Proof of delivery'}
                   </button>
                 )}
               </div>

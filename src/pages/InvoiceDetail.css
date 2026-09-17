@@ -82,6 +82,11 @@
   border: none;
 }
 
+.invoice-detail-btn.failed {
+  color: var(--red);
+  border-color: var(--red);
+}
+
 .invoice-stat-mini-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
