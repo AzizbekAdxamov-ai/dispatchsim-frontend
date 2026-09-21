@@ -1,3 +1,36 @@
+/* The page fits the window exactly -- the one chrome number from
+   tokens.css (topbar 52px + content padding 40px). The head, tabs and
+   toolbar always stay visible; only the table scrolls, so "the list"
+   scrolls instead of the whole page sliding out from under its own
+   controls -- the same model the tracking page and the chats use. */
+.loads-page {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - var(--shell-chrome));
+  min-height: 480px;
+}
+
+.loads-page .page-head,
+.loads-page .page-tabs,
+.loads-page .page-toolbar {
+  flex-shrink: 0;
+}
+
+.loads-page .load-board {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* The column headings ride with the scroll: a 400-row list loses its
+   column meanings without them pinned. */
+.loads-page .load-board th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--panel);
+}
+
 .loads-route-sub {
   font-size: 10.5px;
   color: var(--text-3);

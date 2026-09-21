@@ -1,3 +1,18 @@
+/* Layout chrome: everything a page sits under -- the 52px topbar plus the
+   content box's 20px top and 20px bottom padding. One number so every
+   full-height page (tracking, chats, loads) fits the window exactly,
+   instead of each page guessing its own subtraction and drifting -- the
+   broker chat page used to overflow the window by 12px for exactly
+   that reason. */
+:root {
+  --shell-chrome-base: 92px;
+  --shell-chrome: var(--shell-chrome-base);
+  /* The section tab row under the topbar (SectionTabs.css). When a
+     section has one, AppShell marks .main.has-section-tabs and the chrome
+     grows by exactly this much -- see SectionTabs.css. */
+  --section-tabs-h: 40px;
+}
+
 :root[data-theme="dark"] {
   --bg: #0C0F14;
   --panel: #12161D;

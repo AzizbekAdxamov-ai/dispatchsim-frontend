@@ -1,7 +1,10 @@
 .broker-chat {
   display: grid;
   grid-template-columns: 280px 1fr;
-  height: calc(100vh - 80px);
+  /* The one chrome number (tokens.css): topbar 52px + content padding
+     40px. A hand-picked 80px here used to overflow the window by 12px
+     and scroll the whole page. */
+  height: calc(100vh - var(--shell-chrome));
   min-height: 480px;
   background: var(--panel);
   border: 1px solid var(--border-soft);

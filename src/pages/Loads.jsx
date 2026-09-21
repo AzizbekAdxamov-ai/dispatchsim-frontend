@@ -87,7 +87,7 @@ export default function Loads() {
   const counts = data?.meta?.counts
 
   return (
-    <>
+    <div className="loads-page">
       <div className="page-head">
         <div>
           <div className="page-title">Loads</div>
@@ -246,6 +246,6 @@ export default function Loads() {
           </tbody>
         </table>
       </div>
-    </>
+    </div>
   )
 }
