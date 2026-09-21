@@ -57,7 +57,7 @@ function DocAction({ label, state, onClick }) {
 
   return (
     <button
-      className={'doc-action' + (state !== 'ready' ? ' disabled' : '')}
+      className={'doc-action' + (state !== 'ready' ? ' disabled' : failed ? ' failed' : '')}
       onClick={handle}
       disabled={state !== 'ready' || busy}
       title={state !== 'ready' ? `${label} is not available yet` : `Download ${label}`}
@@ -113,7 +113,7 @@ export default function Documents() {
         ))}
       </div>
 
-      <div className="panel">
+      <div className="panel load-board documents-table">
         <table>
           <thead>
             <tr>
@@ -166,7 +166,7 @@ export default function Documents() {
             {!loading && !error && rows.length === 0 && (
               <tr>
                 <td colSpan={8} className="page-empty">
-                  <FileText size={24} weight="thin" style={{ opacity: 0.3, display: 'block', margin: '0 auto 8px' }} />
+                  <FileText size={24} weight="thin" className="doc-empty-icon" aria-hidden="true" />
                   No paperwork yet. Documents appear as loads are dispatched and delivered.
                 </td>
               </tr>
