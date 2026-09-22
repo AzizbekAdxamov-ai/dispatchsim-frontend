@@ -25,6 +25,8 @@ import { useEffect, useRef, useState } from 'react'
 // aliased to avoid shadowing the built-in global.
 import { Map as MapLibreMap, Popup } from 'maplibre-gl'
 import { greatCirclePoints } from '../../utils/usProjection'
+import { formatMoney, formatEta } from '../../utils/format'
+import { STATUS_LABEL } from '../../data/mockData'
 // MapLibre's own stylesheet -- its controls (attribution, zoom) and
 // popups need it. Imported here, not in the page, so it travels with
 // this lazily-loaded chunk instead of the entry bundle.
@@ -79,7 +81,18 @@ function fleetToGeoJSON(loads) {
     features: loads.map((l) => ({
       type: 'Feature',
       geometry: { type: 'Point', coordinates: [l.lon, l.lat] },
-      properties: { id: idStr(l.id), late: Boolean(l.late) },
+      properties: {
+        id: idStr(l.id),
+        late: Boolean(l.late),
+        // Popup fields, formatted HERE rather than at hover time: the
+        // popup's DOM builder reads properties only, so it never needs the
+        // load objects and never re-formats the same number twice.
+        route: `${l.originCity}, ${l.originState} → ${l.destinationCity}, ${l.destinationState}`,
+        progress: `${Math.round((l.progress ?? 0) * 100)}%`,
+        remaining: l.distanceRemainingMi != null ? `${Math.round(l.distanceRemainingMi).toLocaleString('en-US')} mi` : '—',
+        eta: formatEta(l.etaAt, l.promisedEtaAt) ?? '—',
+        rate: formatMoney(l.rateUsd),
+      },
     })),
   }
 }
@@ -382,6 +395,69 @@ function addLayers(map, { loads, cities, selected, selectedFullGeometry, searchL
 
 const CLICKABLE_LAYERS = ['fleet-layer', 'fleet-selected-layer', 'lanes-layer', 'lanes-selected-layer']
 
+// The load popup's DOM, in the same language as the route planner's trip
+// summary (RoutePlanner.jsx): a labeled head bar with the status badge,
+// the route line, and a two-column key/value grid for the numbers. Built
+// as real DOM (MapLibre's setDOM), not an HTML string -- the same reason
+// the rest of the app never innerHTML's user-shaped text. Formatted values
+// arrive pre-formatted in the feature properties (fleetToGeoJSON).
+function loadPopupEl(p) {
+  const root = document.createElement('div')
+  root.className = 'fleet-popup'
+
+  const head = document.createElement('div')
+  head.className = 'fleet-popup-head'
+  const num = document.createElement('span')
+  num.className = 'fleet-popup-num mono'
+  num.textContent = `#${p.id}`
+  const badge = document.createElement('span')
+  badge.className = 'badge ' + (p.late ? 'crit' : 'ontime')
+  const dot = document.createElement('span')
+  dot.className = 'dot'
+  badge.append(dot, document.createTextNode(p.late ? STATUS_LABEL.crit : STATUS_LABEL.ontime))
+  head.append(num, badge)
+
+  const route = document.createElement('div')
+  route.className = 'fleet-popup-route'
+  route.textContent = p.route
+
+  const grid = document.createElement('div')
+  grid.className = 'fleet-popup-grid'
+  const CELLS = [
+    ['Progress', p.progress, true],
+    ['Remaining', p.remaining, true],
+    ['ETA', p.eta, true],
+    ['Rate', p.rate, true],
+  ]
+  for (const [key, val] of CELLS) {
+    const cell = document.createElement('div')
+    cell.className = 'fleet-popup-cell'
+    const k = document.createElement('div')
+    k.className = 'fleet-popup-key'
+    k.textContent = key
+    const v = document.createElement('div')
+    v.className = 'fleet-popup-val mono'
+    v.textContent = val
+    cell.append(k, v)
+    grid.append(cell)
+  }
+
+  root.append(head, route, grid)
+  return root
+}
+
+// A click already opens the full detail in the side panel; the popup's job
+// is the glance -- so hover on a load point (or its lane) previews it, and
+// the pointer leaving either layer takes it away.
+function showLoadPopup(map, popup, props, lngLat) {
+  popup.setDOMContent(loadPopupEl(props))
+  popup.setLngLat(lngLat).addTo(map)
+}
+
+function hideLoadPopup(popup) {
+  popup.remove()
+}
+
 export default function FleetMap({
   loads, cities = [], selected, onSelect, searchLane = null, resultLanes = [], fitKey = 0,
   routeAlternatives = [], activeAltIndex = null, altFitKey = 0, selectedFullGeometry = null,
@@ -479,12 +555,37 @@ export default function FleetMap({
         const id = e.features?.[0]?.properties?.id
         if (id != null && id !== '') onSelectRef.current?.(id)
       })
-      map.on('mouseenter', layerId, () => { map.getCanvas().style.cursor = 'pointer' })
-      map.on('mouseleave', layerId, () => { map.getCanvas().style.cursor = '' })
+      // Hover on a fleet point or its lane previews the load in the same
+      // popup (the point carries the formatted fields; the lane falls back
+      // to the fleet feature with the same id -- lanes carry id+late only).
+      map.on('mouseenter', layerId, (e) => {
+        map.getCanvas().style.cursor = 'pointer'
+        const f = e.features?.[0]
+        const p = f?.properties
+        if (!p?.id) return
+        if (layerId === 'fleet-layer' || layerId === 'fleet-selected-layer') {
+          showLoadPopup(map, loadPopup, p, f.geometry.coordinates)
+        } else {
+          const hit = (loadsRef.current ?? []).find((l) => idStr(l.id) === p.id)
+          const pt = hit && Number.isFinite(hit.lon) ? [hit.lon, hit.lat] : f.geometry?.coordinates?.slice?.(0, 2)
+          if (hit) {
+            const fl = fleetToGeoJSON([hit]).features[0]
+            showLoadPopup(map, loadPopup, fl.properties, pt)
+          }
+        }
+      })
+      map.on('mouseleave', layerId, () => {
+        map.getCanvas().style.cursor = ''
+        hideLoadPopup(loadPopup)
+      })
     })
 
     // City name on hover, replacing the SVG map's <title> tooltip.
     const popup = new Popup({ closeButton: false, closeOnClick: false, offset: 8 })
+    // The load preview popup -- separate instance from the city tooltip:
+    // different content lifecycle (mouseenter/leave per layer vs per
+    // feature), and hideLoadPopup must never hide a city name mid-hover.
+    const loadPopup = new Popup({ closeButton: false, closeOnClick: false, offset: 10, maxWidth: '280px' })
     map.on('mouseenter', 'cities-layer', (e) => {
       map.getCanvas().style.cursor = 'pointer'
       const f = e.features?.[0]
@@ -508,6 +609,7 @@ export default function FleetMap({
     return () => {
       resizeObserver.disconnect()
       popup.remove()
+      loadPopup.remove()
       map.remove()
       mapRef.current = null
     }
