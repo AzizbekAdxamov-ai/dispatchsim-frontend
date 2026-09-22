@@ -1,0 +1,59 @@
+.hos-back {
+  color: var(--blue);
+  text-decoration: none;
+}
+
+.hos-back:hover {
+  text-decoration: underline;
+}
+
+.hos-day-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hos-day-label {
+  font-size: 12.5px;
+  color: var(--text-2);
+  min-width: 170px;
+  text-align: center;
+}
+
+.hos-grid-panel {
+  padding: 14px 16px 12px;
+  margin-bottom: 16px;
+}
+
+.hos-grid-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  margin-top: 8px;
+  font-size: 11.5px;
+  color: var(--text-3);
+}
+
+.hos-grid-total {
+  margin-left: auto;
+  font-family: var(--mono, ui-monospace, monospace);
+  color: var(--text-2);
+}
+
+.hos-swatch {
+  display: inline-block;
+  width: 18px;
+  height: 0;
+  vertical-align: middle;
+  margin-right: 4px;
+  border-top: 2.5px solid var(--blue);
+}
+
+.hos-swatch.planned {
+  border-top: 2px dashed var(--text-3);
+}
+
+.hos-planned-row td {
+  color: var(--text-3);
+}

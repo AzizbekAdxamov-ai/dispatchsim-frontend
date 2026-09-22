@@ -1,0 +1,49 @@
+.eld-grid {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.eld-row { fill: var(--panel); stroke: var(--border-soft); stroke-width: 1; }
+.eld-row.alt { fill: var(--panel-2); }
+
+.eld-tick { stroke: var(--border-soft); stroke-width: 1; }
+.eld-tick.major { stroke: var(--border); }
+
+.eld-hour {
+  fill: var(--text-3);
+  font-size: 10px;
+  text-anchor: middle;
+}
+
+.eld-row-label {
+  fill: var(--text-2);
+  font-size: 11px;
+  font-weight: 600;
+  text-anchor: end;
+}
+
+.eld-total {
+  fill: var(--text);
+  font-size: 11.5px;
+  font-family: var(--mono, ui-monospace, monospace);
+  text-anchor: end;
+}
+
+.eld-line {
+  fill: none;
+  stroke: var(--blue);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+.eld-line.planned {
+  stroke: var(--text-3);
+  stroke-dasharray: 4 4;
+  stroke-width: 2;
+}
+
+.eld-now {
+  stroke: var(--amber);
+  stroke-width: 1.5;
+}

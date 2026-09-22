@@ -1,0 +1,82 @@
+.hos-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--text-2);
+}
+
+.hos-filter select {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 12.5px;
+  font-family: inherit;
+}
+
+.hos-filter select:focus-visible,
+.hos-filter input:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 1px;
+}
+
+.hos-filter-check {
+  cursor: pointer;
+}
+
+.hos-table th,
+.hos-table td {
+  white-space: nowrap;
+}
+
+.hos-zero {
+  color: var(--red);
+  font-weight: 600;
+}
+
+.hos-muted {
+  color: var(--text-3);
+}
+
+.hos-violation {
+  margin-left: 6px;
+}
+
+.hos-footnote {
+  margin-top: 10px;
+  font-size: 11.5px;
+  color: var(--text-3);
+}
+
+.hos-table {
+  overflow-x: auto;
+}
+
+.hos-violation-detail td {
+  background: var(--panel-2);
+  font-size: 12px;
+}
+
+.hos-type-badge {
+  margin-right: 6px;
+}
+
+.hos-link-cell {
+  text-align: right;
+}
+
+.hos-link-cell a {
+  color: var(--blue);
+  text-decoration: none;
+  font-size: 12px;
+}
+
+.hos-link-cell a:hover {
+  text-decoration: underline;
+}
+
+.hos-expand-col {
+  width: 28px;
+}

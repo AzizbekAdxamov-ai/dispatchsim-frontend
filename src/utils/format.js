@@ -107,7 +107,7 @@ export function formatHos(min) {
 // Minutes → 'Xd Yh' | 'Xh Ym' | 'Xm', NOT zero-padded — for durations that
 // can run past a day (an ETA on an 862 mi flatbed load), matching the
 // mock's 'ETA 1d 4h' / 'ETA 1h 8m' style.
-function formatDurationLong(min) {
+export function formatDurationLong(min) {
   const abs = Math.max(0, Math.round(Math.abs(min)))
   const days = Math.floor(abs / 1440)
   const hours = Math.floor((abs % 1440) / 60)

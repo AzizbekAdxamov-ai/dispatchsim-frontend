@@ -1,0 +1,60 @@
+.section-tabs {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  height: var(--section-tabs-h);
+  box-sizing: border-box;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--border-soft);
+  background: var(--bg);
+  flex-shrink: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.section-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.section-tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  text-decoration: none;
+  white-space: nowrap;
+  border-radius: 6px 6px 0 0;
+}
+
+.section-tab:hover {
+  color: var(--text);
+  background: var(--panel-2);
+}
+
+.section-tab.active {
+  color: var(--text);
+}
+
+.section-tab:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: -2px;
+}
+
+.section-tab-underline {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: var(--blue);
+}
+
+/* Full-height pages (tracking, chats, loads, routes) size themselves off
+   --shell-chrome; the tab row is chrome too. */
+.main.has-section-tabs {
+  --shell-chrome: calc(var(--shell-chrome-base) + var(--section-tabs-h));
+}

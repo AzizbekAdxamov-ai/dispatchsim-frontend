@@ -1,9 +1,111 @@
-/* Tracking board: fleet map + on-the-road list + detail strip.
-   Every color through tokens only -- the map recolors when the theme flips. */
+/* Tracking: full-bleed fleet map + a fixed-width panel beside it, Google-
+   Maps style -- nothing floats over the map but MapLibre's own controls.
+   Every color through tokens only -- the map recolors when the theme flips.
+
+   This used to be a panel-and-small-map grid (.tracking-grid, below) with
+   a SEPARATE full-screen route (/tracking/map, MapExplore.jsx) that
+   floated the same search panel and fleet list over the map in cards.
+   Both are gone: MapExplore.jsx/.css are no longer routed (kept in the
+   tree, unused -- see the coder's report), and .tracking-grid's rules stay
+   here, marked, rather than deleted -- nothing currently renders them. */
+
+.tracking-page {
+  /* AppShell's own content box (Topbar.css: 52px) plus its 20px top/bottom
+     padding (AppShell.jsx's inline style -- neither touched here) already
+     reserves 40px above what this page gets; the one chrome number in
+     tokens.css so every full-height page subtracts the same thing. */
+  height: calc(100vh - var(--shell-chrome));
+  min-height: 480px;
+}
+
+.tracking-layout {
+  display: flex;
+  height: 100%;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  background: var(--panel);
+}
+
+/* Panel width: a fixed rail, not something that reflows per lane -- the
+   same reason a real Google Maps directions panel does not resize itself.
+   The number comes from the widest row the panel actually prints: a route
+   option's "<roadRefs>   <distance> · <duration>" line
+   (.tracking-route-row-line), e.g. "I-40 · I-25 · I-80" (18 IBM Plex Mono
+   glyphs) beside "2,700 mi · 1d 14h" (18 glyphs, via
+   utils/format.js's formatDurationLong -- a cross-country lane routinely
+   clears 24h, so "Xd Yh" is the realistic long case, not "Xh").
+   At 12.5px mono (~0.6em advance, ~7.5px/glyph) that's roughly
+   135px + 135px = 270px of text, +10px flex gap between them = 280px,
+   +24px row padding (.tracking-route-row's 12px each side), +32px panel
+   padding (.tracking-panel-scroll's 16px each side), +~10px scrollbar
+   gutter once the panel's content overflows = ~346px. 400px keeps real
+   headroom above that floor for font-metric drift across browsers/OS and
+   was also checked against LaneSearchPanel's own two-city-box grid, which
+   needs its own room in the same column. */
+.tracking-panel {
+  flex: 0 0 400px;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-right: 1px solid var(--border);
+  background: var(--panel);
+}
+
+.tracking-layout.panel-collapsed .tracking-panel {
+  display: none;
+}
+
+/* The panel scrolls as one column -- not the page (AppShell's .content is
+   the page-level scroller and stays untouched), and not each section on
+   its own (a nested scrollbar per section, doubled against this one,
+   reads as broken). */
+.tracking-panel-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+}
+
+.tracking-panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tracking-panel-collapse {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-2);
+  cursor: pointer;
+}
+
+.tracking-panel-collapse:hover {
+  background: var(--panel-3);
+  color: var(--text);
+}
+
+.tracking-panel-section {
+  display: flex;
+  flex-direction: column;
+}
 
 .tracking-head-meta {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
 }
 
@@ -36,7 +138,6 @@
 }
 
 .tracking-open-events {
-  margin-left: auto;
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -49,17 +150,21 @@
 .tracking-excluded-note {
   font-size: 11.5px;
   color: var(--text-3);
-  margin: -6px 0 16px;
 }
 
+/* --- UNUSED: the old panel-beside-small-map grid ---
+   Tracking.jsx no longer renders .tracking-grid/.tracking-map-panel/
+   .tracking-list-panel/.tracking-detail -- the panel and the map are now
+   .tracking-panel/.tracking-map-pane, flex children of .tracking-layout
+   above. Kept rather than deleted per this pass's own rule (nothing here
+   currently matches, nothing here is deleted); Azizbek can drop this
+   block at review time. */
 .tracking-grid {
   display: grid;
   grid-template-columns: 1.7fr 1fr;
   gap: 16px;
   align-items: start;
 }
-
-/* --- Map --- */
 
 /* MapLibre's container needs a concrete pixel height (unlike the old SVG,
    which was width: 100%, height: auto and let its viewBox set the aspect
@@ -73,13 +178,21 @@
   padding: 8px;
   height: 420px;
 }
+/* --- end unused grid block --- */
+
+/* --- Map pane: full-bleed, MapLibre's own controls only --- */
+
+.tracking-map-pane {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
 
 .fleet-map-wrap {
   position: relative;
   width: 100%;
   height: 100%;
   overflow: hidden;
-  border-radius: 6px;
 }
 
 /* Two classes, not one: MapLibre stamps its own `.maplibregl-map { position:
@@ -117,22 +230,22 @@
    FleetMap.jsx) ships its own light-chrome styling that clashes with the
    dark theme. Restyled with our own tokens so it reads as part of the
    panel in both themes rather than a pasted-on widget. */
-.tracking-map .maplibregl-ctrl-attrib {
+.tracking-map-pane .maplibregl-ctrl-attrib {
   background: var(--panel-2);
   color: var(--text-3);
   font-size: 10.5px;
   border-radius: 4px;
 }
 
-.tracking-map .maplibregl-ctrl-attrib a {
+.tracking-map-pane .maplibregl-ctrl-attrib a {
   color: var(--text-2);
 }
 
-.tracking-map .maplibregl-ctrl-attrib-button {
+.tracking-map-pane .maplibregl-ctrl-attrib-button {
   filter: none;
 }
 
-.tracking-map .maplibregl-popup-content {
+.tracking-map-pane .maplibregl-popup-content {
   background: var(--panel);
   color: var(--text);
   border: 1px solid var(--border);
@@ -141,16 +254,16 @@
   padding: 5px 9px;
 }
 
-.tracking-map .maplibregl-popup-tip {
+.tracking-map-pane .maplibregl-popup-tip {
   border-top-color: var(--panel);
   border-bottom-color: var(--panel);
 }
 
-/* Empty fleet: the message sits ON the map, not instead of it. .tracking-map
-   is already position: relative, so this overlays the outline without
-   changing the panel's height -- the page does not reflow when the last load
-   is delivered. pointer-events: none keeps the map itself clickable
-   underneath, which matters the moment a load appears mid-poll. */
+/* Empty fleet: the message sits ON the map, not instead of it. Nothing in
+   Tracking.jsx currently renders this (the map pane's own outline plus
+   the panel's "Nothing on the road right now." already say it), kept
+   for the same not-deleted reason as the grid block above -- this is
+   pre-existing, not introduced by this pass. */
 .tracking-map-empty {
   position: absolute;
   inset: 0;
@@ -255,11 +368,106 @@
   fill: var(--red-strong);
 }
 
+/* --- Road route alternatives (getLaneRoutes) --- */
+
+.tracking-routes {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tracking-routes-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.tracking-route-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  padding: 12px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.tracking-route-row:hover {
+  border-color: var(--text-3);
+}
+
+.tracking-route-row.selected {
+  border-color: var(--blue);
+  box-shadow: inset 0 0 0 1px var(--blue);
+}
+
+/* A measured comparison (shortest of the alternatives OSRM found), not a
+   recommendation -- neutral tone like .tracking-excluded-note, never the
+   "good" green this project reserves for a verdict it does not make. */
+.tracking-route-fastest {
+  align-self: flex-start;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-2);
+  background: var(--panel-3);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+.tracking-route-row-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12.5px;
+}
+
+.tracking-route-refs {
+  color: var(--text);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tracking-route-row-meta {
+  color: var(--text-2);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Route fetch failed (ROUTE_UNAVAILABLE, or any other OSRM failure) --
+   stated, not silent. The map keeps drawing its dashed straight-line
+   lane; this is the words for what that line actually is. */
+.tracking-route-unavailable {
+  font-size: 12px;
+  color: var(--text-2);
+  padding: 2px 0;
+}
+
+.tracking-route-unavailable-reason {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--text-3);
+}
+
 /* --- List --- */
 
+/* No max-height/overflow of its own any more -- .tracking-panel-scroll
+   owns the one scrollbar for the whole panel (search, routes, list,
+   detail together); a second, nested scroller here would double it. */
 .tracking-list {
-  max-height: 560px;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .tracking-row {
@@ -401,8 +609,117 @@
   padding: 2px 7px;
 }
 
-/* --- Detail strip --- */
+/* --- Selected load detail, inside the panel --- */
 
+.tracking-panel-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.tracking-panel-detail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tracking-panel-detail-title {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.tracking-panel-detail-route {
+  font-size: 12px;
+  color: var(--text-2);
+  margin-top: 4px;
+}
+
+.tracking-panel-detail-route .arrow {
+  margin: 0 5px;
+  color: var(--text-3);
+}
+
+.tracking-panel-detail-distance {
+  font-size: 11.5px;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+
+/* 2 columns, not the old strip's 6 -- this lives in a 400px column, not a
+   grid-spanning full-width strip (see the unused .tracking-detail-stats
+   below). 3 rows of 2 keeps every "<key><value>" pair readable without
+   the column shrinking past its label. */
+.tracking-panel-detail-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px 16px;
+}
+
+.tracking-panel-detail-note {
+  font-size: 11.5px;
+  color: var(--text-3);
+}
+
+.tracking-detail-stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.tracking-detail-key {
+  font-size: 10px;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 2px;
+}
+
+.tracking-detail-val {
+  font-size: 12.5px;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.tracking-detail-link {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--blue);
+  text-decoration: none;
+}
+
+.tracking-detail-link:hover {
+  text-decoration: underline;
+}
+
+.tracking-detail-stopped {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 12px;
+  border-radius: 6px;
+  background: var(--amber-bg);
+  color: var(--amber-strong);
+  font-size: 12px;
+}
+
+.tracking-detail-stopped .tracking-detail-link {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--amber-strong);
+}
+
+/* --- UNUSED: the old full-width detail strip ---
+   This rendered below .tracking-grid, spanning both columns
+   (grid-column: 1 / -1). The panel-embedded replacement above
+   (.tracking-panel-detail*) reuses .tracking-detail-key/-val/-link/
+   -stopped from this block (still active -- see above) but needs its own
+   head/title/route/distance/stats rules for a 400px column instead of a
+   full-width strip. Kept per this pass's don't-delete-unused rule. */
 .tracking-detail {
   grid-column: 1 / -1;
 }
@@ -422,17 +739,6 @@
   gap: 12px;
   font-size: 13.5px;
   font-weight: 600;
-}
-
-.tracking-detail-link {
-  font-size: 11.5px;
-  font-weight: 500;
-  color: var(--blue);
-  text-decoration: none;
-}
-
-.tracking-detail-link:hover {
-  text-decoration: underline;
 }
 
 .tracking-detail-route {
@@ -457,42 +763,60 @@
   gap: 10px 28px;
   padding: 14px 16px;
 }
+/* --- end unused detail-strip block --- */
 
-.tracking-detail-key {
-  font-size: 10px;
-  color: var(--text-3);
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  margin-bottom: 2px;
-}
-
-.tracking-detail-val {
-  font-size: 12.5px;
-  color: var(--text);
-  font-weight: 500;
-}
-
-.tracking-detail-stopped {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 11px 16px;
-  border-top: 1px solid var(--border-soft);
-  background: var(--amber-bg);
-  color: var(--amber-strong);
-  font-size: 12px;
-}
-
-.tracking-detail-stopped .tracking-detail-link {
+/* --- UNUSED: the old map panel's header row ---
+   Held the "Open full map" link (to the now-removed /tracking/map route)
+   and the open-road-event count. The count moved into .tracking-head-meta
+   (panel header, above); the link had nowhere left to point once the two
+   pages merged into one. */
+.tracking-map-head-right {
   margin-left: auto;
-  flex-shrink: 0;
-  color: var(--amber-strong);
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
 }
+
+.tracking-map-expand-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  color: var(--blue);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.tracking-map-expand-link:hover {
+  text-decoration: underline;
+}
+/* --- end unused map-header block --- */
 
 @media (max-width: 980px) {
-  .tracking-grid {
-    grid-template-columns: 1fr;
+  /* Narrow viewport: panel on top (its own bounded height, still the
+     single scroller for its own content), map fills what's left below --
+     same split .tracking-layout uses at desktop width, just stacked
+     instead of side by side. .tracking-page's fixed viewport height
+     (above) is left as-is so this stays one scroll region, not two. */
+  .tracking-layout {
+    flex-direction: column;
   }
+
+  .tracking-panel {
+    flex: 0 0 auto;
+    width: 100%;
+    max-height: 45%;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tracking-map-pane {
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* --- UNUSED (see the block above): narrow-viewport override for the
+     old full-width detail strip's 6-column grid. --- */
   .tracking-detail-stats {
     grid-template-columns: repeat(3, auto);
   }
@@ -511,7 +835,7 @@
 }
 
 /* The tile-error notice has to outrank the empty-fleet overlay. Both are
-   absolutely positioned inside .tracking-map, and the empty overlay is
+   absolutely positioned inside .tracking-map-pane, and the empty overlay is
    rendered after FleetMap in the DOM -- so without this, the one case that
    matters most (no loads AND no map) showed "No active shipments" and said
    nothing at all about the map having failed. That is the silent-failure
@@ -526,4 +850,31 @@
   color: var(--text-3);
   max-width: 90%;
   word-break: break-word;
+}
+
+/* The one thing allowed to float over the map besides MapLibre's own
+   controls: the way back in once the panel is collapsed. Top-left, clear
+   of MapLibre's own zoom control (top-right by default) and its
+   attribution (bottom). */
+.tracking-map-expand {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-2);
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 22%);
+}
+
+.tracking-map-expand:hover {
+  background: var(--panel-2);
+  color: var(--text);
 }

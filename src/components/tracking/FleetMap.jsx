@@ -24,75 +24,13 @@ import { useEffect, useRef, useState } from 'react'
 // still online) -- import the pieces used here by name instead. `Map` is
 // aliased to avoid shadowing the built-in global.
 import { Map as MapLibreMap, Popup } from 'maplibre-gl'
-import { PROJECTION_BOUNDS } from '../../data/usMap'
 import { greatCirclePoints } from '../../utils/usProjection'
 // MapLibre's own stylesheet -- its controls (attribution, zoom) and
 // popups need it. Imported here, not in the page, so it travels with
 // this lazily-loaded chunk instead of the entry bundle.
 import 'maplibre-gl/dist/maplibre-gl.css'
 
-// OpenFreeMap's hosted styles (free, no API key). Picked per theme so the
-// basemap's own ink matches the app's dark/cream split rather than fighting
-// it -- 'positron' is OpenFreeMap's light/muted style, 'dark' its dark one.
-const STYLE_URL = {
-  dark: 'https://tiles.openfreemap.org/styles/dark',
-  light: 'https://tiles.openfreemap.org/styles/positron',
-}
-
-// PROJECTION_BOUNDS.minY/maxY (from usMap.js, generated from us-atlas's
-// real Census geometry) are Mercator-projected y values in mercY()'s
-// pseudo-degree units, not raw latitude -- see usProjection.js's own
-// comment on mercY. Inverting that same formula here recovers the actual
-// latitude bounds of the exact geometry the SVG map was built from, so the
-// vector map's bounding box is not a second, hand-typed guess at where the
-// continental US sits.
-function invMercY(y) {
-  const rad = 2 * Math.atan(Math.exp((y * Math.PI) / 180)) - Math.PI / 2
-  return (rad * 180) / Math.PI
-}
-
-const US_LAT_MIN = invMercY(PROJECTION_BOUNDS.minY)
-const US_LAT_MAX = invMercY(PROJECTION_BOUNDS.maxY)
-
-// Padding added around the exact Census bbox before it becomes maxBounds.
-// A hard box drawn right at the coastline would put open ocean or the
-// Canada/Mexico border strip at the very edge of what the user can pan to,
-// which feels clipped rather than like the edge of the country. A handful
-// of degrees (roughly one state's width) gives room to pan a little past
-// the mapped cities without drifting off into other continents, which is
-// the whole point of maxBounds here -- this board tracks a US-only fleet.
-const BOUNDS_PAD_LON = 5
-const BOUNDS_PAD_LAT = 4
-
-const US_BOUNDS = [
-  [PROJECTION_BOUNDS.minLon - BOUNDS_PAD_LON, US_LAT_MIN - BOUNDS_PAD_LAT],
-  [PROJECTION_BOUNDS.maxLon + BOUNDS_PAD_LON, US_LAT_MAX + BOUNDS_PAD_LAT],
-]
-
-// Our own drawn layers (cities/lanes/fleet dots) must still obey the
-// project's no-hardcoded-color rule, but MapLibre's `paint` properties take
-// plain JS values, not CSS -- there is no `var(--...)` inside a style
-// expression. Reading the resolved custom property off the root element is
-// the one way to keep these colors token-driven instead of hardcoded, and
-// this is re-read on every theme flip (see the MutationObserver below) so
-// the layers stay in sync with dark/cream. The basemap's own colors come
-// from the OpenFreeMap style JSON and are exempt from this rule, same as
-// any other map tile provider's cartography.
-function readColors() {
-  const style = getComputedStyle(document.documentElement)
-  const get = (name) => style.getPropertyValue(name).trim()
-  return {
-    blue: get('--blue'),
-    red: get('--red'),
-    muted: get('--text-3'),
-    panel: get('--panel'),
-    text2: get('--text-2'),
-  }
-}
-
-function currentTheme() {
-  return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark'
-}
+import { STYLE_URL, US_BOUNDS, NORTH_AMERICA_BOUNDS, readColors, currentTheme } from '../map/mapBase'
 
 function idStr(id) {
   return id == null ? '' : String(id)
@@ -109,8 +47,14 @@ function citiesToGeoJSON(cities) {
   }
 }
 
-// LineString coordinates from the shared great-circle sampler -- it already
-// returns [lon, lat] pairs, GeoJSON's own coordinate order, so no swapping.
+// LineString coordinates for every load's lane. `routeGeometry`
+// ([[lon,lat], ...], tracking.service.js's alternative-0 road route) wins
+// when the backend has one -- the great-circle sampler is the fallback
+// for a lane no one has ever searched, same as the marker itself
+// (position.js's positionFor -- geometrySource says which one ran). The
+// LINE never recolors by source: `late` still drives color, source is a
+// fact stated in words (the selected load's detail panel), not a verdict
+// painted onto the map.
 function lanesToGeoJSON(loads) {
   return {
     type: 'FeatureCollection',
@@ -120,7 +64,9 @@ function lanesToGeoJSON(loads) {
         type: 'Feature',
         geometry: {
           type: 'LineString',
-          coordinates: greatCirclePoints(l.originPos, l.destinationPos, 32),
+          coordinates: Array.isArray(l.routeGeometry) && l.routeGeometry.length >= 2
+            ? l.routeGeometry
+            : greatCirclePoints(l.originPos, l.destinationPos, 32),
         },
         properties: { id: idStr(l.id), late: Boolean(l.late) },
       })),
@@ -135,6 +81,118 @@ function fleetToGeoJSON(loads) {
       geometry: { type: 'Point', coordinates: [l.lon, l.lat] },
       properties: { id: idStr(l.id), late: Boolean(l.late) },
     })),
+  }
+}
+
+// The A→B lane the user searched, as [lon, lat] pairs along a great
+// circle -- dashed on the map (a straight-line placeholder, not a road).
+//
+// `hasAlternatives` is true once getLaneRoutes() has real road geometry
+// for this lane (Tracking.jsx's routeAlternatives prop). This line is
+// suppressed in that case -- the real roads (routeAlternativesGeoJSON)
+// take over -- and stays drawn while a route fetch is in flight or failed
+// (ROUTE_UNAVAILABLE), which is exactly when a straight-line estimate is
+// the only distance the page can show.
+function searchLaneLine(searchLane, hasAlternatives) {
+  if (!searchLane?.origin || !searchLane?.destination || hasAlternatives) {
+    return { type: 'FeatureCollection', features: [] }
+  }
+  return {
+    type: 'FeatureCollection',
+    features: [{
+      type: 'Feature',
+      geometry: {
+        type: 'LineString',
+        coordinates: greatCirclePoints(searchLane.origin, searchLane.destination, 48),
+      },
+      properties: {},
+    }],
+  }
+}
+
+// The search lane's endpoint(s) -- both when the lane is complete, the
+// one searched end when only one side was typed. A/B labels stay in the
+// panel; on the map the distinct styling says "these are the searched
+// places", not another fleet dot.
+function searchLanePoints(searchLane) {
+  const ends = []
+  if (searchLane?.origin) ends.push(searchLane.origin)
+  if (searchLane?.destination) ends.push(searchLane.destination)
+  return {
+    type: 'FeatureCollection',
+    features: ends.map((p) => ({
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: [p.lon, p.lat] },
+      properties: {},
+    })),
+  }
+}
+
+// Each recommendation's own lane, drawn faint so the market's shape is
+// visible around the searched one without competing with it for ink.
+function resultLanesGeoJSON(resultLanes) {
+  return {
+    type: 'FeatureCollection',
+    features: (resultLanes ?? [])
+      .filter((r) => r.origin && r.destination)
+      .map((r) => ({
+        type: 'Feature',
+        geometry: {
+          type: 'LineString',
+          coordinates: greatCirclePoints(r.origin, r.destination, 32),
+        },
+        properties: { id: idStr(r.id) },
+      })),
+  }
+}
+
+// The lane-route panel's real road alternatives (getLaneRoutes(), up to
+// three, OSRM's own [lon,lat] order). `activeIndex` marks the one the
+// panel has highlighted (default: shortest duration -- "Fastest", a
+// measurement Tracking.jsx computes, not a recommendation this file
+// makes) so it can be drawn on its own layer, on top, bold -- the rest
+// stay faint underneath. A route whose geometry came back too short to
+// draw (fewer than 2 points) is dropped rather than drawn as a dot.
+function routeAlternativesGeoJSON(routeAlternatives, activeIndex) {
+  return {
+    type: 'FeatureCollection',
+    features: (routeAlternatives ?? [])
+      .filter((r) => Array.isArray(r.geometry) && r.geometry.length >= 2)
+      .map((r) => ({
+        type: 'Feature',
+        geometry: { type: 'LineString', coordinates: r.geometry },
+        properties: { alternativeIndex: r.alternativeIndex, active: r.alternativeIndex === activeIndex },
+      })),
+  }
+}
+
+// The selected load's own lane line, drawn on its own source/layer so it
+// can be upgraded in place once the full-resolution geometry arrives --
+// see Tracking.jsx's selectedFullGeometry (GET /tracking/loads/:id/route,
+// fetched once per selection, never on the poll). Falls back through
+// three tiers, most-accurate first: the full geometry once fetched, the
+// simplified board copy every load already carries while that fetch is
+// in flight or has failed, and the great-circle arc for a lane no one
+// has ever searched at all -- the exact same fallback order
+// lanesToGeoJSON() below already uses for every OTHER (unselected) lane.
+// `id`/`late` stay on the feature so CLICKABLE_LAYERS' click handler and
+// the late-color paint expression keep working exactly as before.
+function selectedLaneGeoJSON(selectedLoad, fullGeometry) {
+  if (!selectedLoad?.originPos || !selectedLoad?.destinationPos) {
+    return { type: 'FeatureCollection', features: [] }
+  }
+  const coordinates = Array.isArray(fullGeometry) && fullGeometry.length >= 2
+    ? fullGeometry
+    : Array.isArray(selectedLoad.routeGeometry) && selectedLoad.routeGeometry.length >= 2
+      ? selectedLoad.routeGeometry
+      : greatCirclePoints(selectedLoad.originPos, selectedLoad.destinationPos, 32)
+  return {
+    type: 'FeatureCollection',
+    features: [{
+      type: 'Feature',
+      geometry: { type: 'LineString', coordinates },
+      properties: { id: idStr(selectedLoad.id), late: Boolean(selectedLoad.late) },
+    }],
   }
 }
 
@@ -158,7 +216,7 @@ function endpointsToGeoJSON(load) {
 // initial 'load', and again after every setStyle() (theme flip) once the
 // new style's 'styledata' fires -- setStyle() throws the old style's
 // sources and layers away, so there is nothing to patch, only to redo.
-function addLayers(map, { loads, cities, selected, colors }) {
+function addLayers(map, { loads, cities, selected, selectedFullGeometry, searchLane, resultLanes, routeAlternatives, activeAltIndex, colors }) {
   const selectedId = idStr(selected)
   const selectedLoad = loads.find((l) => idStr(l.id) === selectedId) ?? null
 
@@ -186,11 +244,14 @@ function addLayers(map, { loads, cities, selected, colors }) {
       'line-opacity': ['case', ['get', 'late'], 0.55, 0.5],
     },
   })
+  // Its OWN source (not a filter on `lanes`), fed by selectedLaneGeoJSON --
+  // see that function's own header for why: it upgrades to the full
+  // geometry independently of the board's simplified `lanes` source.
+  map.addSource('selected-lane', { type: 'geojson', data: selectedLaneGeoJSON(selectedLoad, selectedFullGeometry) })
   map.addLayer({
     id: 'lanes-selected-layer',
     type: 'line',
-    source: 'lanes',
-    filter: ['==', ['get', 'id'], selectedId],
+    source: 'selected-lane',
     layout: { 'line-cap': 'round', 'line-join': 'round' },
     paint: {
       'line-color': ['case', ['get', 'late'], colors.red, colors.blue],
@@ -240,11 +301,91 @@ function addLayers(map, { loads, cities, selected, colors }) {
       'circle-stroke-width': 2,
     },
   })
+
+  // The lane-search panel's drawing, above the fleet: each recommended
+  // posting's lane faint, the searched lane dashed and bold on top. The
+  // endpoints get the panel color + a blue stroke -- clearly not a truck.
+  map.addSource('result-lanes', { type: 'geojson', data: resultLanesGeoJSON(resultLanes) })
+  map.addLayer({
+    id: 'result-lanes-layer',
+    type: 'line',
+    source: 'result-lanes',
+    layout: { 'line-cap': 'round', 'line-join': 'round' },
+    paint: {
+      'line-color': colors.blue,
+      'line-width': 1,
+      'line-opacity': 0.28,
+    },
+  })
+
+  const hasAlternatives = (routeAlternatives?.length ?? 0) > 0
+
+  map.addSource('search-lane', { type: 'geojson', data: searchLaneLine(searchLane, hasAlternatives) })
+  map.addLayer({
+    id: 'search-lane-line',
+    type: 'line',
+    source: 'search-lane',
+    layout: { 'line-cap': 'round', 'line-join': 'round' },
+    paint: {
+      'line-color': colors.blue,
+      'line-width': 2.6,
+      'line-dasharray': [1.2, 1.2],
+      'line-opacity': 0.95,
+    },
+  })
+  map.addSource('search-lane-points', { type: 'geojson', data: searchLanePoints(searchLane) })
+  map.addLayer({
+    id: 'search-lane-points-layer',
+    type: 'circle',
+    source: 'search-lane-points',
+    paint: {
+      'circle-radius': 6,
+      'circle-color': colors.panel,
+      'circle-stroke-color': colors.blue,
+      'circle-stroke-width': 2.5,
+    },
+  })
+
+  // The route panel's real road alternatives, drawn above everything
+  // else the search draws: the un-picked routes faint, the active one
+  // bold on its own layer so it always wins the overlap -- Google Maps'
+  // own convention for "here are your options, this is the one shown".
+  map.addSource('route-alternatives', {
+    type: 'geojson',
+    data: routeAlternativesGeoJSON(routeAlternatives, activeAltIndex),
+  })
+  map.addLayer({
+    id: 'route-alternatives-layer',
+    type: 'line',
+    source: 'route-alternatives',
+    filter: ['!=', ['get', 'active'], true],
+    layout: { 'line-cap': 'round', 'line-join': 'round' },
+    paint: {
+      'line-color': colors.blue,
+      'line-width': 2.2,
+      'line-opacity': 0.3,
+    },
+  })
+  map.addLayer({
+    id: 'route-alternatives-active-layer',
+    type: 'line',
+    source: 'route-alternatives',
+    filter: ['==', ['get', 'active'], true],
+    layout: { 'line-cap': 'round', 'line-join': 'round' },
+    paint: {
+      'line-color': colors.blue,
+      'line-width': 3.4,
+      'line-opacity': 0.95,
+    },
+  })
 }
 
 const CLICKABLE_LAYERS = ['fleet-layer', 'fleet-selected-layer', 'lanes-layer', 'lanes-selected-layer']
 
-export default function FleetMap({ loads, cities = [], selected, onSelect }) {
+export default function FleetMap({
+  loads, cities = [], selected, onSelect, searchLane = null, resultLanes = [], fitKey = 0,
+  routeAlternatives = [], activeAltIndex = null, altFitKey = 0, selectedFullGeometry = null,
+}) {
   const wrapRef = useRef(null)
   const mapRef = useRef(null)
   const [mapReady, setMapReady] = useState(false)
@@ -256,11 +397,25 @@ export default function FleetMap({ loads, cities = [], selected, onSelect }) {
   const loadsRef = useRef(loads)
   const citiesRef = useRef(cities)
   const selectedRef = useRef(selected)
+  const selectedFullGeometryRef = useRef(selectedFullGeometry)
   const onSelectRef = useRef(onSelect)
+  const searchLaneRef = useRef(searchLane)
+  const resultLanesRef = useRef(resultLanes)
+  const fitKeyRef = useRef(fitKey)
+  const routeAlternativesRef = useRef(routeAlternatives)
+  const activeAltIndexRef = useRef(activeAltIndex)
+  const altFitKeyRef = useRef(altFitKey)
   useEffect(() => { loadsRef.current = loads }, [loads])
   useEffect(() => { citiesRef.current = cities }, [cities])
   useEffect(() => { selectedRef.current = selected }, [selected])
+  useEffect(() => { selectedFullGeometryRef.current = selectedFullGeometry }, [selectedFullGeometry])
   useEffect(() => { onSelectRef.current = onSelect }, [onSelect])
+  useEffect(() => { searchLaneRef.current = searchLane }, [searchLane])
+  useEffect(() => { resultLanesRef.current = resultLanes }, [resultLanes])
+  useEffect(() => { fitKeyRef.current = fitKey }, [fitKey])
+  useEffect(() => { routeAlternativesRef.current = routeAlternatives }, [routeAlternatives])
+  useEffect(() => { activeAltIndexRef.current = activeAltIndex }, [activeAltIndex])
+  useEffect(() => { altFitKeyRef.current = altFitKey }, [altFitKey])
 
   // ---- create the map once ----
   useEffect(() => {
@@ -271,6 +426,10 @@ export default function FleetMap({ loads, cities = [], selected, onSelect }) {
       // fitBounds below once the style has loaded) so there is never a
       // flash of the whole globe while tiles are still resolving.
       bounds: US_BOUNDS,
+      // Hard wall: the fleet runs in the US, Canada and Mexico, so those
+      // are the only places the user can pan to. Without this the map is
+      // the whole planet and one stray drag loses the country entirely.
+      maxBounds: NORTH_AMERICA_BOUNDS,
       // Always show the credit line as text rather than collapsing to an
       // icon on narrow panels -- OpenFreeMap/OpenStreetMap attribution is
       // required, and MapLibre renders it for us automatically from the
@@ -305,6 +464,11 @@ export default function FleetMap({ loads, cities = [], selected, onSelect }) {
         loads: loadsRef.current,
         cities: citiesRef.current,
         selected: selectedRef.current,
+        selectedFullGeometry: selectedFullGeometryRef.current,
+        searchLane: searchLaneRef.current,
+        resultLanes: resultLanesRef.current,
+        routeAlternatives: routeAlternativesRef.current,
+        activeAltIndex: activeAltIndexRef.current,
         colors: readColors(),
       })
       setMapReady(true)
@@ -365,6 +529,11 @@ export default function FleetMap({ loads, cities = [], selected, onSelect }) {
           loads: loadsRef.current,
           cities: citiesRef.current,
           selected: selectedRef.current,
+          selectedFullGeometry: selectedFullGeometryRef.current,
+          searchLane: searchLaneRef.current,
+          resultLanes: resultLanesRef.current,
+          routeAlternatives: routeAlternativesRef.current,
+          activeAltIndex: activeAltIndexRef.current,
           colors: readColors(),
         })
         setMapReady(true)
@@ -390,16 +559,90 @@ export default function FleetMap({ loads, cities = [], selected, onSelect }) {
 
   // Selection changes restyle only -- no flyTo/fitBounds, so picking a row
   // in the list or a poll that reorders `loads` never yanks the camera.
+  // Also reruns when `selectedFullGeometry` itself changes (the fetch in
+  // Tracking.jsx resolves after selection, on its own schedule) so the
+  // selected line upgrades from the simplified/arc fallback to the real
+  // road the moment it arrives, with no other prop needing to change.
   useEffect(() => {
     const map = mapRef.current
     if (!mapReady || !map?.getLayer('lanes-selected-layer')) return
     const selectedId = idStr(selected)
-    map.setFilter('lanes-selected-layer', ['==', ['get', 'id'], selectedId])
     map.setFilter('fleet-layer', ['!=', ['get', 'id'], selectedId])
     map.setFilter('fleet-selected-layer', ['==', ['get', 'id'], selectedId])
     const selectedLoad = loads.find((l) => idStr(l.id) === selectedId) ?? null
+    map.getSource('selected-lane')?.setData(selectedLaneGeoJSON(selectedLoad, selectedFullGeometry))
     map.getSource('endpoints')?.setData(endpointsToGeoJSON(selectedLoad))
-  }, [selected, loads, mapReady])
+  }, [selected, loads, selectedFullGeometry, mapReady])
+
+  // The search panel's drawing: swap the lane/results data in place. The
+  // camera is deliberately NOT driven from here -- a poll re-render would
+  // otherwise re-frame the view mid-read. Only an explicit user action
+  // (Enter / Search) bumps fitKey, and that is what may move the camera.
+  // `hasAlternatives` (real routes on screen) also decides whether the
+  // dashed straight-line placeholder is still the thing being drawn --
+  // see searchLaneLine()'s own comment.
+  useEffect(() => {
+    const map = mapRef.current
+    if (!mapReady || !map?.getLayer('search-lane-line')) return
+    const hasAlternatives = routeAlternatives.length > 0
+    map.getSource('search-lane')?.setData(searchLaneLine(searchLane, hasAlternatives))
+    map.getSource('search-lane-points')?.setData(searchLanePoints(searchLane))
+    map.getSource('result-lanes')?.setData(resultLanesGeoJSON(resultLanes))
+  }, [searchLane, resultLanes, routeAlternatives, mapReady])
+
+  // The route panel's own drawing: swap in the real road alternatives and
+  // which one is active. No camera move here either -- picking a row is
+  // what may move it, via the altFitKey effect below, same split as the
+  // lane search's fitKey.
+  useEffect(() => {
+    const map = mapRef.current
+    if (!mapReady || !map?.getSource('route-alternatives')) return
+    map.getSource('route-alternatives').setData(routeAlternativesGeoJSON(routeAlternatives, activeAltIndex))
+  }, [routeAlternatives, activeAltIndex, mapReady])
+
+  // The one sanctioned camera move: the user searched. Frame the lane
+  // (or the single searched end) with padding for the endpoint dots and
+  // labels; everything else stays where the user left it.
+  useEffect(() => {
+    const map = mapRef.current
+    if (!mapReady || !fitKey) return
+    const lane = searchLaneRef.current
+    const pts = []
+    if (lane?.origin) pts.push([lane.origin.lon, lane.origin.lat])
+    if (lane?.destination) pts.push([lane.destination.lon, lane.destination.lat])
+    if (pts.length === 0) return
+    if (pts.length === 1) {
+      map.easeTo({ center: pts[0], zoom: Math.max(map.getZoom(), 5.5), duration: 600 })
+      return
+    }
+    map.fitBounds([pts[0], pts[1]], { padding: 90, duration: 800, maxZoom: 7 })
+  }, [fitKey, mapReady])
+
+  // The other sanctioned camera move: the user picked one route option
+  // out of the up-to-three the panel lists. Frames that route's own
+  // geometry (a real road bends outside the straight line between its
+  // endpoints, so the bbox has to come from every coordinate, not just
+  // the two ends) rather than the whole lane -- clicking a specific
+  // alternative is a request to look at THAT road, closer than the
+  // lane-level fitKey view above.
+  useEffect(() => {
+    const map = mapRef.current
+    if (!mapReady || !altFitKey) return
+    const route = routeAlternativesRef.current.find((r) => r.alternativeIndex === activeAltIndexRef.current)
+    const coords = route?.geometry
+    if (!Array.isArray(coords) || coords.length === 0) return
+    let minLon = Infinity
+    let minLat = Infinity
+    let maxLon = -Infinity
+    let maxLat = -Infinity
+    for (const [lon, lat] of coords) {
+      if (lon < minLon) minLon = lon
+      if (lon > maxLon) maxLon = lon
+      if (lat < minLat) minLat = lat
+      if (lat > maxLat) maxLat = lat
+    }
+    map.fitBounds([[minLon, minLat], [maxLon, maxLat]], { padding: 90, duration: 800, maxZoom: 8 })
+  }, [altFitKey, mapReady])
 
   return (
     <div className="fleet-map-wrap">

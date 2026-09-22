@@ -5,10 +5,18 @@
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  transition: width 0.18s ease;
+}
+
+.sidebar.collapsed {
+  width: 60px;
 }
 
 .brand {
-  padding: 18px 20px;
+  padding: 18px 17px;
   border-bottom: 1px solid var(--border-soft);
   display: flex;
   align-items: center;
@@ -44,6 +52,13 @@
 .nav {
   padding: 14px 10px;
   flex: 1;
+  overflow-y: auto;
+}
+
+/* The rail's tooltips sit OUTSIDE the nav's box; a scrolling box would
+   clip them. Six sections fit a rail at any real screen height. */
+.sidebar.collapsed .nav {
+  overflow: visible;
 }
 
 .nav-item {
@@ -148,4 +163,97 @@
 .user-role {
   font-size: 10.5px;
   color: var(--text-3);
+}
+
+/* ---- Collapse (logo toggles) ------------------------------------- */
+
+.brand-toggle {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 7px;
+  display: flex;
+  flex-shrink: 0;
+}
+
+.brand-toggle:hover .brand-mark {
+  filter: brightness(1.12);
+}
+
+.brand-toggle:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.brand-text,
+.sidebar-footer-text {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.nav-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav-bottom {
+  flex: 0 0 auto;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.sidebar.collapsed .brand-text,
+.sidebar.collapsed .nav-label,
+.sidebar.collapsed .nav-badge,
+.sidebar.collapsed .sidebar-footer-text {
+  display: none;
+}
+
+.sidebar.collapsed .nav-item {
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.sidebar.collapsed .sidebar-footer {
+  justify-content: center;
+  padding: 12px 0;
+}
+
+/* Collapsed labels: a tooltip to the right of the rail. */
+.sidebar.collapsed [data-tip] {
+  position: relative;
+}
+
+.sidebar.collapsed [data-tip]:hover::after,
+.sidebar.collapsed [data-tip]:focus-visible::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 50;
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: var(--panel-3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.nav-item:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: -2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar {
+    transition: none;
+  }
 }

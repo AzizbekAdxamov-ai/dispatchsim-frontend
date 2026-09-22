@@ -2,40 +2,22 @@ import { Outlet, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import Sidebar from './Sidebar'
 import Topbar from './Topbar'
-
-const TITLES = {
-  '/': 'Dashboard',
-  '/loads': 'Loads',
-  '/tracking': 'Tracking',
-  '/drivers': 'Drivers',
-  '/broker-chat': 'Broker chat',
-  '/alerts': 'Alerts',
-  '/documents': 'Documents',
-  '/dispatch-status': 'Dispatch status',
-  '/settings': 'Settings',
-  '/load-board': 'Load board',
-  '/broker-check': 'Broker check',
-  '/cash': 'Cash',
-}
+import SectionTabs from './SectionTabs'
+import { DISPATCH_SECTIONS, DISPATCH_SETTINGS, titleFor, hasSectionTabs } from './navSections'
 
 export default function AppShell() {
   const location = useLocation()
 
-  const title =
-    TITLES[location.pathname] ??
-    (    location.pathname.startsWith('/loads/')
-      ? 'Load details'
-      : location.pathname === '/load-board'
-      ? 'Load board'
-      : location.pathname.startsWith('/drivers/')
-      ? 'Driver details'
-      : 'Dashboard')
+  const title = location.pathname === DISPATCH_SETTINGS.to
+    ? DISPATCH_SETTINGS.label
+    : titleFor(DISPATCH_SECTIONS, location.pathname, 'Dashboard')
 
   return (
     <div className="app" style={{ position: 'relative', display: 'flex', minHeight: '100vh' }}>
-      <Sidebar />
-      <div className="main" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+      <Sidebar sections={DISPATCH_SECTIONS} settings={DISPATCH_SETTINGS} />
+      <div className={'main' + (hasSectionTabs(DISPATCH_SECTIONS, location.pathname) ? ' has-section-tabs' : '')} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
         <Topbar title={title} />
+        <SectionTabs sections={DISPATCH_SECTIONS} />
         <div className="content" style={{ padding: '20px 24px 20px', overflowY: 'auto' }}>
           <AnimatePresence mode="wait">
             <motion.div

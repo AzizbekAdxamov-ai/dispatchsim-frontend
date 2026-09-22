@@ -11,6 +11,10 @@ import Tracking from './pages/Tracking'
 import Loads from './pages/Loads'
 import LoadDetail from './pages/LoadDetail'
 import Alerts from './pages/Alerts'
+import DriverHos from './pages/DriverHos'
+import DriverHosLog from './pages/DriverHosLog'
+import HosViolations from './pages/HosViolations'
+import RoutePlanner from './pages/RoutePlanner'
 import Documents from './pages/Documents'
 import DispatchStatus from './pages/DispatchStatus'
 import Settings from './pages/Settings'
@@ -75,6 +79,10 @@ export default function App() {
             <Route path="alerts" element={<Alerts />} />
             <Route path="documents" element={<Documents />} />
             <Route path="dispatch-status" element={<DispatchStatus />} />
+            <Route path="compliance/hos" element={<DriverHos />} />
+            <Route path="compliance/hos/:driverId" element={<DriverHosLog />} />
+            <Route path="compliance/violations" element={<HosViolations />} />
+            <Route path="routes" element={<RoutePlanner />} />
             <Route path="settings" element={<Settings />} />
           </Route>
           <Route
