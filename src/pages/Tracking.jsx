@@ -1,10 +1,10 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowsInSimple, ArrowsOutSimple, Truck, Warning } from '@phosphor-icons/react'
+import { ArrowsInSimple, ArrowsOutSimple, Park, Truck, Warning } from '@phosphor-icons/react'
 import { getLoadRoute, getTrackingBoard, getTrackingMapReference } from '../api/tracking'
 import { useResource } from '../hooks/useResource'
-import { formatEta, formatMoney, formatPlace } from '../utils/format'
+import { formatEta, formatHos, formatMoney, formatPlace } from '../utils/format'
 import { STATUS_LABEL } from '../data/mockData'
 
 // FleetMap is loaded on demand, and so is MapLibre with it. MapLibre is
@@ -246,11 +246,28 @@ export default function Tracking() {
                         </span>
                         <span className="tracking-row-eta mono">{formatEta(load.etaAt)}</span>
                       </div>
+                      {/* The truck's state at a glance: stopped at a planned
+                          stop with the clock that owns the stop running, or
+                          the driver's drive hours left. Both are facts the
+                          board already computed server-side; neither is a
+                          verdict on the dispatcher. */}
+                      {load.currentStop && (
+                        <div className={'tracking-row-stop' + (load.currentStop.reason === 'rest' ? ' rest' : '')}>
+                          <Park size={12} aria-hidden="true" />
+                          <span>
+                            {load.currentStop.reason === 'rest' ? 'Resting' : load.currentStop.reason === 'fuel' ? 'Fueling' : 'Stopped'}
+                            {load.currentStop.facilityName ? ` at ${load.currentStop.facilityName}` : ' on the shoulder'}
+                          </span>
+                        </div>
+                      )}
                       <div className="tracking-row-unit">
                         {load.driver ? (
                           <>
                             <Truck size={12} aria-hidden="true" />
                             {load.driver.name}
+                            {load.driver.hosRemainingMin != null && (
+                              <span className="tracking-row-hos mono">· {formatHos(load.driver.hosRemainingMin)} drive</span>
+                            )}
                             {load.truck ? ` · ${load.truck.make} ${load.truck.model}` : ''}
                           </>
                         ) : (

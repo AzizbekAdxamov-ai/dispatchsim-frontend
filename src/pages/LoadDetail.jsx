@@ -202,6 +202,58 @@ export default function LoadDetail() {
 
       <div className="load-detail-grid">
         <div>
+          {/* The plan the law wrote at dispatch, and everything it concluded
+              since: the fact list from replans and road events, the legal
+              arrival beside the broker's promise (two facts, no verdict),
+              and the stops the plan makes. Rendered only when the run is
+              planned -- before dispatch there is no plan to show. */}
+          {load.stopPlanStatus && load.dispatchedAt && (
+            <div className="panel">
+              <div className="panel-head">
+                <div className="panel-title">Trip plan</div>
+                <span className={'badge ' + (load.etaAt && load.promisedEtaAt && new Date(load.etaAt) > new Date(load.promisedEtaAt) ? 'warn' : 'ontime')}>
+                  <span className="dot" />
+                  {load.etaAt && load.promisedEtaAt && new Date(load.etaAt) > new Date(load.promisedEtaAt) ? 'Arrives after the promise' : 'Arrives within the promise'}
+                </span>
+              </div>
+              <div className="ld-tripplan-body">
+                <div className="ld-tripplan-eta">
+                  <div className="ld-tripplan-eta-row">
+                    <div className="ld-detail-label">Legal arrival</div>
+                    <div className="ld-detail-value mono">{formatDateTime(load.etaAt)}</div>
+                  </div>
+                  <div className="ld-tripplan-eta-row">
+                    <div className="ld-detail-label">Promised to broker</div>
+                    <div className="ld-detail-value mono">{formatDateTime(load.promisedEtaAt)}</div>
+                  </div>
+                </div>
+                {(load.stopPlanFacts ?? []).length > 0 && (
+                  <ul className="ld-tripplan-facts">
+                    {load.stopPlanFacts.map((f, i) => (
+                      <li key={i}>
+                        {f.cfr && <span className="ld-tripplan-cfr mono">{f.cfr}</span>}
+                        <span>{f.detail}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {(load.plannedStops ?? []).length > 0 && (
+                  <div className="ld-tripplan-stops">
+                    <div className="ld-tripplan-stops-head">Planned stops</div>
+                    {load.plannedStops.map((s, i) => (
+                      <div className="ld-tripplan-stop" key={i}>
+                        <span className="ld-tripplan-stop-mile mono">mi {s.mile}</span>
+                        <span className="ld-tripplan-stop-name">
+                          {s.facility ? `${s.facility.name} · ${s.facility.city}, ${s.facility.state}` : 'Roadside'}
+                        </span>
+                        <span className={'ld-tripplan-stop-reason' + (s.reason === 'rest' ? ' rest' : '')}>{s.reason}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
           <div className="panel">
             <div className="panel-head"><div className="panel-title">Load details</div></div>
             <div className="ld-detail-body">

@@ -939,3 +939,29 @@
   background: var(--panel-2);
   color: var(--text);
 }
+
+/* The row's stop strip: the truck is AT a planned stop right now. Amber
+   for rest (the HOS clock owns it), green for fuel. Facts, not verdicts. */
+.tracking-row-stop {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--amber-strong);
+  margin-top: 6px;
+}
+
+.tracking-row-stop.rest {
+  color: var(--amber-strong);
+}
+
+.tracking-row-stop:not(.rest) {
+  color: var(--green-strong);
+}
+
+/* Drive hours left, beside the driver's name -- the same fact the Driver
+   HOS page shows, at the size the row already speaks. */
+.tracking-row-hos {
+  color: var(--text-3);
+  font-size: 11px;
+}
