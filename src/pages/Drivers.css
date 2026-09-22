@@ -18,3 +18,16 @@
 .drivers-hos-amber {
   color: var(--amber);
 }
+
+/* The Event Log link rides the same quiet button style, but it is a
+   Link: only the color/text-decoration need normalizing. */
+a.driver-card-log-link {
+  text-decoration: none;
+  color: var(--blue);
+  border-color: var(--border);
+  background: var(--panel);
+}
+
+a.driver-card-log-link:hover {
+  background: var(--panel-2);
+}
