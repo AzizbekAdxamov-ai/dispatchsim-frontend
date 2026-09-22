@@ -41,17 +41,6 @@ function errorText(err) {
   if (code === 'DRIVER_REFUSED_WORK') {
     const d = err.details
 
-    // Just delivered, and 49 CFR 395.3 wants ten consecutive hours off
-    // before they drive again. Not a mistake the dispatcher made -- it is
-    // the law, and it passes on its own.
-    if (d?.reason === 'resting') {
-      // No claim about Driver chat. postRefusal is best-effort and its
-      // failure is only logged, so promising the dispatcher a message that
-      // may never have been written would send them to read nothing.
-      return `${d.driverName} came off a run and is on their ${d.requiredRestHours}-hour break — ` +
-        `about ${d.restHoursLeft} hours left.`
-    }
-
     if (d?.owedUsd != null) {
       return `${d.driverName} is owed ${money(d.owedUsd)} across ` +
         `${d.unpaidCount} settlement${d.unpaidCount === 1 ? '' : 's'}, ` +
