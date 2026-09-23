@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ArrowsInSimple, ArrowsOutSimple, Park, Truck, Warning } from '@phosphor-icons/react'
 import { getLoadRoute, getTrackingBoard, getTrackingMapReference } from '../api/tracking'
+import { listFacilities } from '../api/facilities'
 import { useResource } from '../hooks/useResource'
 import { formatEta, formatHos, formatMoney, formatPlace } from '../utils/format'
 import { STATUS_LABEL } from '../data/mockData'
@@ -55,6 +56,11 @@ export default function Tracking() {
   // fleet is what the page is for, and it does not depend on this.
   const { data: mapRef } = useResource((signal) => getTrackingMapReference(signal), [])
   const cities = useMemo(() => mapRef?.cities ?? [], [mapRef])
+
+  // The road's own services, drawn under the fleet. One fetch: the
+  // generator writes them, nothing at runtime moves one (api/facilities.js).
+  const { data: facilitiesData, error: facilitiesError } = useResource((signal) => listFacilities(signal), [])
+  const facilities = useMemo(() => facilitiesData?.facilities ?? [], [facilitiesData])
 
   // Selection defaults to the head of the list (server-ordered by ETA -- the
   // soonest delivery is the one dispatch looks at first) and then stays put:
@@ -176,6 +182,12 @@ export default function Tracking() {
                 reload is the true state. */}
             {error && (
               <div className="page-empty">Could not load tracking — {error.message}</div>
+            )}
+
+            {facilitiesError && (
+              <div className="tracking-excluded-note">
+                Stops could not be loaded — {facilitiesError.message}
+              </div>
             )}
 
             <div className="tracking-panel-section">
@@ -377,6 +389,7 @@ export default function Tracking() {
             <FleetMap
               loads={loads}
               cities={cities}
+              facilities={facilities}
               selected={selected}
               onSelect={setUserSelected}
               selectedFullGeometry={selectedFullGeometry}

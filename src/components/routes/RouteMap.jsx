@@ -103,9 +103,19 @@ export default function RouteMap({ trip }) {
       setTileError((prev) => prev ?? String(reason))
     })
     map.on('load', () => {
+      // The panel beside it, the tab row above it and this page's own
+      // lazy chunk all settle after the map is constructed, so the canvas
+      // is built against whatever height the container had at that
+      // instant -- which was none, and the map drew 300px tall inside a
+      // 766px pane. FleetMap.jsx watches its wrapper for exactly this
+      // reason; so does this one now.
+      map.resize()
       addLayers(map, tripRef.current, readColors())
       fit(map, tripRef.current)
     })
+
+    const resizeObserver = new ResizeObserver(() => map.resize())
+    resizeObserver.observe(wrapRef.current)
 
     // Theme flips restyle the basemap and redraw our layers.
     let lastTheme = currentTheme()
@@ -119,6 +129,7 @@ export default function RouteMap({ trip }) {
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
 
     return () => {
+      resizeObserver.disconnect()
       observer.disconnect()
       map.remove()
       mapRef.current = null

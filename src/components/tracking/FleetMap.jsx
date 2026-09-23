@@ -229,9 +229,83 @@ function endpointsToGeoJSON(load) {
 // initial 'load', and again after every setStyle() (theme flip) once the
 // new style's 'styledata' fires -- setStyle() throws the old style's
 // sources and layers away, so there is nothing to patch, only to redo.
-function addLayers(map, { loads, cities, selected, selectedFullGeometry, searchLane, resultLanes, routeAlternatives, activeAltIndex, colors }) {
+// The road's own services -- fuel stops, truck stops, repair shops and
+// rest areas (facilities, migration 035). Generated, never real brands;
+// see scripts/seed/vocabulary.js's banned-brand rule.
+function facilitiesToGeoJSON(facilities) {
+  return {
+    type: 'FeatureCollection',
+    features: (facilities ?? [])
+      .filter((f) => Number.isFinite(Number(f.lat)) && Number.isFinite(Number(f.lon)))
+      .map((f) => ({
+        type: 'Feature',
+        properties: {
+          name: f.name,
+          kind: f.kind,
+          place: `${f.nearCity}, ${f.nearState}`,
+          diesel: f.fuelPriceCents == null ? '' : `$${(f.fuelPriceCents / 100).toFixed(2)}/gal`,
+          amenities: (f.amenities ?? []).join(' · '),
+        },
+        geometry: { type: 'Point', coordinates: [Number(f.lon), Number(f.lat)] },
+      })),
+  }
+}
+
+// One popup's worth of a stop: what it is, where it is, what diesel costs.
+function facilityPopupEl(props) {
+  const root = document.createElement('div')
+  root.className = 'fleet-popup'
+  const head = document.createElement('div')
+  head.className = 'fleet-popup-head'
+  const name = document.createElement('span')
+  name.className = 'fleet-popup-num'
+  name.textContent = props.name
+  head.append(name)
+  const line = document.createElement('div')
+  line.className = 'fleet-popup-route'
+  line.textContent = [FACILITY_LABEL[props.kind] ?? props.kind, props.place, props.diesel].filter(Boolean).join(' · ')
+  root.append(head, line)
+  if (props.amenities) {
+    const am = document.createElement('div')
+    am.className = 'fleet-popup-route'
+    am.textContent = props.amenities
+    root.append(am)
+  }
+  return root
+}
+
+const FACILITY_LABEL = {
+  truck_stop: 'Truck stop',
+  fuel: 'Fuel',
+  repair: 'Repair',
+  rest_area: 'Rest area',
+}
+
+function addLayers(map, { loads, cities, facilities, selected, selectedFullGeometry, searchLane, resultLanes, routeAlternatives, activeAltIndex, colors }) {
   const selectedId = idStr(selected)
   const selectedLoad = loads.find((l) => idStr(l.id) === selectedId) ?? null
+
+  // Under everything else: the stops are the backdrop the freight moves
+  // across, not the subject of the page.
+  map.addSource('facilities', { type: 'geojson', data: facilitiesToGeoJSON(facilities) })
+  map.addLayer({
+    id: 'facilities-layer',
+    type: 'circle',
+    source: 'facilities',
+    paint: {
+      'circle-radius': ['interpolate', ['linear'], ['zoom'], 3, 1.8, 6, 3.2, 10, 5],
+      'circle-color': [
+        'match', ['get', 'kind'],
+        'fuel', colors.green,
+        'truck_stop', colors.amber,
+        'repair', colors.red,
+        colors.muted,
+      ],
+      'circle-opacity': 0.85,
+      'circle-stroke-color': colors.panel,
+      'circle-stroke-width': 0.5,
+    },
+  })
 
   map.addSource('cities', { type: 'geojson', data: citiesToGeoJSON(cities) })
   map.addLayer({
@@ -459,7 +533,7 @@ function hideLoadPopup(popup) {
 }
 
 export default function FleetMap({
-  loads, cities = [], selected, onSelect, searchLane = null, resultLanes = [], fitKey = 0,
+  loads, cities = [], facilities = [], selected, onSelect, searchLane = null, resultLanes = [], fitKey = 0,
   routeAlternatives = [], activeAltIndex = null, altFitKey = 0, selectedFullGeometry = null,
 }) {
   const wrapRef = useRef(null)
@@ -472,6 +546,7 @@ export default function FleetMap({
   // effect depending on them.
   const loadsRef = useRef(loads)
   const citiesRef = useRef(cities)
+  const facilitiesRef = useRef(facilities)
   const selectedRef = useRef(selected)
   const selectedFullGeometryRef = useRef(selectedFullGeometry)
   const onSelectRef = useRef(onSelect)
@@ -483,6 +558,7 @@ export default function FleetMap({
   const altFitKeyRef = useRef(altFitKey)
   useEffect(() => { loadsRef.current = loads }, [loads])
   useEffect(() => { citiesRef.current = cities }, [cities])
+  useEffect(() => { facilitiesRef.current = facilities }, [facilities])
   useEffect(() => { selectedRef.current = selected }, [selected])
   useEffect(() => { selectedFullGeometryRef.current = selectedFullGeometry }, [selectedFullGeometry])
   useEffect(() => { onSelectRef.current = onSelect }, [onSelect])
@@ -539,6 +615,7 @@ export default function FleetMap({
       addLayers(map, {
         loads: loadsRef.current,
         cities: citiesRef.current,
+        facilities: facilitiesRef.current,
         selected: selectedRef.current,
         selectedFullGeometry: selectedFullGeometryRef.current,
         searchLane: searchLaneRef.current,
@@ -597,6 +674,20 @@ export default function FleetMap({
       popup.remove()
     })
 
+    // A stop on hover: what it is, where it is, what diesel costs there.
+    // Same popup instance as the load preview -- only one of the two can
+    // be under the pointer at a time.
+    map.on('mouseenter', 'facilities-layer', (e) => {
+      map.getCanvas().style.cursor = 'pointer'
+      const f = e.features?.[0]
+      if (!f) return
+      loadPopup.setDOMContent(facilityPopupEl(f.properties)).setLngLat(f.geometry.coordinates).addTo(map)
+    })
+    map.on('mouseleave', 'facilities-layer', () => {
+      map.getCanvas().style.cursor = ''
+      hideLoadPopup(loadPopup)
+    })
+
     // The panel this map sits in can change width (sidebar toggle, window
     // resize) without the window itself firing 'resize' -- MapLibre needs
     // to be told explicitly or it keeps rendering into a stale canvas size.
@@ -630,6 +721,7 @@ export default function FleetMap({
         addLayers(map, {
           loads: loadsRef.current,
           cities: citiesRef.current,
+        facilities: facilitiesRef.current,
           selected: selectedRef.current,
           selectedFullGeometry: selectedFullGeometryRef.current,
           searchLane: searchLaneRef.current,
@@ -658,6 +750,15 @@ export default function FleetMap({
     map.getSource('lanes').setData(lanesToGeoJSON(loads))
     map.getSource('fleet').setData(fleetToGeoJSON(loads))
   }, [loads, mapReady])
+
+  // The stops arrive on their own fetch (they never change while the page
+  // is open, so this runs once) -- swapped in place like every other
+  // source, never by rebuilding the map.
+  useEffect(() => {
+    const map = mapRef.current
+    if (!mapReady || !map?.getSource('facilities')) return
+    map.getSource('facilities').setData(facilitiesToGeoJSON(facilities))
+  }, [facilities, mapReady])
 
   // Selection changes restyle only -- no flyTo/fitBounds, so picking a row
   // in the list or a poll that reorders `loads` never yanks the camera.

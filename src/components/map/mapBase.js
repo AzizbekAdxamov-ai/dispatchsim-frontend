@@ -2,7 +2,18 @@
 // starting frame, and the theme-token colors for drawn layers. Moved out
 // of FleetMap.jsx unchanged so the fleet map and the route planner can
 // never disagree about where North America is.
+import { setWorkerUrl } from 'maplibre-gl'
+// MapLibre runs its tiling in a web worker that it loads at runtime from
+// a sibling file (maplibre-gl-worker.mjs) built from a URL it assembles
+// itself. Rollup cannot see that URL, so `vite build` never emitted the
+// file: in a production build the worker 404'd and EVERY geojson layer --
+// the fleet dots, the lanes, the stops -- silently stayed empty while the
+// basemap still drew. `?worker&url` makes Vite bundle that file (with its
+// own sibling imports) and hand back the hashed URL to hand MapLibre.
+import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
 import { PROJECTION_BOUNDS } from '../../data/usMap'
+
+setWorkerUrl(maplibreWorkerUrl)
 
 // OpenFreeMap's hosted styles (free, no API key). Picked per theme so the
 // basemap's own ink matches the app's dark/cream split rather than fighting

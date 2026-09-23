@@ -268,8 +268,19 @@
   min-width: 0;
 }
 
-.route-map-wrap,
-.route-map {
+.route-map-wrap {
+  position: absolute;
+  inset: 0;
+}
+
+/* Two classes on purpose. MapLibre's own stylesheet sets
+   `.maplibregl-map { position: relative }` and it is imported by this
+   page's lazily-loaded chunk, so it lands AFTER this file: at equal
+   specificity it won, the map div collapsed to zero height, and MapLibre
+   built its canvas at its 300px fallback inside a 766px pane -- the map
+   was there, just three hundred pixels of it with nothing drawn. The
+   child selector outranks it without !important. */
+.route-map-wrap > .route-map {
   position: absolute;
   inset: 0;
 }
