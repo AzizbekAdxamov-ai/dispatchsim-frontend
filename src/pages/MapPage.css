@@ -1,0 +1,54 @@
+/* Map page (/map): the whole screen is the map. The pane rules live in
+   Tracking.css (.tracking-map-pane) -- this file adds only the page's own
+   wrapper, so a full-screen map cannot inherit the tracking page's panel
+   split. Same MapLibre scoping as Tracking's pane: the library's own
+   stylesheet loads inside the lazy chunk, so these win on specificity
+   (.map-page-pane .class, two selectors) rather than import order. */
+
+.map-page-pane {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+}
+
+/* Same dark-theme restyle Tracking's pane applies to MapLibre's built-in
+   attribution -- required by the tile source, so it stays, but it should
+   read as part of the panel in both themes. */
+.map-page-pane .maplibregl-ctrl-attrib {
+  background: var(--panel-2);
+  color: var(--text-3);
+  font-size: 10.5px;
+  border-radius: 4px;
+}
+
+.map-page-pane .maplibregl-ctrl-attrib a {
+  color: var(--text-2);
+}
+
+.map-page-pane .maplibregl-ctrl-attrib-button {
+  filter: none;
+}
+
+/* The load preview popup (fleet popup) is styled in Tracking.css scoped to
+   .tracking-map-pane; this page renders the same FleetMap, so the same
+   rules apply to its popup here. */
+.map-page-pane .maplibregl-popup-content {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: none;
+  font-size: 11.5px;
+  padding: 5px 9px;
+}
+
+.map-page-pane .maplibregl-popup-content:has(.fleet-popup) {
+  padding: 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.map-page-pane .maplibregl-popup-tip {
+  border-top-color: var(--panel);
+  border-bottom-color: var(--panel);
+}

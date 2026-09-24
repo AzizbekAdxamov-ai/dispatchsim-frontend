@@ -125,3 +125,9 @@ export function hasSectionTabs(sections, pathname) {
   const { section } = locate(sections, pathname)
   return Boolean(section && section.tabs.length >= 2)
 }
+
+// Pages outside every section: the top bar's Map button lands on /map, and
+// a full-screen map is its own place -- no tab row, no section highlight in
+// the sidebar. titleFor() cannot see it (it walks the sections), so the
+// shell looks here first for a standalone title.
+export const STANDALONE_TITLES = { '/map': 'Fleet map' }

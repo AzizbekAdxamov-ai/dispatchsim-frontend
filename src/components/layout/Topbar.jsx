@@ -14,8 +14,10 @@ export default function Topbar({ title }) {
       <div className="topbar-title">{title}</div>
       {/* Where the timezone clocks used to sit: the fleet map is the one
           screen dispatch opens all day, so it gets the top bar instead --
-          one click from every page, the same spot the clocks held. */}
-      <Link to="/tracking" className="topbar-map-btn">
+          one click from every page, the same spot the clocks held. /map is
+          the map on its own, full-screen; the fleet's tabbed home stays
+          /tracking. */}
+      <Link to="/map" className="topbar-map-btn">
         <MapTrifold size={15} aria-hidden="true" />
         <span>Map</span>
       </Link>

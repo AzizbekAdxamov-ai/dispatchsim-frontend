@@ -8,6 +8,7 @@ import FleetShell from './components/layout/FleetShell'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Tracking from './pages/Tracking'
+import Map from './pages/Map'
 import Loads from './pages/Loads'
 import LoadDetail from './pages/LoadDetail'
 import Alerts from './pages/Alerts'
@@ -70,6 +71,7 @@ export default function App() {
             <Route path="loads/:id" element={<LoadDetail />} />
             <Route path="load-board" element={<LoadBoard />} />
             <Route path="tracking" element={<Tracking />} />
+            <Route path="map" element={<Map />} />
             <Route path="drivers" element={<Drivers />} />
             <Route path="drivers/:id" element={<DriverDetail />} />
             <Route path="broker-chat" element={<BrokerChat />} />

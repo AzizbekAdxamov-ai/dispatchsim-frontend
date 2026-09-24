@@ -3,14 +3,17 @@ import { AnimatePresence, motion } from 'framer-motion'
 import Sidebar from './Sidebar'
 import Topbar from './Topbar'
 import SectionTabs from './SectionTabs'
-import { DISPATCH_SECTIONS, DISPATCH_SETTINGS, titleFor, hasSectionTabs } from './navSections'
+import { DISPATCH_SECTIONS, DISPATCH_SETTINGS, titleFor, hasSectionTabs, STANDALONE_TITLES } from './navSections'
 
 export default function AppShell() {
   const location = useLocation()
 
-  const title = location.pathname === DISPATCH_SETTINGS.to
-    ? DISPATCH_SETTINGS.label
-    : titleFor(DISPATCH_SECTIONS, location.pathname, 'Dashboard')
+  // A standalone page (/map) belongs to no section, so titleFor() misses
+  // it; the shell checks the standalone map first.
+  const title = STANDALONE_TITLES[location.pathname]
+    ?? (location.pathname === DISPATCH_SETTINGS.to
+      ? DISPATCH_SETTINGS.label
+      : titleFor(DISPATCH_SECTIONS, location.pathname, 'Dashboard'))
 
   return (
     <div className="app" style={{ position: 'relative', display: 'flex', minHeight: '100vh' }}>
