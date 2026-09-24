@@ -2,7 +2,6 @@ import { Moon, Sun, MapTrifold, Package, MagnifyingGlass } from '@phosphor-icons
 import { NavLink } from 'react-router-dom'
 import { useTheme } from '../../theme/ThemeProvider'
 import WorkspaceSwitcher from './WorkspaceSwitcher'
-import CashChip from './CashChip'
 import AlertsBell from './AlertsBell'
 import './Topbar.css'
 
@@ -37,7 +36,6 @@ export default function Topbar({ title }) {
         ))}
       </nav>
       <div className="topbar-spacer"></div>
-      <CashChip />
       <WorkspaceSwitcher />
       <div className="topbar-icons">
         <button className="icon-btn" onClick={toggleTheme} aria-label="Toggle theme">
