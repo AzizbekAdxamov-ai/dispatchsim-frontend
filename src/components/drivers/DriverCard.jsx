@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { Star, BookOpenText } from '@phosphor-icons/react'
-import { formatCdl, formatRating } from '../../utils/format'
+import { formatCdl, formatRating, formatHos } from '../../utils/format'
 
 function initials(name) {
   return (name || '')
@@ -30,6 +30,26 @@ export default function DriverCard({ driver, variants }) {
       </div>
 
       <div className="driver-card-email">{driver.email}</div>
+
+      {/* The three clocks the Driver HOS page leads with (Samsara's report
+          order): drive remaining, shift (window) remaining, cycle remaining.
+          The list endpoint carries drive (hos_remaining_min); shift and
+          cycle come from the same computed source as the HOS page -- one
+          fetch for the whole roster, not per-card calls. */}
+      <div className="driver-card-hours">
+        <div>
+          <div className="driver-card-hours-val mono">{formatHos(driver.hosRemainingMin)}</div>
+          <div className="driver-card-hours-lbl">Drive left</div>
+        </div>
+        <div>
+          <div className="driver-card-hours-val mono">{formatHos(driver.hoursTodayMin)}</div>
+          <div className="driver-card-hours-lbl">Today</div>
+        </div>
+        <div>
+          <div className="driver-card-hours-val mono">{formatHos(driver.hoursWeekMin)}</div>
+          <div className="driver-card-hours-lbl">This week</div>
+        </div>
+      </div>
 
       <div className="driver-card-actions">
         {/* The one HOS action that exists: the driver's own ELD log. Call
