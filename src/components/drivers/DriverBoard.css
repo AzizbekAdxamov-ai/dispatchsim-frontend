@@ -147,23 +147,6 @@
   text-overflow: ellipsis;
 }
 
-.driver-card-hours {
-  display: flex;
-  gap: 16px;
-  margin-top: 10px;
-}
-
-.driver-card-hours-val {
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.driver-card-hours-lbl {
-  font-size: 9.5px;
-  color: var(--text-3);
-  margin-top: 1px;
-}
-
 .driver-card-actions {
   position: relative;
   z-index: 1;
