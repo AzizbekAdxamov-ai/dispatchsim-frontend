@@ -1,4 +1,5 @@
-import { Moon, Sun } from '@phosphor-icons/react'
+import { Moon, Sun, MapTrifold } from '@phosphor-icons/react'
+import { Link } from 'react-router-dom'
 import { useTheme } from '../../theme/ThemeProvider'
 import WorkspaceSwitcher from './WorkspaceSwitcher'
 import CashChip from './CashChip'
@@ -11,6 +12,13 @@ export default function Topbar({ title }) {
   return (
     <div className="topbar">
       <div className="topbar-title">{title}</div>
+      {/* Where the timezone clocks used to sit: the fleet map is the one
+          screen dispatch opens all day, so it gets the top bar instead --
+          one click from every page, the same spot the clocks held. */}
+      <Link to="/tracking" className="topbar-map-btn">
+        <MapTrifold size={15} aria-hidden="true" />
+        <span>Map</span>
+      </Link>
       <div className="topbar-spacer"></div>
       <CashChip />
       <WorkspaceSwitcher />
