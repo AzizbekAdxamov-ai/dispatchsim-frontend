@@ -17,8 +17,12 @@
 /* Quick-link chips in the spot the timezone clocks used to occupy: nav
    controls styled like the other top-bar chip (CashChip), not bare icons
    -- labeled controls survive cramped widths and new eyes. Three of them
-   (Map, Loads, Messages); more than that and the top bar starts reading
-   as a second sidebar, which it must never be. */
+   (Map, Loads, Load Board); more than that and the top bar starts reading
+   as a second sidebar, which it must never be. Messages lost the seat to
+   Load Board in the 2026-09-24 review: the board is a rhythm screen
+   (every freed truck checks it), while the chat reaches the dispatcher
+   reactively through the alerts bell, and it keeps its section home in
+   the sidebar. */
 .topbar-links {
   display: flex;
   gap: 8px;

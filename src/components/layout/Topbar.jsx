@@ -1,4 +1,4 @@
-import { Moon, Sun, MapTrifold, Package, ChatDots } from '@phosphor-icons/react'
+import { Moon, Sun, MapTrifold, Package, MagnifyingGlass } from '@phosphor-icons/react'
 import { NavLink } from 'react-router-dom'
 import { useTheme } from '../../theme/ThemeProvider'
 import WorkspaceSwitcher from './WorkspaceSwitcher'
@@ -13,7 +13,7 @@ import './Topbar.css'
 const QUICK_LINKS = [
   { to: '/map', icon: MapTrifold, label: 'Map' },
   { to: '/loads', icon: Package, label: 'Loads' },
-  { to: '/driver-chat', icon: ChatDots, label: 'Messages' },
+  { to: '/load-board', icon: MagnifyingGlass, label: 'Load Board' },
 ]
 
 export default function Topbar({ title }) {
