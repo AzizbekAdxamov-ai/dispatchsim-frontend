@@ -7,6 +7,7 @@ import OnTimeChart from '../components/dashboard/OnTimeChart'
 import UtilizationChart from '../components/dashboard/UtilizationChart'
 
 import DriverBoard from '../components/drivers/DriverBoard'
+import TrackingBoard from '../components/tracking/TrackingBoard'
 import { getDashboard } from '../api/stats'
 import { listLoads } from '../api/loads'
 import { listDrivers } from '../api/drivers'
@@ -68,6 +69,14 @@ export default function Dashboard() {
       </div>
       <div style={{ marginTop: 16 }}>
         <OnTimeChart data={onTimeTrendData} />
+      </div>
+
+      {/* The fleet map, where the day starts: the same board Tracking
+          renders -- one implementation, two pages. Embedded mode swaps the
+          full-height rule for a card height; panel, polls and map are
+          identical to the Tracking page. */}
+      <div className="dashboard-map" style={{ marginTop: 16 }}>
+        <TrackingBoard embedded />
       </div>
 
       <div style={{ marginTop: 16 }}>

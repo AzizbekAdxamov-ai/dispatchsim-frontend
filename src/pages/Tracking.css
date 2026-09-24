@@ -18,6 +18,17 @@
   min-height: 480px;
 }
 
+/* Embedded mode (Dashboard): the board lives inside a scrolling page, so
+   the full-height viewport rule above is wrong there -- a fixed card
+   height keeps the page scrolling normally. The 420px floor is the panel's
+   own minimum usable stack (head + meta + ~3 list rows) so the map pane
+   never wins by starving the panel; both panes keep every other rule from
+   the full-height page unchanged. */
+.tracking-page.tracking-embedded {
+  height: 480px;
+  min-height: 420px;
+}
+
 .tracking-layout {
   display: flex;
   height: 100%;
@@ -427,98 +438,6 @@
 
 .tracking-fleet-dot.late:hover {
   fill: var(--red-strong);
-}
-
-/* --- Road route alternatives (getLaneRoutes) --- */
-
-.tracking-routes {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.tracking-routes-title {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--text-3);
-}
-
-.tracking-route-row {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  width: 100%;
-  padding: 12px;
-  background: var(--panel-2);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--text);
-  text-align: left;
-  cursor: pointer;
-}
-
-.tracking-route-row:hover {
-  border-color: var(--text-3);
-}
-
-.tracking-route-row.selected {
-  border-color: var(--blue);
-  box-shadow: inset 0 0 0 1px var(--blue);
-}
-
-/* A measured comparison (shortest of the alternatives OSRM found), not a
-   recommendation -- neutral tone like .tracking-excluded-note, never the
-   "good" green this project reserves for a verdict it does not make. */
-.tracking-route-fastest {
-  align-self: flex-start;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: var(--text-2);
-  background: var(--panel-3);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 2px 6px;
-}
-
-.tracking-route-row-line {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
-  font-size: 12.5px;
-}
-
-.tracking-route-refs {
-  color: var(--text);
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.tracking-route-row-meta {
-  color: var(--text-2);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-/* Route fetch failed (ROUTE_UNAVAILABLE, or any other OSRM failure) --
-   stated, not silent. The map keeps drawing its dashed straight-line
-   lane; this is the words for what that line actually is. */
-.tracking-route-unavailable {
-  font-size: 12px;
-  color: var(--text-2);
-  padding: 2px 0;
-}
-
-.tracking-route-unavailable-reason {
-  margin-top: 4px;
-  font-size: 11px;
-  color: var(--text-3);
 }
 
 /* --- List --- */
