@@ -14,10 +14,18 @@
   font-weight: 600;
 }
 
-/* Chip in the spot the timezone clocks used to occupy: a nav control
-   styled like the other top-bar chip (CashChip), not a bare icon -- a
-   labeled control survives collapse, cramped widths and new eyes. */
-.topbar-map-btn {
+/* Quick-link chips in the spot the timezone clocks used to occupy: nav
+   controls styled like the other top-bar chip (CashChip), not bare icons
+   -- labeled controls survive cramped widths and new eyes. Three of them
+   (Map, Loads, Messages); more than that and the top bar starts reading
+   as a second sidebar, which it must never be. */
+.topbar-links {
+  display: flex;
+  gap: 8px;
+  margin-left: 8px;
+}
+
+.topbar-link {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -32,8 +40,15 @@
   white-space: nowrap;
 }
 
-.topbar-map-btn:hover {
+.topbar-link:hover {
   border-color: var(--text-3);
+}
+
+/* The chip you are on reads as selected, not just tappable -- same logic
+   as the sidebar's active state, at chip size. */
+.topbar-link.active {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .topbar-spacer {

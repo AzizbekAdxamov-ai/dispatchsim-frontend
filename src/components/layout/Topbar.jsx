@@ -1,10 +1,20 @@
-import { Moon, Sun, MapTrifold } from '@phosphor-icons/react'
-import { Link } from 'react-router-dom'
+import { Moon, Sun, MapTrifold, Package, ChatDots } from '@phosphor-icons/react'
+import { NavLink } from 'react-router-dom'
 import { useTheme } from '../../theme/ThemeProvider'
 import WorkspaceSwitcher from './WorkspaceSwitcher'
 import CashChip from './CashChip'
 import AlertsBell from './AlertsBell'
 import './Topbar.css'
+
+// The screens dispatch opens all day, one click from any page. Lives here
+// (not navSections.js) on purpose: these are shortcuts, not structure --
+// the sidebar stays the single source of the workspace's navigation, and
+// this list never grows into a duplicate of it.
+const QUICK_LINKS = [
+  { to: '/map', icon: MapTrifold, label: 'Map' },
+  { to: '/loads', icon: Package, label: 'Loads' },
+  { to: '/driver-chat', icon: ChatDots, label: 'Messages' },
+]
 
 export default function Topbar({ title }) {
   const { theme, toggleTheme } = useTheme()
@@ -12,15 +22,20 @@ export default function Topbar({ title }) {
   return (
     <div className="topbar">
       <div className="topbar-title">{title}</div>
-      {/* Where the timezone clocks used to sit: the fleet map is the one
-          screen dispatch opens all day, so it gets the top bar instead --
-          one click from every page, the same spot the clocks held. /map is
-          the map on its own, full-screen; the fleet's tabbed home stays
-          /tracking. */}
-      <Link to="/map" className="topbar-map-btn">
-        <MapTrifold size={15} aria-hidden="true" />
-        <span>Map</span>
-      </Link>
+      {/* Where the timezone clocks used to sit. NavLink, not Link: the
+          chip you are on reads as selected, not just tappable. */}
+      <nav className="topbar-links" aria-label="Quick links">
+        {QUICK_LINKS.map(({ to, icon: Icon, label }) => (
+          <NavLink
+            key={to}
+            to={to}
+            className={({ isActive }) => 'topbar-link' + (isActive ? ' active' : '')}
+          >
+            <Icon size={15} aria-hidden="true" />
+            <span>{label}</span>
+          </NavLink>
+        ))}
+      </nav>
       <div className="topbar-spacer"></div>
       <CashChip />
       <WorkspaceSwitcher />
