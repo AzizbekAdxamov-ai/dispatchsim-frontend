@@ -19,6 +19,7 @@ import UnassignedHos from './pages/UnassignedHos'
 import DriverQualification from './pages/DriverQualification'
 import ComplianceOverview from './pages/ComplianceOverview'
 import DispatchBoard from './pages/DispatchBoard'
+import FleetDvir from './pages/FleetDvir'
 import RoutePlanner from './pages/RoutePlanner'
 import Documents from './pages/Documents'
 import DispatchStatus from './pages/DispatchStatus'
@@ -108,6 +109,7 @@ export default function App() {
             <Route path="market/:id" element={<TruckListingDetail />} />
             <Route path="trucks/:id" element={<TruckDetail />} />
             <Route path="maintenance" element={<FleetMaintenance />} />
+            <Route path="dvir" element={<FleetDvir />} />
             <Route path="alerts" element={<FleetAlerts />} />
             <Route path="documents" element={<FleetDocuments />} />
             <Route path="settings" element={<FleetSettings />} />
