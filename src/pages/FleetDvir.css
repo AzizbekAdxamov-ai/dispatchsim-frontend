@@ -21,6 +21,13 @@
   min-width: 180px;
 }
 
+/* The wear-note list under the defects: quieter on purpose -- an
+   observation that holds nothing should read like one. */
+.dvir-report-notes {
+  margin-top: 4px;
+  color: var(--text-3);
+}
+
 .dvir-actions-cell {
   text-align: right;
 }

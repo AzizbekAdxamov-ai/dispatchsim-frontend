@@ -23,6 +23,18 @@ const POLL_MS = 15000
 const OK = { badge: 'ontime', label: 'OK' }
 const FAILED = { badge: 'crit', label: 'Defect' }
 
+// The wear notes (tread between the note and defect thresholds, a roadside
+// observation) ride in their own list: they never hold the truck, so they
+// never ride the defect list either.
+function NoteLines({ report }) {
+  if (!report.notes?.length) return null
+  return (
+    <div className="dvir-notes dvir-report-notes">
+      {report.notes.map((n, i) => <div key={i}>{n.detail}</div>)}
+    </div>
+  )
+}
+
 function ItemBadges({ report, items }) {
   return (
     <div className="dvir-items">
@@ -144,10 +156,13 @@ export default function FleetDvir() {
                   <td>{r.driver?.name ?? <span className="hos-muted">—</span>}</td>
                   <td>{formatDate(r.createdAt)}</td>
                   <td><ItemBadges report={r} items={items} /></td>
-                  <td className="dvir-notes">
-                    {r.defects.length === 0
-                      ? <span className="hos-muted">No defects noted.</span>
-                      : r.defects.map((d, i) => <div key={i}>{d.detail}</div>)}
+                  <td>
+                    <div className="dvir-notes">
+                      {r.defects.length === 0
+                        ? <span className="hos-muted">No defects noted.</span>
+                        : r.defects.map((d, i) => <div key={i}>{d.detail}</div>)}
+                    </div>
+                    <NoteLines report={r} />
                   </td>
                   <td>
                     {r.defects.length === 0
