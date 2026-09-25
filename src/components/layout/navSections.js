@@ -55,6 +55,7 @@ export const DISPATCH_SECTIONS = [
     tabs: [
       { to: '/compliance/hos', label: 'Driver HOS', match: ['/compliance/hos/'], detailTitle: 'Driver Event Log' },
       { to: '/compliance/violations', label: 'HOS Violations' },
+      { to: '/compliance/unassigned-hos', label: 'Unassigned HOS' },
     ],
   },
   {

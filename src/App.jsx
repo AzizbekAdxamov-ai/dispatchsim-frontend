@@ -8,13 +8,14 @@ import FleetShell from './components/layout/FleetShell'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Tracking from './pages/Tracking'
-import Map from './pages/Map'
+import MapPage from './pages/Map'
 import Loads from './pages/Loads'
 import LoadDetail from './pages/LoadDetail'
 import Alerts from './pages/Alerts'
 import DriverHos from './pages/DriverHos'
 import DriverHosLog from './pages/DriverHosLog'
 import HosViolations from './pages/HosViolations'
+import UnassignedHos from './pages/UnassignedHos'
 import RoutePlanner from './pages/RoutePlanner'
 import Documents from './pages/Documents'
 import DispatchStatus from './pages/DispatchStatus'
@@ -71,7 +72,7 @@ export default function App() {
             <Route path="loads/:id" element={<LoadDetail />} />
             <Route path="load-board" element={<LoadBoard />} />
             <Route path="tracking" element={<Tracking />} />
-            <Route path="map" element={<Map />} />
+            <Route path="map" element={<MapPage />} />
             <Route path="drivers" element={<Drivers />} />
             <Route path="drivers/:id" element={<DriverDetail />} />
             <Route path="broker-chat" element={<BrokerChat />} />
@@ -84,6 +85,7 @@ export default function App() {
             <Route path="compliance/hos" element={<DriverHos />} />
             <Route path="compliance/hos/:driverId" element={<DriverHosLog />} />
             <Route path="compliance/violations" element={<HosViolations />} />
+            <Route path="compliance/unassigned-hos" element={<UnassignedHos />} />
             <Route path="routes" element={<RoutePlanner />} />
             <Route path="settings" element={<Settings />} />
           </Route>

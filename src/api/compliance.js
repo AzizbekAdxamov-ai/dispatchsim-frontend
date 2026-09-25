@@ -17,3 +17,21 @@ export function getDriverDayLog(driverId, day = 0, signal) {
 export function getHosViolations(days = 7, signal) {
   return api.get(`/compliance/violations?days=${days}`, { auth: true, signal })
 }
+
+// Compliance > Unassigned HOS: the ELD's unidentified driving records
+// (49 CFR 395.32), grouped by vehicle and simulated day by the backend.
+export function getUnassignedHos(signal) {
+  return api.get('/compliance/unassigned-hos', { auth: true, signal })
+}
+
+// The review of one record. Assign names the driver who actually drove
+// (395.32(d): the original is kept, marked changed, and a replacement
+// goes into the driver's log); annotate explains the drive instead --
+// the record stays exactly where the ELD wrote it.
+export function assignUnassignedHos(eventId, { driverId, annotation }) {
+  return api.post(`/compliance/unassigned-hos/${encodeURIComponent(eventId)}/assign`, { driverId, annotation }, { auth: true })
+}
+
+export function annotateUnassignedHos(eventId, { annotation }) {
+  return api.post(`/compliance/unassigned-hos/${encodeURIComponent(eventId)}/annotate`, { annotation }, { auth: true })
+}
