@@ -18,6 +18,7 @@ import HosViolations from './pages/HosViolations'
 import UnassignedHos from './pages/UnassignedHos'
 import DriverQualification from './pages/DriverQualification'
 import ComplianceOverview from './pages/ComplianceOverview'
+import DispatchBoard from './pages/DispatchBoard'
 import RoutePlanner from './pages/RoutePlanner'
 import Documents from './pages/Documents'
 import DispatchStatus from './pages/DispatchStatus'
@@ -71,6 +72,7 @@ export default function App() {
           >
             <Route index element={<RoleHome />} />
             <Route path="loads" element={<Loads />} />
+            <Route path="loads/board" element={<DispatchBoard />} />
             <Route path="loads/:id" element={<LoadDetail />} />
             <Route path="load-board" element={<LoadBoard />} />
             <Route path="tracking" element={<Tracking />} />

@@ -79,6 +79,7 @@ export const DISPATCH_SECTIONS = [
     label: 'Dispatch',
     icon: Package,
     tabs: [
+      { to: '/loads/board', label: 'Board' },
       { to: '/loads', label: 'Loads', match: ['/loads/'], detailTitle: 'Load Details' },
       { to: '/load-board', label: 'Load Board' },
       { to: '/routes', label: 'Routes', title: 'Route Planner' },

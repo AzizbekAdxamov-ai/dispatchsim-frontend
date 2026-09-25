@@ -14,6 +14,13 @@ export function listLoads({ status, equipmentType, search, page, limit } = {}, s
   return api.get(`/loads${qs ? `?${qs}` : ''}`, { auth: true, signal })
 }
 
+// The dispatch board: four columns of cards, composed by the backend
+// from the same projection the loads list uses. 'Assigned' is the ELD's
+// own window -- dispatched but no driving minute started yet.
+export function getLoadBoard(signal) {
+  return api.get('/loads/board', { auth: true, signal })
+}
+
 // The compliance lines the confirm window shows before dispatching:
 // qualification documents, truck, workload, the driver's willingness and
 // the raw drive clock. Read-only — the dispatch itself keeps its guards.
