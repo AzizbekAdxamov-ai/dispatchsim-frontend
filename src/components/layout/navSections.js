@@ -16,7 +16,7 @@
 // URLs are unchanged from the flat sidebar this replaces.
 
 import {
-  House, Package, MapTrifold, ChatCircleText, FileText, ClipboardText,
+  House, Package, MapTrifold, ChatCircleText, FileText, ClipboardText, UserCircle,
 } from '@phosphor-icons/react'
 
 // Section and tab names follow the fleet-platform dashboards dispatchers
@@ -43,7 +43,18 @@ export const DISPATCH_SECTIONS = [
     icon: MapTrifold,
     tabs: [
       { to: '/tracking', label: 'Overview', title: 'Fleet Overview' },
-      { to: '/drivers', label: 'Drivers', match: ['/drivers/'], detailTitle: 'Driver Details' },
+    ],
+  },
+  {
+    // Drivers get their own section, the way fleet platforms split
+    // assets from people: trucks and maintenance under Fleet, drivers
+    // and their qualification files here.
+    id: 'drivers',
+    label: 'Drivers',
+    icon: UserCircle,
+    tabs: [
+      { to: '/drivers', label: 'All Drivers', match: ['/drivers/'], detailTitle: 'Driver Details' },
+      { to: '/drivers/qualification', label: 'Qualification' },
     ],
   },
   {

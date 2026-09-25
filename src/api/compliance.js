@@ -24,6 +24,13 @@ export function getUnassignedHos(signal) {
   return api.get('/compliance/unassigned-hos', { auth: true, signal })
 }
 
+// Compliance > Driver Qualification: every working driver's DQ file
+// (49 CFR 391 Subpart E), already timed by the backend -- statuses are
+// the row's reading AS OF now, not a stored verdict.
+export function getDriverQualification(signal) {
+  return api.get('/compliance/driver-qualification', { auth: true, signal })
+}
+
 // The review of one record. Assign names the driver who actually drove
 // (395.32(d): the original is kept, marked changed, and a replacement
 // goes into the driver's log); annotate explains the drive instead --

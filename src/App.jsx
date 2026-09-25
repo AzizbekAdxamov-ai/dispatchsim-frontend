@@ -16,6 +16,7 @@ import DriverHos from './pages/DriverHos'
 import DriverHosLog from './pages/DriverHosLog'
 import HosViolations from './pages/HosViolations'
 import UnassignedHos from './pages/UnassignedHos'
+import DriverQualification from './pages/DriverQualification'
 import RoutePlanner from './pages/RoutePlanner'
 import Documents from './pages/Documents'
 import DispatchStatus from './pages/DispatchStatus'
@@ -86,6 +87,7 @@ export default function App() {
             <Route path="compliance/hos/:driverId" element={<DriverHosLog />} />
             <Route path="compliance/violations" element={<HosViolations />} />
             <Route path="compliance/unassigned-hos" element={<UnassignedHos />} />
+            <Route path="drivers/qualification" element={<DriverQualification />} />
             <Route path="routes" element={<RoutePlanner />} />
             <Route path="settings" element={<Settings />} />
           </Route>
