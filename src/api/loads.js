@@ -14,6 +14,14 @@ export function listLoads({ status, equipmentType, search, page, limit } = {}, s
   return api.get(`/loads${qs ? `?${qs}` : ''}`, { auth: true, signal })
 }
 
+// The compliance lines the confirm window shows before dispatching:
+// qualification documents, truck, workload, the driver's willingness and
+// the raw drive clock. Read-only — the dispatch itself keeps its guards.
+export function getDispatchCheck(id, driverId = '', signal) {
+  const qs = driverId ? `?driverId=${encodeURIComponent(driverId)}` : ''
+  return api.get(`/loads/${encodeURIComponent(id)}/dispatch-check${qs}`, { auth: true, signal })
+}
+
 // Put a driver on a booked load and start the clock. The truck is not
 // sent — the server uses whichever truck that driver is assigned to, so
 // the client cannot pair a driver with someone else's truck.

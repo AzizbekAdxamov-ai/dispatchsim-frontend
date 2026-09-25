@@ -31,10 +31,102 @@
   cursor: not-allowed;
 }
 
+.dp-btn-secondary {
+  background: var(--panel-2);
+  color: var(--text);
+  border-color: var(--border);
+  font-weight: 400;
+}
+
+.dp-confirm {
+  display: flex;
+  gap: 8px;
+}
+
 .dp-error {
   font-size: 11.5px;
   color: var(--text);
   background: var(--panel-3);
   border-radius: 6px;
   padding: 8px 10px;
+}
+
+/* The pre-dispatch check window. */
+
+.dp-check {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-2);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dp-check-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.dp-check-sub {
+  font-weight: 400;
+  font-size: 11.5px;
+  color: var(--text-3);
+  text-align: right;
+}
+
+.dp-check-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.dp-check-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 5px 0;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+}
+
+.dp-check-line:first-child {
+  border-top: none;
+}
+
+.dp-check-label {
+  min-width: 130px;
+}
+
+.dp-check-cfr {
+  display: block;
+  font-size: 10.5px;
+  color: var(--text-3);
+}
+
+.dp-check-detail {
+  color: var(--text-2);
+  font-size: 11.5px;
+}
+
+.dp-check-transit {
+  font-size: 11.5px;
+  color: var(--text-2);
+  border-top: 1px solid var(--border);
+  padding-top: 6px;
+}
+
+.dp-check-warning,
+.dp-check-error {
+  font-size: 11.5px;
+  color: var(--text);
+  background: var(--panel-3);
+  border-radius: 6px;
+  padding: 7px 10px;
 }
