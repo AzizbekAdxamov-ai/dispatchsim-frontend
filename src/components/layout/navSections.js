@@ -64,9 +64,14 @@ export const DISPATCH_SECTIONS = [
     label: 'Compliance',
     icon: ClipboardText,
     tabs: [
+      // end: true -- every other compliance page's path starts with
+      // /compliance, and tabMatches would otherwise call them all this
+      // tab's. The Dashboard tab under Home uses the same guard.
+      { to: '/compliance', label: 'Overview', end: true },
       { to: '/compliance/hos', label: 'Driver HOS', match: ['/compliance/hos/'], detailTitle: 'Driver Event Log' },
       { to: '/compliance/violations', label: 'HOS Violations' },
       { to: '/compliance/unassigned-hos', label: 'Unassigned HOS' },
+      { to: '/drivers/qualification', label: 'Qualification' },
     ],
   },
   {
