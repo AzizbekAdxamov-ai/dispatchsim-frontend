@@ -184,3 +184,11 @@
 @media (max-width: 860px) {
   .dc-page { grid-template-columns: 1fr; height: auto; }
 }
+
+/* A driver line the bridge gave up on (046's attempt cap). The words stay
+   in the thread; this line says what the group did not receive. */
+.dc-undelivered {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--text-3);
+}

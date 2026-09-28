@@ -1,0 +1,116 @@
+/* The Telegram panel. Colors come only from the theme variables -- this
+   file has not a single hardcoded value, so dark and cream both hold. */
+
+.tg-panel {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+  padding: 16px 18px;
+  margin-bottom: 16px;
+}
+
+.tg-panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tg-panel-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.01em;
+}
+
+.tg-panel-sub {
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-2);
+  max-width: 56ch;
+}
+
+.tg-linked {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tg-linked-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.tg-label {
+  color: var(--text-2);
+  font-size: 12px;
+  min-width: 84px;
+}
+
+.tg-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.tg-btn {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.tg-btn:hover:not(:disabled) {
+  border-color: var(--text-2);
+}
+
+.tg-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.tg-linking {
+  margin-top: 12px;
+}
+
+.tg-code-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tg-code {
+  font-size: 18px;
+  letter-spacing: 0.14em;
+  color: var(--text);
+}
+
+.tg-expiry {
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.tg-steps {
+  margin: 12px 0 0;
+  padding-left: 18px;
+  color: var(--text-2);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.tg-error {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--red);
+}

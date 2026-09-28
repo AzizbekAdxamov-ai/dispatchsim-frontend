@@ -2,9 +2,11 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ChatCircle, PaperPlaneTilt } from '@phosphor-icons/react'
 import { listThreads, openConversation, getThread, sendMessage } from '../api/driverChat'
+import { getStatus as getTelegramStatus } from '../api/telegram'
 import { useResource } from '../hooks/useResource'
 import { ApiError } from '../api/client'
 import { chatLimitMessage } from '../utils/chatBudget.js'
+import TelegramPanel from '../components/TelegramPanel'
 import './DriverChat.css'
 
 // Texting your drivers.
@@ -39,6 +41,11 @@ export default function DriverChat() {
   const fetchThreads = useCallback((signal) => listThreads(signal), [])
   const { data: listData, error: listError, loading: listLoading, refetch: refetchList } =
     useResource(fetchThreads, [], { pollMs: 20000 })
+
+  // The bridge panel sits above the threads: one read, no polling -- the
+  // link state changes only when the user acts on it.
+  const fetchTgStatus = useCallback((signal) => getTelegramStatus(signal), [])
+  const { data: tgStatus, refetch: refetchTgStatus } = useResource(fetchTgStatus, [], {})
 
   // Polled: the driver's reply is written when you send and becomes
   // visible when it comes due.
@@ -108,6 +115,7 @@ export default function DriverChat() {
 
   return (
     <div className="dc-page">
+      <TelegramPanel status={tgStatus} onRefresh={refetchTgStatus} />
       <div className="dc-list">
         <div className="dc-list-head">Drivers</div>
         <div className="dc-list-body">
@@ -189,6 +197,13 @@ export default function DriverChat() {
               {messages.map((m) => (
                 <div key={m.id} className={'dc-msg ' + m.role}>
                   {m.content}
+                  {/* Written when the send failed five times and 046's
+                      CHECK stopped counting: the words are in the thread,
+                      the group never saw them. Silent would look like
+                      silence from the driver. */}
+                  {m.role === 'driver' && m.notDelivered && (
+                    <div className="dc-undelivered">Not delivered to Telegram</div>
+                  )}
                 </div>
               ))}
               {awaitingReply && (
