@@ -17,6 +17,12 @@ import './FleetDvir.css'
 // whether the next driver has signed the defects off. A report with
 // uncertified defects holds the truck -- the row says so and offers the
 // certify action; a clean report is history, and reads like it.
+//
+// Next to each report sits the truck's most recent WALK-AROUND (392.7,
+// written at dispatch): the other end of the cycle -- the report closes a
+// run, the walk-around opens one. The two belong on one screen because
+// the review duty 396.13(b)(2) names connects them: the walk-around is
+// what reads the report, and its row says what that read found.
 
 const POLL_MS = 15000
 
@@ -51,6 +57,34 @@ function ItemBadges({ report, items }) {
   )
 }
 
+// The walk-around's own column: clean is a fact, and so is what it found.
+// Defect names come from the SAME checklist vocabulary the reports carry
+// -- a walk-around defect is never translated by a second word list.
+function WalkAroundCell({ walkAround, items }) {
+  if (!walkAround) {
+    return <span className="hos-muted">None yet — written at dispatch</span>
+  }
+  const defects = walkAround.defects ?? []
+  return (
+    <div>
+      {defects.length === 0
+        ? <span className="badge ontime"><span className="dot"></span>Clear</span>
+        : <span className="badge crit"><span className="dot"></span>{defects.length} defect{defects.length === 1 ? '' : 's'}</span>}
+      <div className="dvir-walk-defects">
+        {defects.map((d, i) => {
+          const label = items.find((it) => it.key === d.item)?.label ?? d.item
+          return <div key={i}>{label}: {d.detail}</div>
+        })}
+      </div>
+      {walkAround.reviewedDvir
+        && (walkAround.reviewedDvir.defects?.length ?? 0) > 0
+        && !walkAround.reviewedDvir.defectsCorrected && (
+        <div className="dvir-walk-review">Read a last report that still holds the truck</div>
+      )}
+    </div>
+  )
+}
+
 export default function FleetDvir() {
   const [query, setQuery] = useState('')
   const [onlyOpen, setOnlyOpen] = useState(false)
@@ -60,6 +94,11 @@ export default function FleetDvir() {
   const { data, error, loading, refetch } = useResource((signal) => listDvir(signal), [], { pollMs: POLL_MS })
 
   const items = data?.items ?? []
+  // The walk-around is keyed by truck because 392.7 inspects the VEHICLE;
+  // the list carries at most one per truck (the newest), so a truck that
+  // ran twice shows the walk-around its current state stands next to.
+  const lastWalkAround = data?.lastWalkAround ?? []
+  const walkAroundFor = (truckId) => lastWalkAround.find((w) => w.truckId === truckId)
   const reports = (data?.reports ?? []).filter((r) => {
     if (query.trim()) {
       const q = query.trim().toLowerCase()
@@ -136,14 +175,15 @@ export default function FleetDvir() {
               <th>Checklist</th>
               <th>Notes</th>
               <th>396.13</th>
+              <th>Last walk-around</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            {loading && <tr><td colSpan={7} className="page-empty">Loading inspection reports…</td></tr>}
-            {!loading && error && <tr><td colSpan={7} className="page-empty">Could not load reports — {error.message}</td></tr>}
+            {loading && <tr><td colSpan={8} className="page-empty">Loading inspection reports…</td></tr>}
+            {!loading && error && <tr><td colSpan={8} className="page-empty">Could not load reports — {error.message}</td></tr>}
             {!loading && !error && reports.length === 0 && (
-              <tr><td colSpan={7} className="page-empty">No inspection reports yet. One is written every time a run is delivered.</td></tr>
+              <tr><td colSpan={8} className="page-empty">No inspection reports yet. One is written every time a run is delivered.</td></tr>
             )}
             {!loading && !error && reports.map((r) => {
               const holds = r.defects.length > 0 && !r.defectsCorrected
@@ -171,6 +211,7 @@ export default function FleetDvir() {
                         ? <span className="badge ontime"><span className="dot"></span>Certified{r.certifiedBy?.name ? ` by ${r.certifiedBy.name}` : ''}</span>
                         : <span className="badge crit"><span className="dot"></span>Holds the truck</span>}
                   </td>
+                  <td><WalkAroundCell walkAround={walkAroundFor(r.truckId)} items={items} /></td>
                   <td className="dvir-actions-cell">
                     {holds && (
                       <button
@@ -190,7 +231,8 @@ export default function FleetDvir() {
         </table>
       </div>
       <div className="hos-footnote">
-        A report is written every time a run is delivered, from the truck's arrival state.
+        A report is written every time a run is delivered, from the truck's arrival state;
+        the walk-around beside it is written when a load is dispatched, before the wheels move.
         A failed item (396.11) holds the vehicle until the next driver certifies the defects
         fixed (396.13(b)(2)); a wear note does not hold it. Checklist sections cite their rule:
         393.40 brakes, 393.75 tires, 393.70 coupling, 393.95 emergency equipment.

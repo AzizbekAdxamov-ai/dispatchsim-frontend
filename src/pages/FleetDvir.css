@@ -28,6 +28,20 @@
   color: var(--text-3);
 }
 
+/* The walk-around column: the defect lines read like the notes column
+   (the same quiet), the 396.13 review line quieter still. */
+.dvir-walk-defects {
+  margin-top: 4px;
+  font-size: 11.5px;
+  color: var(--text-2);
+}
+
+.dvir-walk-review {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--text-3);
+}
+
 .dvir-actions-cell {
   text-align: right;
 }
