@@ -2,6 +2,7 @@ import { Moon, Sun, MapTrifold, Package, MagnifyingGlass } from '@phosphor-icons
 import { NavLink } from 'react-router-dom'
 import { useTheme } from '../../theme/ThemeProvider'
 import WorkspaceSwitcher from './WorkspaceSwitcher'
+import CashChip from './CashChip'
 import AlertsBell from './AlertsBell'
 import './Topbar.css'
 
@@ -36,6 +37,11 @@ export default function Topbar({ title }) {
         ))}
       </nav>
       <div className="topbar-spacer"></div>
+      {/* Back after a day out: the balance is the one number this project
+          insists stays in front of whoever is spending it, and CashChip's
+          own header says why. Leaving it out made the component dead code
+          and took the number off every page at the same time. */}
+      <CashChip />
       <WorkspaceSwitcher />
       <div className="topbar-icons">
         <button className="icon-btn" onClick={toggleTheme} aria-label="Toggle theme">

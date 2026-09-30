@@ -11,6 +11,25 @@
      section has one, AppShell marks .main.has-section-tabs and the chrome
      grows by exactly this much -- see SectionTabs.css. */
   --section-tabs-h: 40px;
+  /* The "live data stopped updating" strip (LiveDataNotice.css). It is
+     chrome too, and it comes and goes at runtime -- so the chrome is
+     composed from three parts below rather than redefined per case, or
+     a page with both a tab row and the notice would have counted only
+     one of them. */
+  --live-notice-h: 29px;
+}
+
+/* --shell-chrome = topbar + padding, plus whatever chrome is actually on
+   screen. Each part defaults to zero and is switched on by a class
+   AppShell puts on .main, so any combination adds up correctly. */
+.main {
+  --chrome-tabs: 0px;
+  --chrome-notice: 0px;
+  --shell-chrome: calc(var(--shell-chrome-base) + var(--chrome-tabs) + var(--chrome-notice));
+}
+
+.main.has-live-notice {
+  --chrome-notice: var(--live-notice-h);
 }
 
 :root[data-theme="dark"] {

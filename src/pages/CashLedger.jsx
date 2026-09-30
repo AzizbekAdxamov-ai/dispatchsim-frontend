@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { getCashOverview, listLedger } from '../api/cash'
 import { useResource } from '../hooks/useResource'
+import { financeOff } from '../utils/financeSwitch'
 import '../components/dashboard/Panel.css'
 import './CashLedger.css'
 
@@ -57,6 +58,19 @@ export default function CashLedger() {
           Every dollar in and out. The balance is the sum of this list, nothing else.
         </p>
       </div>
+
+      {/* The numbers below stay true -- they are what was spent and
+          collected. What is gone is the consequence: with the money model
+          off nothing accrues against this balance and nothing is refused
+          because of it. Said here rather than left for someone to work out
+          from a balance that has stopped moving. */}
+      {financeOff(overview) && (
+        <p className="cl-off">
+          The money model is off on the server. No credit line interest, no insurance
+          premium, and no load, hire or truck is refused for lack of money. The ledger
+          below is still recorded.
+        </p>
+      )}
 
       <div className="cl-cards">
         <div className="cl-card">

@@ -23,6 +23,19 @@ const STATUS_CLASS = {
 // the raw hosRemainingMin minutes.
 const MAX_HOS_MIN = 660
 
+// Pay plan, spelled out the way an HR page would. Values are the two the
+// schema allows (drivers_pay_model CHECK); anything else or missing shows
+// the em-dash like every other unknown.
+function formatPayPlan(driver) {
+  if (driver.payModel === 'percent' && driver.payPercentBp != null) {
+    return `${(driver.payPercentBp / 100).toFixed(0)}% of gross`
+  }
+  if (driver.payModel === 'permile' && driver.payPerMileCents != null) {
+    return `$${(driver.payPerMileCents / 100).toFixed(2)} per mile`
+  }
+  return '—'
+}
+
 const listContainer = {
   hidden: {},
   show: { transition: { staggerChildren: 0.05 } },
@@ -95,7 +108,7 @@ export default function DriverDetail() {
                 {status.status}
               </span>
             </div>
-            <div className="driver-detail-sub">{formatCdl(driver.cdlClass, driver.cdlNumber)} &nbsp;·&nbsp; {formatUnit(driver.truck)} &nbsp;·&nbsp; {formatPlace(driver.homeBaseCity, driver.homeBaseState)}</div>
+            <div className="driver-detail-sub">{formatCdl(driver.cdlClass, driver.cdlNumber)} &nbsp;·&nbsp; {formatUnit(driver.truck)} &nbsp;·&nbsp; {formatPlace(driver.homeBaseCity, driver.homeBaseState)}{driver.telegram ? ' · Answers on Telegram' : ''}</div>
           </div>
         </div>
         <div className="driver-detail-actions">
@@ -122,6 +135,13 @@ export default function DriverDetail() {
                 <div><div className="dd-detail-label">Assigned unit</div><div className="dd-detail-value">{formatUnit(driver.truck)}</div></div>
                 <div><div className="dd-detail-label">Total miles</div><div className="dd-detail-value mono">{formatMiles(driver.totalMiles)}</div></div>
                 <div><div className="dd-detail-label">Safety rating</div><div className="dd-detail-value mono">{driver.safetyRating} / 100</div></div>
+                <div><div className="dd-detail-label">Now in</div><div className="dd-detail-value">{formatPlace(driver.currentCity, driver.currentState)}</div></div>
+                <div><div className="dd-detail-label">Pay plan</div><div className="dd-detail-value">{formatPayPlan(driver)}</div></div>
+                <div><div className="dd-detail-label">Truck</div><div className="dd-detail-value">{formatUnit(driver.truck)}</div></div>
+                <div><div className="dd-detail-label">Odometer</div><div className="dd-detail-value mono">{driver.truck?.odometerMi != null ? formatMiles(driver.truck.odometerMi) : '—'}</div></div>
+                <div><div className="dd-detail-label">Fuel</div><div className="dd-detail-value mono">{driver.truck?.fuelPercent != null ? `${driver.truck.fuelPercent}%` : '—'}</div></div>
+                <div><div className="dd-detail-label">Telegram</div><div className="dd-detail-value">{driver.telegram ? 'Yes — replies there' : '—'}</div></div>
+                <div><div className="dd-detail-label">Qualification file</div><div className="dd-detail-value"><Link to="/drivers/qualification">Open DQ file</Link></div></div>
               </div>
             </div>
           </div>

@@ -1,5 +1,9 @@
+/* The rail, in the shape a load board uses: full-width rows separated by
+   a hairline, one line per destination, the active one a band rather than
+   a pill. Wider and taller than a settings menu because it is read at a
+   glance, dozens of times a day, by someone whose eyes are on a table. */
 .sidebar {
-  width: 216px;
+  width: 236px;
   background: var(--panel);
   border-right: 1px solid var(--border-soft);
   display: flex;
@@ -16,7 +20,7 @@
 }
 
 .brand {
-  padding: 18px 17px;
+  padding: 20px 16px;
   border-bottom: 1px solid var(--border-soft);
   display: flex;
   align-items: center;
@@ -50,7 +54,8 @@
 }
 
 .nav {
-  padding: 14px 10px;
+  /* No side padding: the rows and their separators run edge to edge. */
+  padding: 0;
   flex: 1;
   overflow-y: auto;
 }
@@ -64,16 +69,18 @@
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
-  border-radius: 6px;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 0;
   color: var(--text-2);
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 500;
   cursor: pointer;
-  margin-bottom: 1px;
   position: relative;
   border: none;
+  /* The separator between rows. On the row itself rather than between
+     them, so the list keeps its lines when one is hidden by a role. */
+  border-bottom: 1px solid var(--border-soft);
   background: none;
   width: 100%;
   text-align: left;
@@ -92,19 +99,18 @@
   position: absolute;
   inset: 0;
   background: var(--panel-2);
-  border-radius: 6px;
+  border-radius: 0;
   z-index: 0;
 }
 
 .nav-item-bg::before {
   content: '';
   position: absolute;
-  left: -10px;
-  top: 6px;
-  bottom: 6px;
+  left: 0;
+  top: 0;
+  bottom: 0;
   width: 3px;
   background: var(--blue);
-  border-radius: 0 3px 3px 0;
 }
 
 .nav-item > .nav-icon,
@@ -115,7 +121,7 @@
 }
 
 .nav-icon {
-  width: 16px;
+  width: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -201,8 +207,6 @@
 
 .nav-bottom {
   flex: 0 0 auto;
-  padding-top: 8px;
-  padding-bottom: 8px;
   border-top: 1px solid var(--border-soft);
 }
 
@@ -215,7 +219,7 @@
 
 .sidebar.collapsed .nav-item {
   justify-content: center;
-  padding: 8px 0;
+  padding: 12px 0;
 }
 
 .sidebar.collapsed .sidebar-footer {

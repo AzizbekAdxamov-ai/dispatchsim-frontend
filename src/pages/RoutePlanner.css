@@ -285,6 +285,33 @@
   inset: 0;
 }
 
+/* The stop popup's own layout. The popup's frame, background and tip come
+   from components/map/mapBase.css (shared by every map); what is here is
+   only what makes THIS popup different from the fleet one. */
+/* Four classes: mapBase.css's shared frame is three
+   (`.maplibregl-map .maplibregl-popup .maplibregl-popup-content`) and
+   loads later, from the map's own lazy chunk -- at a tie it would win and
+   this popup would wear the fleet popup's tighter padding. */
+.routes-map .maplibregl-popup .maplibregl-popup-content:has(.route-popup) {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+}
+
+.route-popup-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.route-popup-line {
+  font-size: 11.5px;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
 .route-map-error,
 .routes-map-loading {
   position: absolute;

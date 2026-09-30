@@ -3,6 +3,8 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { UserPlus, SteeringWheel } from '@phosphor-icons/react'
 import Sidebar from './Sidebar'
 import Topbar from './Topbar'
+import LiveDataNotice from './LiveDataNotice'
+import { useLiveDataHealth } from '../../hooks/useLiveDataHealth'
 import { listApplicants } from '../../api/hr'
 import { useResource } from '../../hooks/useResource'
 
@@ -13,6 +15,9 @@ const TITLES = {
 
 export default function HrShell() {
   const location = useLocation()
+  // Every shell says it, not just dispatch: a poll that stops landing
+  // on the HR or finance side leaves just as stale a screen.
+  const liveDataFailing = useLiveDataHealth().failingCount > 0
   const title = TITLES[location.pathname] ?? (location.pathname.startsWith('/hr/applicants/') ? 'Applicant detail' : 'HR')
 
   // Only the nav badge needs the applicant count — every /hr/* page
@@ -33,8 +38,9 @@ export default function HrShell() {
   return (
     <div className="app" style={{ position: 'relative', display: 'flex', minHeight: '100vh' }}>
       <Sidebar items={HR_NAV_ITEMS} brandSub="HR" />
-      <div className="main" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+      <div className={'main' + (liveDataFailing ? ' has-live-notice' : '')} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
         <Topbar title={title} onPhoneClick={() => {}} />
+        <LiveDataNotice />
         <div className="content" style={{ padding: '20px 24px 60px', overflowY: 'auto' }}>
           <AnimatePresence mode="wait">
             <motion.div

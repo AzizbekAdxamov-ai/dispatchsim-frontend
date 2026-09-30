@@ -1,111 +1,146 @@
-/* LoadBoard page — all classes prefixed lb- to avoid collision with
-   components/dashboard/LoadBoard.css (.load-board) which is used by Loads.jsx */
+/* The board: a query bar, one line of counts, and a dense table.
+   Dense on purpose — the whole point of a board is that twenty postings
+   are on screen at once and the eye compares them. Every colour is a
+   token; nothing here is a fixed hex. */
 
-.lb-panel {
-  background: var(--panel);
-  border: 1px solid var(--border-soft);
-  border-radius: 8px;
-  overflow: hidden;
+/* Counts, sort and what the distances are measured from. */
+.lbh {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 2px 8px;
 }
 
-.lb-panel table {
-  width: 100%;
-  border-collapse: collapse;
+.lbh-counts {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
 }
 
-.lb-panel th {
-  text-align: left;
-  font-size: 10.5px;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
+.lbh-total {
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.lbh-nearby {
+  font-size: 12px;
   color: var(--text-3);
-  font-weight: 500;
-  padding: 9px 16px;
-  border-bottom: 1px solid var(--border-soft);
+  cursor: help;
 }
 
-.lb-panel td {
-  padding: 11px 16px;
-  border-bottom: 1px solid var(--border-soft);
-  font-size: 12.5px;
-  vertical-align: middle;
-}
-
-.lb-panel tr:last-child td {
-  border-bottom: none;
-}
-
-.lb-panel tr.row:hover {
-  background: var(--panel-2);
-  cursor: pointer;
-}
-
-.lb-age {
-  color: var(--text-3);
-  white-space: nowrap;
-}
-
-.lb-route-sub {
-  font-size: 10.5px;
-  color: var(--text-3);
-  margin-top: 2px;
-}
-
-.lb-equip-chip {
-  display: inline-flex;
+.lbh-sort {
+  display: flex;
   align-items: center;
   gap: 6px;
+  font-size: 12px;
   color: var(--text-2);
-  white-space: nowrap;
 }
 
-.lb-dh-green {
-  color: var(--green, #28a745);
-  font-weight: 500;
-}
-
-.lb-dh-amber {
-  color: var(--amber, #d99f33);
-  font-weight: 500;
-}
-
-.lb-dh-red {
-  color: var(--red, #dc3545);
-  font-weight: 500;
-}
-
-.lb-result-count {
+.lbh-sort select {
+  height: 28px;
+  padding: 0 6px;
+  font: inherit;
   font-size: 12px;
-  color: var(--text-3);
-  margin-bottom: 10px;
-}
-
-.lb-book-mini {
-  padding: 5px 12px;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--border);
   border-radius: 6px;
-  border: 1px solid var(--blue);
-  background: transparent;
-  color: var(--blue);
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
 }
 
-.lb-book-mini:hover {
-  background: var(--blue);
-  color: #fff;
-}
-
-.lb-book-mini:focus-visible {
-  outline: 2px solid var(--blue);
-  outline-offset: 2px;
-}
-
-/* "Call for rate". Not styled as a warning or a gap — a posting without a
-   printed price is an ordinary thing on a real board, and the broker is
-   expecting the call. */
-.lb-ask {
+.lbh-ref {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-left: auto;
+  font-size: 11px;
   color: var(--text-3);
-  font-style: normal;
+}
+
+/* The table scrolls sideways rather than squeezing: fourteen columns do
+   not fit a laptop, and a wrapped cell costs more than a scrollbar. */
+.lbt-wrap {
+  overflow-x: auto;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.lbt {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.lbt thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 8px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  text-align: left;
+  white-space: nowrap;
+  background: var(--panel-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.lbt-r { text-align: right; }
+.lbt thead th.lbt-r { text-align: right; }
+
+.lbt tbody td {
+  padding: 7px 10px;
+  color: var(--text);
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.lbt-row { cursor: pointer; }
+.lbt-row:hover td { background: var(--panel-2); }
+.lbt-row.open td { background: var(--panel-3); }
+
+.lbt-age { color: var(--text-3); }
+
+.lbt-rate { line-height: 1.25; }
+.lbt-rate .mono { font-weight: 600; }
+
+.lbt-sub {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-3);
+}
+
+/* "Call for rate": a fact about the posting, not a missing value. The
+   broker knows the number and expects to be asked for it. */
+.lbt-ask {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--text-3);
+}
+
+.lbt-dh { color: var(--text-2); }
+
+.lbt-eq {
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.lbt-company { color: var(--accent); }
+.lbt-contact { color: var(--text-2); }
+
+.lbt-empty {
+  padding: 28px 10px;
+  color: var(--text-3);
+  text-align: center;
+  white-space: normal;
+}
+
+.lbt-detail-row td {
+  padding: 0;
+  background: var(--panel-3);
+  white-space: normal;
 }

@@ -54,7 +54,9 @@
 }
 
 /* Full-height pages (tracking, chats, loads, routes) size themselves off
-   --shell-chrome; the tab row is chrome too. */
+   --shell-chrome; the tab row is chrome too. It adds its own part rather
+   than redefining the whole sum (tokens.css) -- the live-data notice can
+   be on screen at the same time, and redefining used to drop it. */
 .main.has-section-tabs {
-  --shell-chrome: calc(var(--shell-chrome-base) + var(--section-tabs-h));
+  --chrome-tabs: var(--section-tabs-h);
 }

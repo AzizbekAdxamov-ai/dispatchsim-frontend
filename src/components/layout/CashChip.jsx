@@ -2,6 +2,7 @@ import { useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { getCashOverview } from '../../api/cash'
 import { useResource } from '../../hooks/useResource'
+import { financeOff } from '../../utils/financeSwitch'
 import './CashChip.css'
 
 // The company balance, in the top bar, on every page.
@@ -30,6 +31,11 @@ export default function CashChip() {
   // top bar of every page in every workspace — silently, on the number
   // this component exists to keep in front of whoever is spending it.
   if (loading && !data) return null
+  // The money model is switched off on the server: no interest, no
+  // insurance premium, and nothing refused for lack of money. Nothing the
+  // balance says is actionable, so it leaves the bar entirely rather than
+  // sitting there looking like a constraint.
+  if (financeOff(data)) return null
   if (!data) {
     return (
       <span className="cash-chip cash-chip-error" title="Could not read the balance">

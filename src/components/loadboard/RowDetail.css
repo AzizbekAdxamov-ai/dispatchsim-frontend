@@ -1,0 +1,139 @@
+/* The opened row: three columns, one per question a posting answers. */
+.rd {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 24px;
+  padding: 16px 18px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+@media (max-width: 1100px) {
+  .rd { grid-template-columns: 1fr; gap: 18px; }
+}
+
+.rd-col { min-width: 0; }
+
+.rd-h {
+  margin: 0 0 10px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.rd-leg {
+  display: flex;
+  gap: 9px;
+  padding-bottom: 8px;
+}
+
+.rd-dot {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  margin-top: 5px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+.rd-dot-end {
+  background: none;
+  border: 2px solid var(--accent);
+}
+
+.rd-place {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.rd-sub {
+  font-size: 11.5px;
+  color: var(--text-3);
+}
+
+.rd-facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 14px;
+  margin: 10px 0 0;
+}
+
+.rd-facts > div {
+  display: contents;
+}
+
+.rd-facts dt {
+  font-size: 11.5px;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+
+.rd-facts dd {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--text);
+}
+
+.rd-total { font-size: 17px; font-weight: 600; }
+
+.rd-ask {
+  font-style: italic;
+  color: var(--text-3);
+}
+
+.rd-label {
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.rd-contact,
+.rd-driver {
+  margin-top: 12px;
+  font-size: 12.5px;
+  color: var(--text);
+}
+
+.rd-contact a { color: var(--accent); }
+
+.rd-company {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.rd-check {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.rd-check-link,
+.rd-route-btn,
+.rd-contact-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  font-size: 12.5px;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.rd-route-btn,
+.rd-contact-btn {
+  padding: 7px 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.rd-contact-btn {
+  color: var(--bg);
+  background: var(--accent);
+  border-color: transparent;
+  font-weight: 600;
+}
+
+.rd-route-btn:hover { border-color: var(--accent); }
+.rd-contact-btn:hover { opacity: 0.92; }

@@ -51,8 +51,6 @@ export function makeProject(bounds) {
   }
 }
 
-export const TRACKING_VIEWBOX = `0 0 ${VIEW_W} ${VIEW_H}`
-
 // Great-circle interpolation (slerp over the unit sphere) -- the same math
 // position.js uses server-side to place the marker. The lane line is drawn
 // by sampling this arc, so the line a lane is drawn on and the dot that
@@ -70,6 +68,15 @@ function interpolateGreatCircle(a, b, f) {
     + Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1)
   const d = Math.acos(Math.min(1, Math.max(-1, cosD)))
 
+  // Not dead code, and not defensive decoration either: both halves are
+  // divide-by-zero guards for the `/ sinD` two lines below, and sinD is
+  // zero at exactly these two angles. d ~ 0 is a lane whose ends are the
+  // same point, which the load board forbids (120-mile floor) but this
+  // module does not -- it is a general sampler, used for city pairs the
+  // caller chooses. d ~ PI is antipodal, where the great circle is not
+  // unique and no interpolation is meaningful; unreachable from a
+  // lower-48 city pair, kept because the alternative is NaN coordinates
+  // silently drawn as nothing.
   if (d < 1e-9 || Math.abs(d - Math.PI) < 1e-9) return { lat: a.lat, lon: a.lon }
 
   const sinD = Math.sin(d)
@@ -100,18 +107,4 @@ export function greatCirclePoints(origin, destination, steps = 32) {
     points.push([p.lon, p.lat])
   }
   return points
-}
-
-// SVG path string for a lane: greatCirclePoints() run through the SVG
-// projector. `project` is passed in (rather than imported) so callers
-// always use the one projector built from PROJECTION_BOUNDS.
-export function lanePathD(project, origin, destination) {
-  const points = greatCirclePoints(origin, destination, 32)
-  if (points.length === 0) return ''
-  return points
-    .map(([lon, lat], i) => {
-      const p = project(lat, lon)
-      return `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)} ${p.y.toFixed(1)}`
-    })
-    .join(' ')
 }

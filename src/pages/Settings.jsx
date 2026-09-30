@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../theme/ThemeProvider'
 import { roleLabel, sortRoles } from '../data/roleRoutes'
 import Toggle from '../components/Toggle'
+import CarrierPanel from '../components/settings/CarrierPanel'
 import '../components/dashboard/Panel.css'
 import '../components/dashboard/LoadBoard.css'
 import './PageHeader.css'
@@ -86,6 +87,8 @@ export default function Settings() {
               </div>
             </div>
           </div>
+
+          <CarrierPanel isAdmin={Boolean(user?.isAdmin)} />
 
           <div className="panel">
             <div className="panel-head"><div className="panel-title">Password</div></div>

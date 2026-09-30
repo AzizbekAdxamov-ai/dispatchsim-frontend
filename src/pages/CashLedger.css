@@ -77,3 +77,17 @@
 .cl-table td.neg { color: var(--text); }
 .cl-table td.pos { color: var(--text); font-weight: 600; }
 .cl-card-value.neg::before { content: ''; }
+
+/* The money model is switched off on the server (FINANCE=off). A statement
+   of fact about the environment, not a warning: no accent colour, no icon,
+   same surface as the panels it sits above. */
+.cl-off {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-2);
+  color: var(--text-2);
+  font-size: 13px;
+  line-height: 1.5;
+}

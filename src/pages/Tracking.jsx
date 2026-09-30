@@ -362,8 +362,7 @@ export default function Tracking() {
                     this lane (the simplified board line, or the arc note
                     above) -- this states why it is not the full-resolution
                     road, the same "fact, not a verdict" framing as the
-                    arc note. Mirrors the route planner's
-                    tracking-route-unavailable block. */}
+                    arc note. */}
                 {selectedFullGeometryError && (
                   <div className="tracking-panel-detail-note">
                     Full-resolution road unavailable — showing the lighter

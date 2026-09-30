@@ -91,7 +91,7 @@ function NavEntry({ to, end, icon: Icon, label, badge, active, collapsed }) {
         />
       )}
       <span className="nav-icon" aria-hidden="true">
-        <Icon size={16} weight={active ? 'fill' : 'regular'} />
+        <Icon size={20} weight={active ? 'fill' : 'regular'} />
       </span>
       <span className="nav-label">{label}</span>
       {badge != null && <span className="nav-badge">{badge}</span>}

@@ -12,8 +12,22 @@
 // `refreshing` flag indicates a background fetch is in flight. Background
 // errors never clear existing `data`; only the first load sets `error`.
 // Tabs hidden via document.visibilityState skip polls entirely.
-import { useEffect, useRef, useState, useCallback } from 'react'
+//
+// A failed background poll is NOT silent. It keeps `data` (stale data
+// beats a blank screen) but it is reported twice: locally as
+// `staleError` + `lastUpdatedAt`, for a page that wants to say it in its
+// own words, and globally to pollHealth.js, which AppShell renders as
+// one notice for the whole app. Before that, the catch below was a
+// comment and nothing else — the board simply stopped moving and said
+// nothing about it.
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { ApiError } from '../api/client'
+import { reportPoll, forgetPoll } from './pollHealth'
+
+// Identifies this hook instance to the global store. A counter, not the
+// fetcher: two pages polling the same endpoint are two things that can
+// fail independently.
+let nextPollId = 0
 
 export function useResource(fetcher, deps = [], options = {}) {
   const { pollMs } = options
@@ -21,8 +35,15 @@ export function useResource(fetcher, deps = [], options = {}) {
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
+  // The last background failure, and when data last actually arrived.
+  // Both stay put across a failing poll so a page can say "showing
+  // 14:32 data — refresh failed: ..." instead of showing nothing new
+  // and no reason.
+  const [staleError, setStaleError] = useState(null)
+  const [lastUpdatedAt, setLastUpdatedAt] = useState(null)
   const fetcherRef = useRef(fetcher)
   fetcherRef.current = fetcher
+  const pollId = useMemo(() => `poll-${nextPollId += 1}`, [])
 
   // Bumped on every refetch() call so a caller can force a reload without
   // needing a new dependency value.
@@ -47,13 +68,23 @@ export function useResource(fetcher, deps = [], options = {}) {
         const result = await fetcherRef.current(signal)
         if (signal.aborted) return
         setData(result)
-        if (!isPoll) setLoading(false)
+        setLastUpdatedAt(Date.now())
+        if (isPoll) {
+          setStaleError(null)
+          reportPoll(pollId, null)
+        } else {
+          setLoading(false)
+        }
         hasLoaded.current = true
       } catch (err) {
         if (signal.aborted || err?.name === 'AbortError') return
         const apiErr = err instanceof ApiError ? err : new ApiError('INTERNAL_ERROR', 'Something went wrong. Please try again.', 0)
         if (isPoll) {
-          // Background error — keep existing data, don't set error
+          // Keep the data — a stale board is more use than an empty one —
+          // but never keep the silence: the page gets `staleError` and
+          // the app gets one notice through pollHealth.
+          setStaleError(apiErr)
+          reportPoll(pollId, apiErr)
         } else {
           setError(apiErr)
           setLoading(false)
@@ -62,7 +93,7 @@ export function useResource(fetcher, deps = [], options = {}) {
         if (isPoll) setRefreshing(false)
       }
     },
-    [],
+    [pollId],
   )
 
   // Start a new background poll, aborting any in-flight poll first.
@@ -85,10 +116,15 @@ export function useResource(fetcher, deps = [], options = {}) {
     hasLoaded.current = false
     setLoading(true)
     setError(null)
+    setStaleError(null)
+    forgetPoll(pollId)
 
     doFetch(controller.signal, false)
 
-    return () => controller.abort()
+    return () => {
+      controller.abort()
+      forgetPoll(pollId)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [...deps, reloadToken])
 
@@ -123,5 +159,5 @@ export function useResource(fetcher, deps = [], options = {}) {
 
   const refetch = useCallback(() => setReloadToken((t) => t + 1), [])
 
-  return { data, error, loading, refreshing, refetch }
+  return { data, error, loading, refreshing, refetch, staleError, lastUpdatedAt }
 }

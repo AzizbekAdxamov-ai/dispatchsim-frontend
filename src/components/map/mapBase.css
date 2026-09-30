@@ -1,0 +1,80 @@
+/* MapLibre's own chrome, in this app's colors — once, for every map.
+ *
+ * It lived twice before (Tracking.css for `.tracking-map-pane`, MapPage.css
+ * for `.map-page-pane`), and both copies lost:
+ *
+ *   ours   .tracking-map-pane .maplibregl-ctrl-attrib     (2 classes)
+ *   theirs .maplibregl-ctrl.maplibregl-ctrl-attrib        (2 classes)
+ *
+ * Equal specificity, and MapLibre's stylesheet is imported inside the map's
+ * own lazily-loaded chunk, so it always lands LAST and always won. The
+ * attribution has been a white bar on a dark map on every map page since
+ * the vector map landed; the popup tip was a white arrow under a dark
+ * popup for the same reason (`.maplibregl-popup-anchor-bottom
+ * .maplibregl-popup-tip`, also 2).
+ *
+ * So every rule here is anchored on `.maplibregl-map` — the container class
+ * MapLibre puts on the map itself — which both raises the specificity above
+ * theirs AND makes the rule apply to every map in the app without a page
+ * wrapper to hang it on. Import it from the map components, not from a
+ * page: a map that is added tomorrow gets this for free.
+ *
+ * Attribution stays visible throughout: the tile source requires it. It is
+ * restyled, never hidden.
+ */
+
+.maplibregl-map .maplibregl-ctrl.maplibregl-ctrl-attrib {
+  background: var(--panel-2);
+  color: var(--text-3);
+  font-size: 10.5px;
+  border-radius: 4px;
+}
+
+.maplibregl-map .maplibregl-ctrl.maplibregl-ctrl-attrib a {
+  color: var(--text-2);
+}
+
+.maplibregl-map .maplibregl-ctrl-attrib-button {
+  filter: none;
+}
+
+.maplibregl-map .maplibregl-popup .maplibregl-popup-content {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: none;
+  font-size: 11.5px;
+  padding: 5px 9px;
+}
+
+/* The tip is a CSS triangle: three transparent borders and one colored,
+   and WHICH one is colored depends on the anchor MapLibre picked, so each
+   anchor is answered separately — recoloring all four sides at once would
+   fill the triangle into a square. */
+.maplibregl-map .maplibregl-popup.maplibregl-popup-anchor-top .maplibregl-popup-tip,
+.maplibregl-map .maplibregl-popup.maplibregl-popup-anchor-top-left .maplibregl-popup-tip,
+.maplibregl-map .maplibregl-popup.maplibregl-popup-anchor-top-right .maplibregl-popup-tip {
+  border-bottom-color: var(--panel);
+}
+
+.maplibregl-map .maplibregl-popup.maplibregl-popup-anchor-bottom .maplibregl-popup-tip,
+.maplibregl-map .maplibregl-popup.maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip,
+.maplibregl-map .maplibregl-popup.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip {
+  border-top-color: var(--panel);
+}
+
+.maplibregl-map .maplibregl-popup.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+  border-right-color: var(--panel);
+}
+
+.maplibregl-map .maplibregl-popup.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+  border-left-color: var(--panel);
+}
+
+/* The fleet popup draws its own head bar edge to edge, so it supplies the
+   padding the generic rule above would otherwise impose. */
+.maplibregl-map .maplibregl-popup .maplibregl-popup-content:has(.fleet-popup) {
+  padding: 0;
+  border-radius: 8px;
+  overflow: hidden;
+}

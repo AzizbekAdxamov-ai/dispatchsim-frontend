@@ -1,0 +1,196 @@
+/* The query bar. One row on a wide screen, wrapping on a narrow one.
+   Every colour is a token: the board has to read the same in both themes,
+   and a hardcoded white here is the bug that makes a dark-mode screen
+   unreadable at the one place the day starts. */
+.sb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.sb-field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.sb-place { flex: 1 1 170px; }
+.sb-narrow { flex: 0 0 64px; }
+.sb-narrow-2 { flex: 0 0 92px; }
+.sb-picker { flex: 0 0 150px; }
+.sb-dates { flex: 0 0 auto; }
+
+.sb-label {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+
+.sb-input {
+  width: 100%;
+  height: 32px;
+  padding: 0 8px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  outline: none;
+}
+
+.sb-input:focus { border-color: var(--accent); }
+
+.sb-input:disabled {
+  color: var(--text-3);
+  background: var(--panel-2);
+  cursor: not-allowed;
+}
+
+/* Not an input: a fact that happens to sit in the row of inputs. */
+.sb-static {
+  display: flex;
+  align-items: center;
+  color: var(--text-2);
+  background: var(--panel-2);
+}
+
+.sb-button-input {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.sb-clear {
+  position: absolute;
+  right: 6px;
+  bottom: 9px;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  color: var(--text-3);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.sb-clear:hover { color: var(--text); }
+
+.sb-swap {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 32px;
+  padding: 0;
+  color: var(--text-2);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.sb-swap:hover { color: var(--accent); }
+
+.sb-date-pair {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sb-date-pair .sb-input { width: 130px; }
+
+.sb-dash { color: var(--text-3); }
+
+.sb-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 16px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--bg);
+  background: var(--accent);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Not --accent-dim: that token is a dark tint in one theme and a light
+   one in the other, so using it here turns the button's own label
+   invisible in light mode. */
+.sb-search:hover { opacity: 0.92; }
+
+/* The suggestion list under a place field, and the equipment checklist.
+   Both hang off a .sb-field, which is positioned. */
+.sb-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 20;
+  min-width: 100%;
+  max-height: 260px;
+  margin: 4px 0 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.18);
+}
+
+.sb-menu-pad { padding: 6px; }
+
+.sb-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 7px 10px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--text);
+  text-align: left;
+  white-space: nowrap;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.sb-menu-item:hover { background: var(--panel-2); }
+
+.sb-menu-kind {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+
+.sb-check {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 8px;
+  font-size: 13px;
+  color: var(--text);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.sb-check:hover { background: var(--panel-2); }

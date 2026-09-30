@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { ArrowDown, ArrowUp, XCircle } from '@phosphor-icons/react'
 import { planTrip } from '../api/trips'
-import { getTrackingMapReference } from '../api/tracking'
+import { getTrackingMapReference, searchLane } from '../api/tracking'
 import { formatClock } from '../components/compliance/dutyStatus'
 import './RoutePlanner.css'
 
@@ -41,9 +41,23 @@ const REPORTS = [
   { key: 'legs', label: 'Legs Itinerary' },
   { key: 'stops', label: 'Truck Stops' },
   { key: 'hos', label: 'HOS Plan' },
+  { key: 'loads', label: 'Loads on This Lane' },
   { key: 'highways', label: 'Highways' },
   { key: 'settings', label: 'Trip Settings' },
 ]
+
+// What the ranker means by laneFit, in words. Placing, not judging: a
+// posting is not "better" for sharing an end, it is a different thing,
+// and the dispatcher decides.
+const LANE_FIT = {
+  2: 'This lane',
+  1: 'Shares one end',
+  0: 'Elsewhere',
+}
+
+function ratePerMile(x) {
+  return x == null ? '—' : `$${x.toFixed(2)}`
+}
 
 export default function RoutePlanner() {
   const [waypoints, setWaypoints] = useState(EMPTY_WAYPOINTS)
@@ -53,6 +67,12 @@ export default function RoutePlanner() {
   const [error, setError] = useState(null)
   const [running, setRunning] = useState(false)
   const [report, setReport] = useState('legs')
+  // The open board for this trip's own A->B, through the same ranking
+  // the fleet map's lane panel used. Fetched when the report is opened,
+  // not with the trip: a dispatcher planning a route does not always
+  // want to know what else is posted on it, and the postings read is a
+  // table scan the trip itself does not need.
+  const [lane, setLane] = useState({ key: null, status: 'idle', results: [], error: null })
 
   useEffect(() => {
     const ctrl = new AbortController()
@@ -61,6 +81,30 @@ export default function RoutePlanner() {
       .catch((e) => { if (e.name !== 'AbortError') setError(`City list could not load — ${e.message}`) })
     return () => ctrl.abort()
   }, [])
+
+  // Loads on this lane. Driven by the click that opens the report rather
+  // than by an effect watching `report`: the effect would have to depend
+  // on the very state it sets, which is how a fetch ends up running on
+  // every render. Re-opening an already-read lane costs nothing; a lane
+  // that failed is retried, because the alternative is a report that
+  // stays broken until the trip is re-run.
+  //
+  // The failure is stated in the report body, never only logged -- an
+  // empty table would read as "no loads on this lane", which is a
+  // different fact.
+  function openReport(key) {
+    setReport(key)
+    if (key !== 'loads' || !trip) return
+    const a = trip.waypoints[0]
+    const b = trip.waypoints.at(-1)
+    const laneKey = `${a.city}, ${a.state}->${b.city}, ${b.state}`
+    if (lane.key === laneKey && lane.status === 'ready') return
+
+    setLane({ key: laneKey, status: 'loading', results: [], error: null })
+    searchLane({ origin: `${a.city}, ${a.state}`, destination: `${b.city}, ${b.state}` })
+      .then((r) => setLane({ key: laneKey, status: 'ready', results: r.results ?? [], error: null }))
+      .catch((e) => setLane({ key: laneKey, status: 'error', results: [], error: e.message }))
+  }
 
   const setWp = (i, v) => setWaypoints((w) => w.map((x, j) => (j === i ? v : x)))
   const move = (i, d) => setWaypoints((w) => {
@@ -191,7 +235,7 @@ export default function RoutePlanner() {
             <div className="routes-section-head">Trip Reports</div>
             <div className="routes-report-btns">
               {REPORTS.map((r) => (
-                <button key={r.key} type="button" className={'routes-btn' + (report === r.key ? ' active' : '')} onClick={() => setReport(r.key)}>{r.label}</button>
+                <button key={r.key} type="button" className={'routes-btn' + (report === r.key ? ' active' : '')} onClick={() => openReport(r.key)}>{r.label}</button>
               ))}
             </div>
             <div className="routes-report">
@@ -225,6 +269,34 @@ export default function RoutePlanner() {
                     </tbody>
                   </table>
                   <ul className="routes-facts">{trip.hosFacts.map((f, i) => <li key={i}>{f.cfr ? <span className="mono">{f.cfr}</span> : null} {f.detail}</li>)}</ul>
+                </>
+              )}
+              {report === 'loads' && (
+                <>
+                  {lane.status === 'loading' && <div className="routes-dim">Reading the load board…</div>}
+                  {lane.status === 'error' && <div className="routes-error" role="alert">The load board could not be read — {lane.error}</div>}
+                  {lane.status === 'ready' && lane.results.length === 0 && (
+                    <div className="routes-dim">No open postings on the board right now.</div>
+                  )}
+                  {lane.status === 'ready' && lane.results.length > 0 && (
+                    <>
+                      <table>
+                        <thead><tr><th>Where</th><th>Lane</th><th>Broker</th><th>Miles</th><th>Rate</th><th>$/mi</th><th>Deadhead</th></tr></thead>
+                        <tbody>{lane.results.map((p) => (
+                          <tr key={p.id}>
+                            <td>{LANE_FIT[p.score.laneFit] ?? '—'}</td>
+                            <td>{p.originCity}, {p.originState} → {p.destinationCity}, {p.destinationState}</td>
+                            <td>{p.broker}</td>
+                            <td className="mono">{p.distanceMi?.toLocaleString('en-US') ?? '—'}</td>
+                            <td className="mono">{p.rateHidden ? 'Call' : money(p.rateUsd)}</td>
+                            <td className="mono">{p.rateHidden ? '—' : ratePerMile(p.score.ratePerMile)}</td>
+                            <td className="mono">{p.score.deadheadMi == null ? '—' : `${p.score.deadheadMi.toLocaleString('en-US')} mi`}</td>
+                          </tr>
+                        ))}</tbody>
+                      </table>
+                      <div className="routes-note">Open postings, this lane first, then ones sharing an end, then the rest of the board. Deadhead is measured from this trip's Start. Rate is what the broker shows: some postings do not show one.</div>
+                    </>
+                  )}
                 </>
               )}
               {report === 'highways' && (

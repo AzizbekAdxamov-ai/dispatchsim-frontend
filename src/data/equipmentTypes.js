@@ -7,12 +7,14 @@ import truckStepDeck from '../assets/truck-lowboy-slate.png'
 import truckTanker from '../assets/truck-tanker-slate.png'
 import truckPowerOnly from '../assets/truck-power-only.webp'
 
-// Single source of truth for equipment type → label/icon/image.
+// Single source of truth for equipment type → label/icon/image/code.
 // image is deliberately theme-independent: each type has exactly one
 // dedicated illustration so the artwork always matches the label.
 export const EQUIPMENT_TYPES = {
   'dry-van': {
     key: 'dry-van',
+    // The one- or two-letter code the board's EQ column uses.
+    code: 'V',
     label: 'Dry Van',
     icon: Van,
     image: { dark: truckDryVanNight, light: truckDryVan },
@@ -20,6 +22,7 @@ export const EQUIPMENT_TYPES = {
   },
   reefer: {
     key: 'reefer',
+    code: 'R',
     label: 'Reefer',
     icon: Snowflake,
     image: { dark: truckReefer, light: truckReefer },
@@ -27,6 +30,7 @@ export const EQUIPMENT_TYPES = {
   },
   flatbed: {
     key: 'flatbed',
+    code: 'F',
     label: 'Flatbed',
     icon: Stack,
     image: { dark: truckFlatbed, light: truckFlatbed },
@@ -34,6 +38,7 @@ export const EQUIPMENT_TYPES = {
   },
   'step-deck': {
     key: 'step-deck',
+    code: 'SD',
     label: 'Step Deck',
     icon: TruckTrailer,
     image: { dark: truckStepDeck, light: truckStepDeck },
@@ -41,6 +46,7 @@ export const EQUIPMENT_TYPES = {
   },
   tanker: {
     key: 'tanker',
+    code: 'TK',
     label: 'Tanker',
     icon: Drop,
     image: { dark: truckTanker, light: truckTanker },
@@ -48,6 +54,7 @@ export const EQUIPMENT_TYPES = {
   },
   'power-only': {
     key: 'power-only',
+    code: 'PO',
     label: 'Power Only',
     icon: Truck,
     image: { dark: truckPowerOnly, light: truckPowerOnly },

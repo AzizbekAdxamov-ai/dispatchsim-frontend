@@ -1,54 +1,124 @@
-/* Map page (/map): the whole screen is the map. The pane rules live in
-   Tracking.css (.tracking-map-pane) -- this file adds only the page's own
-   wrapper, so a full-screen map cannot inherit the tracking page's panel
-   split. Same MapLibre scoping as Tracking's pane: the library's own
-   stylesheet loads inside the lazy chunk, so these win on specificity
-   (.map-page-pane .class, two selectors) rather than import order. */
+/* Map page (/map): the whole screen is the map. MapLibre's own chrome --
+   attribution, popups -- is styled once for every map in
+   components/map/mapBase.css, not here: this file used to carry its own
+   copy of those rules, and so did Tracking.css, and both copies were
+   being overridden by MapLibre anyway. */
 
+/* `.map-page` on the wrapper is the hook for this page's own rules; the
+   height comes from .tracking-page (Tracking.css), which is only a
+   height container -- no panel split to inherit. */
 .map-page-pane {
   position: relative;
-  flex: 1;
   min-width: 0;
   height: 100%;
 }
 
-/* Same dark-theme restyle Tracking's pane applies to MapLibre's built-in
-   attribution -- required by the tile source, so it stays, but it should
-   read as part of the panel in both themes. */
-.map-page-pane .maplibregl-ctrl-attrib {
-  background: var(--panel-2);
-  color: var(--text-3);
-  font-size: 10.5px;
-  border-radius: 4px;
+/* The picked load: top-left, where a card does not fight MapLibre's own
+   controls (zoom top-right, attribution bottom-right) or the error lines
+   at the bottom. */
+.map-page-card {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 1;
+  width: 260px;
+  padding: 10px 12px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
 }
 
-.map-page-pane .maplibregl-ctrl-attrib a {
+.map-page-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.map-page-card-id {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.map-page-card-id:hover {
+  color: var(--blue);
+}
+
+.map-page-card-close {
+  display: inline-flex;
+  padding: 2px;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  color: var(--text-3);
+  cursor: pointer;
+}
+
+.map-page-card-close:hover {
+  color: var(--text);
+  background: var(--panel-3);
+}
+
+.map-page-card-route {
+  font-size: 12px;
+  color: var(--text-2);
+  margin-bottom: 8px;
+}
+
+.map-page-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 0 0 10px;
+}
+
+.map-page-card-grid dt {
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-3);
+  margin-bottom: 1px;
+}
+
+.map-page-card-grid dd {
+  margin: 0;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.map-page-card-link {
+  display: inline-block;
+  font-size: 11.5px;
+  color: var(--blue);
+  text-decoration: none;
+}
+
+.map-page-card-link:hover {
+  text-decoration: underline;
+}
+
+/* Loud, not silent: a fetch that failed says so over the map rather than
+   leaving it looking merely empty. Bottom-left, clear of MapLibre's own
+   controls (zoom top-right, attribution bottom-right) and of the card
+   above. */
+.map-page-errors {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: min(520px, calc(100% - 24px));
+  padding: 8px 12px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 12px;
   color: var(--text-2);
 }
 
-.map-page-pane .maplibregl-ctrl-attrib-button {
-  filter: none;
-}
-
-/* The load preview popup (fleet popup) is styled in Tracking.css scoped to
-   .tracking-map-pane; this page renders the same FleetMap, so the same
-   rules apply to its popup here. */
-.map-page-pane .maplibregl-popup-content {
-  background: var(--panel);
-  color: var(--text);
-  border: 1px solid var(--border);
-  box-shadow: none;
-  font-size: 11.5px;
-  padding: 5px 9px;
-}
-
-.map-page-pane .maplibregl-popup-content:has(.fleet-popup) {
-  padding: 0;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.map-page-pane .maplibregl-popup-tip {
-  border-top-color: var(--panel);
-  border-bottom-color: var(--panel);
-}

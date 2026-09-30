@@ -9,7 +9,8 @@
     "build:map": "node scripts/build-us-map.mjs",
     "check:map": "node scripts/build-us-map.mjs --check",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node --test \"test/**/*.test.js\""
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

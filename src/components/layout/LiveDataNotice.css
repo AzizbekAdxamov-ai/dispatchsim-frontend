@@ -1,0 +1,32 @@
+/* Sits between the tab row and the page, full width: it is about the
+   whole app, not about whatever is under the cursor. Tokens only, and
+   the warning amber rather than the red this project keeps for a load
+   that is actually late -- a poll that failed is a fact to state, not an
+   emergency to declare. */
+/* Its height is the token, not the sum of its padding: tokens.css adds
+   exactly --live-notice-h to --shell-chrome while this is on screen, and
+   a full-height page under it would be off by the difference if the two
+   ever drifted apart. */
+.live-data-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  height: var(--live-notice-h);
+  padding: 0 24px;
+  font-size: 12px;
+  color: var(--text-2);
+  background: var(--panel-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.live-data-notice svg {
+  flex-shrink: 0;
+  color: var(--amber);
+}
+
+.live-data-notice span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
