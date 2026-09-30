@@ -267,3 +267,11 @@
     grid-template-columns: 1fr;
   }
 }
+
+.dd-about-body {
+  padding: 14px 16px;
+  white-space: pre-line;
+  color: var(--text-2);
+  font-size: 13px;
+  line-height: 1.55;
+}

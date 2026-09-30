@@ -167,6 +167,13 @@ export default function DriverDetail() {
         </div>
 
         <div>
+          {driver.bio ? (
+            <div className="panel">
+              <div className="panel-head"><div className="panel-title">About</div></div>
+              <div className="dd-about-body">{driver.bio.trim()}</div>
+            </div>
+          ) : null}
+
           <div className="panel">
             <div className="panel-head"><div className="panel-title">Hours of service</div></div>
             <div className="dd-hos-body">
