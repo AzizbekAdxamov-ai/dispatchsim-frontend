@@ -100,6 +100,48 @@ function fleetToGeoJSON(loads) {
   }
 }
 
+// The trucks with nothing on them, as their own layer. Square-ish,
+// muted, underneath the moving fleet: a parked unit is context, not the
+// subject. Coordinates were settled server-side (idleTrucksToBoard drops
+// anything without a real driver position), so every feature here has a
+// place to stand.
+function idleToGeoJSON(trucks) {
+  return {
+    type: 'FeatureCollection',
+    features: (trucks ?? []).map((t) => ({
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: [t.lon, t.lat] },
+      properties: {
+        id: idStr(t.id),
+        unit: t.truck ? `${t.truck.make} ${t.truck.model}` : t.id,
+        driver: t.driver?.name ?? '',
+        place: t.city ? `${t.city}, ${t.state}` : '',
+        hours: t.driver?.hosRemainingMin != null
+          ? `${Math.floor(t.driver.hosRemainingMin / 60)}h ${t.driver.hosRemainingMin % 60}m left`
+          : '',
+      },
+    })),
+  }
+}
+
+// The idle popup: unit, driver, where, and the clock. Same DOM-builder
+// approach as loadPopupEl -- properties in, DOM out, no innerHTML.
+function idlePopupEl(p) {
+  const root = document.createElement('div')
+  root.className = 'fleet-popup'
+  const head = document.createElement('div')
+  head.className = 'fleet-popup-head'
+  const unit = document.createElement('span')
+  unit.className = 'fleet-popup-num'
+  unit.textContent = p.unit
+  head.append(unit)
+  const line = document.createElement('div')
+  line.className = 'fleet-popup-route'
+  line.textContent = [p.driver || 'No load assigned', p.place, p.hours].filter(Boolean).join(' · ')
+  root.append(head, line)
+  return root
+}
+
 // The selected load's own lane line, drawn on its own source/layer so it
 // can be upgraded in place once the full-resolution geometry arrives --
 // see Tracking.jsx's selectedFullGeometry (GET /tracking/loads/:id/route,
@@ -202,7 +244,7 @@ const FACILITY_LABEL = {
   rest_area: 'Rest area',
 }
 
-function addLayers(map, { loads, cities, facilities, selected, selectedFullGeometry, colors }) {
+function addLayers(map, { loads, idleTrucks = [], cities, facilities, selected, selectedFullGeometry, colors }) {
   const selectedId = idStr(selected)
   const selectedLoad = loads.find((l) => idStr(l.id) === selectedId) ?? null
 
@@ -277,6 +319,21 @@ function addLayers(map, { loads, cities, facilities, selected, selectedFullGeome
       'circle-radius': 4,
       'circle-color': colors.panel,
       'circle-stroke-color': colors.text2,
+      'circle-stroke-width': 1.5,
+    },
+  })
+
+  // Idle trucks UNDER the moving fleet: a parked unit must never cover
+  // the load a dispatcher is hunting.
+  map.addSource('idle-fleet', { type: 'geojson', data: idleToGeoJSON(idleTrucks) })
+  map.addLayer({
+    id: 'idle-fleet-layer',
+    type: 'circle',
+    source: 'idle-fleet',
+    paint: {
+      'circle-radius': 3,
+      'circle-color': colors.muted,
+      'circle-stroke-color': colors.panel,
       'circle-stroke-width': 1.5,
     },
   })
@@ -377,7 +434,7 @@ function hideLoadPopup(popup) {
 }
 
 export default function FleetMap({
-  loads, cities = [], facilities = [], selected, onSelect, selectedFullGeometry = null,
+  loads, idleTrucks = [], cities = [], facilities = [], selected, onSelect, selectedFullGeometry = null,
 }) {
   const wrapRef = useRef(null)
   const mapRef = useRef(null)
@@ -387,12 +444,14 @@ export default function FleetMap({
   // Refs so the map's event handlers (bound once, at mount) and the
   // post-setStyle relayer always see the latest props without the mount
   // effect depending on them.
+  const idleTrucksRef = useRef(idleTrucks)
   const loadsRef = useRef(loads)
   const citiesRef = useRef(cities)
   const facilitiesRef = useRef(facilities)
   const selectedRef = useRef(selected)
   const selectedFullGeometryRef = useRef(selectedFullGeometry)
   const onSelectRef = useRef(onSelect)
+  useEffect(() => { idleTrucksRef.current = idleTrucks }, [idleTrucks])
   useEffect(() => { loadsRef.current = loads }, [loads])
   useEffect(() => { citiesRef.current = cities }, [cities])
   useEffect(() => { facilitiesRef.current = facilities }, [facilities])
@@ -445,6 +504,7 @@ export default function FleetMap({
       map.setMinZoom(map.getZoom())
       addLayers(map, {
         loads: loadsRef.current,
+        idleTrucks: idleTrucksRef.current,
         cities: citiesRef.current,
         facilities: facilitiesRef.current,
         selected: selectedRef.current,
@@ -452,6 +512,17 @@ export default function FleetMap({
         colors: readColors(),
       })
       setMapReady(true)
+    })
+
+    map.on('mouseenter', 'idle-fleet-layer', (e) => {
+      map.getCanvas().style.cursor = 'pointer'
+      const f = e.features?.[0]
+      if (!f) return
+      loadPopup.setDOMContent(idlePopupEl(f.properties)).setLngLat(f.geometry.coordinates).addTo(map)
+    })
+    map.on('mouseleave', 'idle-fleet-layer', () => {
+      map.getCanvas().style.cursor = ''
+      hideLoadPopup(loadPopup)
     })
 
     CLICKABLE_LAYERS.forEach((layerId) => {
@@ -547,6 +618,7 @@ export default function FleetMap({
       map.once('styledata', () => {
         addLayers(map, {
           loads: loadsRef.current,
+          idleTrucks: idleTrucksRef.current,
           cities: citiesRef.current,
         facilities: facilitiesRef.current,
           selected: selectedRef.current,
@@ -573,6 +645,15 @@ export default function FleetMap({
     map.getSource('lanes').setData(lanesToGeoJSON(loads))
     map.getSource('fleet').setData(fleetToGeoJSON(loads))
   }, [loads, mapReady])
+
+  // Idle trucks swap in place like every other source -- a truck the
+  // tick placed, or one the dispatcher just assigned, appears on the
+  // next poll without rebuilding the map.
+  useEffect(() => {
+    const map = mapRef.current
+    if (!mapReady || !map?.getSource('idle-fleet')) return
+    map.getSource('idle-fleet').setData(idleToGeoJSON(idleTrucks))
+  }, [idleTrucks, mapReady])
 
   // The stops arrive on their own fetch (they never change while the page
   // is open, so this runs once) -- swapped in place like every other

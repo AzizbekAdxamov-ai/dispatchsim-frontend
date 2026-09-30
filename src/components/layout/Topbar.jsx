@@ -4,17 +4,17 @@ import { useTheme } from '../../theme/ThemeProvider'
 import WorkspaceSwitcher from './WorkspaceSwitcher'
 import CashChip from './CashChip'
 import AlertsBell from './AlertsBell'
+// The order lives in its own plain-.js module (quickLinks.js) so
+// node:test can pin it -- node:test cannot import JSX, and an untestable
+// rule is a rule that is quietly reordered. Icons attach here, by `to`.
+import { QUICK_LINKS } from './quickLinks'
 import './Topbar.css'
 
-// The screens dispatch opens all day, one click from any page. Lives here
-// (not navSections.js) on purpose: these are shortcuts, not structure --
-// the sidebar stays the single source of the workspace's navigation, and
-// this list never grows into a duplicate of it.
-const QUICK_LINKS = [
-  { to: '/map', icon: MapTrifold, label: 'Map' },
-  { to: '/loads', icon: Package, label: 'Loads' },
-  { to: '/load-board', icon: MagnifyingGlass, label: 'Load Board' },
-]
+const LINK_ICONS = {
+  '/loads': Package,
+  '/load-board': MagnifyingGlass,
+  '/map': MapTrifold,
+}
 
 export default function Topbar({ title }) {
   const { theme, toggleTheme } = useTheme()
@@ -25,16 +25,19 @@ export default function Topbar({ title }) {
       {/* Where the timezone clocks used to sit. NavLink, not Link: the
           chip you are on reads as selected, not just tappable. */}
       <nav className="topbar-links" aria-label="Quick links">
-        {QUICK_LINKS.map(({ to, icon: Icon, label }) => (
-          <NavLink
-            key={to}
-            to={to}
-            className={({ isActive }) => 'topbar-link' + (isActive ? ' active' : '')}
-          >
-            <Icon size={15} aria-hidden="true" />
-            <span>{label}</span>
-          </NavLink>
-        ))}
+        {QUICK_LINKS.map(({ to, label }) => {
+          const Icon = LINK_ICONS[to] ?? Package
+          return (
+            <NavLink
+              key={to}
+              to={to}
+              className={({ isActive }) => 'topbar-link' + (isActive ? ' active' : '')}
+            >
+              <Icon size={15} aria-hidden="true" />
+              <span>{label}</span>
+            </NavLink>
+          )
+        })}
       </nav>
       <div className="topbar-spacer"></div>
       {/* Back after a day out: the balance is the one number this project

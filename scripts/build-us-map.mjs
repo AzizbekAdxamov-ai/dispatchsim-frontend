@@ -169,6 +169,15 @@ function build() {
     maxY: roundBound(maxY),
   }
 
+  // The nation's outer rings as raw [lon, lat] pairs, rounded the same
+  // way round4 rounds coordinates elsewhere in this repo. This is the
+  // LAND, readable by any point-in-polygon test without a projection:
+  // the backend seed (scripts/seed/facilities.js) reads exactly this
+  // export to keep city-ring truck stops off the water. Carried as
+  // longitude-first pairs so no consumer ever has to guess the order.
+  const nationRings = nationPolygons.map((polygon) =>
+    polygon[0].map(([lon, lat]) => [Number(lon.toFixed(4)), Number(lat.toFixed(4))]))
+
   const lines = []
   lines.push('// GENERATED FILE -- do not edit by hand.')
   lines.push('// Run `npm run build:map` to regenerate. Source: us-atlas states-10m')
@@ -177,6 +186,8 @@ function build() {
   lines.push(`export const PROJECTION_BOUNDS = ${JSON.stringify(boundsOut)}`)
   lines.push('')
   lines.push(`export const NATION_PATH = ${JSON.stringify(nationPath)}`)
+  lines.push('')
+  lines.push(`export const NATION_RINGS = ${JSON.stringify(nationRings)}`)
   lines.push('')
   lines.push('export const STATE_PATHS = [')
   for (const s of statePaths) {

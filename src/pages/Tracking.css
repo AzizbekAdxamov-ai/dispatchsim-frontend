@@ -597,7 +597,7 @@
   border-radius: 6px;
   color: var(--text-2);
   cursor: pointer;
-  box-shadow: 0 4px 14px rgb(0 0 0 / 22%);
+  box-shadow: 0 4px 14px var(--shadow);
 }
 
 .tracking-map-expand:hover {

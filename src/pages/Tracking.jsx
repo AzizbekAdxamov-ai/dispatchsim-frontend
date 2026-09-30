@@ -48,6 +48,10 @@ export default function Tracking() {
   )
 
   const loads = useMemo(() => data?.loads ?? [], [data])
+  // The trucks with nothing on them -- the board names them separately so
+  // a fresh-start company (one truck, no loads) still has a fleet on this
+  // page instead of an empty country.
+  const idleTrucks = useMemo(() => data?.idleTrucks ?? [], [data])
 
   // The city layer is fetched once and never polled: it only changes when
   // cities.js does, which is a deploy. Its own request rather than a field
@@ -293,6 +297,45 @@ export default function Tracking() {
               </div>
             </div>
 
+            {/* The yard: trucks with nothing on them. Listed so the fleet
+                count on this page is the whole fleet, and selectable so a
+                click highlights the same dot the map draws. */}
+            {!loading && idleTrucks.length > 0 && (
+              <div className="tracking-panel-section">
+                <div className="panel-head">
+                  <div className="panel-title">In the yard</div>
+                  <span className="panel-count">{idleTrucks.length}</span>
+                </div>
+                <div className="tracking-list">
+                  {idleTrucks.map((t) => (
+                    <div className="tracking-row idle" key={t.id}>
+                      <div className="tracking-row-top">
+                        <span className="tracking-row-id mono">{t.id}</span>
+                        <span className="badge neutral"><span className="dot" />Idle</span>
+                      </div>
+                      <div className="tracking-row-route">
+                        {t.truck.make} {t.truck.model}
+                        {t.city ? ` — ${t.city}, ${t.state}` : ''}
+                      </div>
+                      <div className="tracking-row-unit">
+                        {t.driver ? (
+                          <>
+                            <Truck size={12} aria-hidden="true" />
+                            {t.driver.name}
+                            {t.driver.hosRemainingMin != null && (
+                              <span className="tracking-row-hos mono">· {formatHos(t.driver.hosRemainingMin)} drive</span>
+                            )}
+                          </>
+                        ) : (
+                          <span className="tracking-row-nodriver">No load assigned</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Selected load's own facts -- no new fetches, same numbers
                 the row above already carries. */}
             {selectedLoad && (
@@ -387,6 +430,7 @@ export default function Tracking() {
           <Suspense fallback={<div className="tracking-map-loading">Loading map…</div>}>
             <FleetMap
               loads={loads}
+              idleTrucks={idleTrucks}
               cities={cities}
               facilities={facilities}
               selected={selected}

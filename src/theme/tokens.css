@@ -61,6 +61,8 @@
   --red: #F0605C;
   --red-bg: rgba(240, 96, 92, 0.14);
   --red-strong: #F0605C;
+
+  --shadow: rgba(0, 0, 0, 0.22);
 }
 
 :root[data-theme="light"] {
@@ -92,4 +94,6 @@
   --red: #C4453B;
   --red-bg: #FBEAE8;
   --red-strong: #96332B;
+
+  --shadow: rgba(58, 50, 41, 0.16);
 }
