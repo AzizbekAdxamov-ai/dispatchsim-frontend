@@ -16,9 +16,11 @@
 /* The picked load: top-left, where a card does not fight MapLibre's own
    controls (zoom top-right, attribution bottom-right) or the error lines
    at the bottom. */
+/* Below the search box (components/map/MapSearch.css): the box is
+   always there, the card only when a truck is picked. */
 .map-page-card {
   position: absolute;
-  top: 12px;
+  top: 60px;
   left: 12px;
   z-index: 1;
   width: 260px;

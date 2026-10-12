@@ -1,10 +1,13 @@
-import { lazy, Suspense, useState } from 'react'
+import { lazy, Suspense, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { X } from '@phosphor-icons/react'
 import { getTrackingBoard, getTrackingMapReference } from '../api/tracking'
 import { listFacilities } from '../api/facilities'
 import { useResource } from '../hooks/useResource'
 import { formatPlace, formatEta, formatMiles, formatMoney } from '../utils/format'
+import MapSearch from '../components/map/MapSearch'
+import { buildPlaceIndex } from '../components/map/placeSearch'
+import { STATE_BOUNDS } from '../data/usMap'
 // MapLibre rides along inside FleetMap.jsx (about a megabyte minified) --
 // lazy keeps it out of every other route's bundle, same as Tracking does.
 import './Tracking.css'
@@ -37,10 +40,21 @@ export default function MapPage() {
   const { data: facilitiesData, error: facilitiesError } = useResource((signal) => listFacilities(signal), [])
 
   const [selected, setSelected] = useState(null)
+  // Where the search last sent the map. A fresh object per pick, so the
+  // same city picked twice flies there twice.
+  const [focus, setFocus] = useState(null)
 
   const loads = data?.loads ?? []
-  const cities = mapRef?.cities ?? []
+  // The trucks with no load. Passed here as Tracking passes them: this
+  // page used to leave them out, so a driver sitting in a truck with
+  // nothing to haul -- the whole company on 2026-09-30 -- was on the
+  // Tracking map and missing from this one.
+  const idleTrucks = data?.idleTrucks ?? []
+  // Memoized, not `?? []` inline: a fresh empty array every render would
+  // rebuild the search index and re-send the city layer each time.
+  const cities = useMemo(() => mapRef?.cities ?? [], [mapRef])
   const facilities = facilitiesData?.facilities ?? []
+  const placeIndex = useMemo(() => buildPlaceIndex({ cities, states: STATE_BOUNDS }), [cities])
   // By id from the live list, not a copy taken at click time: the poll
   // moves this truck every 10s and the card has to move with it.
   const selectedLoad = loads.find((l) => String(l.id) === String(selected)) ?? null
@@ -65,12 +79,19 @@ export default function MapPage() {
         <Suspense fallback={<div className="tracking-map-loading">Loading map…</div>}>
           <FleetMap
             loads={loads}
+            idleTrucks={idleTrucks}
+            focus={focus}
             cities={cities}
             facilities={facilities}
             selected={selected}
             onSelect={setSelected}
           />
         </Suspense>
+        <MapSearch
+          index={placeIndex}
+          cityCount={cities.length}
+          onPick={(place) => setFocus({ ...place })}
+        />
         {/* The card is facts and a way out, not a verdict: where the load
             is going, how much is left, what the ETA is against what was
             promised, what it pays. Anything more is the load's own page,

@@ -435,6 +435,11 @@ function hideLoadPopup(popup) {
 
 export default function FleetMap({
   loads, idleTrucks = [], cities = [], facilities = [], selected, onSelect, selectedFullGeometry = null,
+  // A place to go to, from the Map page's search: a city
+  // ({ kind: 'city', lat, lon, label }) or a state ({ kind: 'state', bbox }).
+  // A new object each time -- picking the same city twice flies there
+  // twice, which is what someone who panned away expects.
+  focus = null,
 }) {
   const wrapRef = useRef(null)
   const mapRef = useRef(null)
@@ -680,6 +685,37 @@ export default function FleetMap({
     map.getSource('selected-lane')?.setData(selectedLaneGeoJSON(selectedLoad, selectedFullGeometry))
     map.getSource('endpoints')?.setData(endpointsToGeoJSON(selectedLoad))
   }, [selected, loads, selectedFullGeometry, mapReady])
+
+  // ---- go to a searched place ----
+  //
+  // A city gets a fly-in and a label on the spot, because a dot among a
+  // hundred other dots is not an answer to "where is Dover"; a state gets
+  // framed whole, from its own Census bounding box. Someone who asked the
+  // system to keep motion down gets the jump without the flight.
+  const focusPopupRef = useRef(null)
+  useEffect(() => {
+    const map = mapRef.current
+    if (!mapReady || !map || !focus) return
+    focusPopupRef.current?.remove()
+    const reduce = typeof window !== 'undefined'
+      && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    if (focus.kind === 'state' && Array.isArray(focus.bbox)) {
+      const [minLon, minLat, maxLon, maxLat] = focus.bbox
+      map.fitBounds([[minLon, minLat], [maxLon, maxLat]], { padding: 48, ...(reduce ? { duration: 0 } : {}) })
+      return
+    }
+    if (focus.kind === 'city' && Number.isFinite(focus.lat) && Number.isFinite(focus.lon)) {
+      map.flyTo({ center: [focus.lon, focus.lat], zoom: Math.max(map.getZoom(), 8), ...(reduce ? { duration: 0 } : {}) })
+      const el = document.createElement('div')
+      el.className = 'fleet-popup fleet-popup-place'
+      el.textContent = focus.label
+      focusPopupRef.current = new Popup({ closeButton: true, closeOnClick: true, offset: 6 })
+        .setLngLat([focus.lon, focus.lat])
+        .setDOMContent(el)
+        .addTo(map)
+    }
+  }, [focus, mapReady])
+  useEffect(() => () => focusPopupRef.current?.remove(), [])
 
   return (
     <div className="fleet-map-wrap">

@@ -1,0 +1,120 @@
+/* The Map page's search box: top-left over the map, above the picked-load
+   card (MapPage.css moves the card down to make room). MapLibre keeps the
+   top-right for zoom and the bottom-right for attribution. */
+.map-search {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+  width: 300px;
+  max-width: calc(100% - 24px);
+}
+
+.map-search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 6px 18px var(--shadow);
+}
+
+.map-search-box:focus-within {
+  border-color: var(--accent);
+}
+
+.map-search-icon {
+  color: var(--text-3);
+  flex-shrink: 0;
+}
+
+.map-search-input {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+}
+
+.map-search-input::placeholder {
+  color: var(--text-3);
+}
+
+.map-search-clear {
+  display: inline-flex;
+  padding: 3px;
+  border: none;
+  border-radius: 4px;
+  background: none;
+  color: var(--text-3);
+  cursor: pointer;
+}
+
+.map-search-clear:hover {
+  color: var(--text);
+}
+
+.map-search-list {
+  margin: 6px 0 0;
+  padding: 4px;
+  list-style: none;
+  max-height: 320px;
+  overflow-y: auto;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px var(--shadow);
+}
+
+.map-search-option {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 9px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.map-search-option.active {
+  background: var(--panel-3);
+}
+
+.map-search-label {
+  color: var(--text);
+  font-size: 13px;
+}
+
+.map-search-sub {
+  color: var(--text-3);
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+
+.map-search-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 9px;
+  color: var(--text-2);
+  font-size: 12.5px;
+}
+
+.map-search-empty span {
+  color: var(--text-3);
+  font-size: 11.5px;
+}
+
+/* The label on a searched city -- MapLibre's popup, styled like the
+   fleet's own popups (mapBase.css) but a single line. */
+.fleet-popup-place {
+  font-size: 12.5px;
+  font-weight: 600;
+  padding-right: 14px;
+}

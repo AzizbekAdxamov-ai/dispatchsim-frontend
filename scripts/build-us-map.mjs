@@ -109,6 +109,52 @@ function geometryToPath(project, geometry, tolerance) {
 // Islands, the US Virgin Islands). See the header comment for why.
 const EXCLUDED_FIPS = new Set(['02', '15', '60', '66', '69', '72', '78'])
 
+// FIPS state code -> USPS two-letter code, for the lower 48 and DC.
+// us-atlas carries only the FIPS id and the name; the app's own data
+// (cities, postings, drivers) speaks in USPS codes, so the map search
+// needs both to connect "TX", "Texas" and "Dallas, TX".
+// Source: US Census Bureau, "ANSI/FIPS state codes"
+// https://www.census.gov/library/reference/code-lists/ansi.html
+// (checked 2026-09-30). A state the table does not cover stops the build
+// rather than shipping without its code -- see stateBounds() below.
+const USPS_BY_FIPS = Object.freeze({
+  '01': 'AL', '04': 'AZ', '05': 'AR', '06': 'CA', '08': 'CO', '09': 'CT', '10': 'DE', '11': 'DC',
+  '12': 'FL', '13': 'GA', '16': 'ID', '17': 'IL', '18': 'IN', '19': 'IA', '20': 'KS', '21': 'KY',
+  '22': 'LA', '23': 'ME', '24': 'MD', '25': 'MA', '26': 'MI', '27': 'MN', '28': 'MS', '29': 'MO',
+  '30': 'MT', '31': 'NE', '32': 'NV', '33': 'NH', '34': 'NJ', '35': 'NM', '36': 'NY', '37': 'NC',
+  '38': 'ND', '39': 'OH', '40': 'OK', '41': 'OR', '42': 'PA', '44': 'RI', '45': 'SC', '46': 'SD',
+  '47': 'TN', '48': 'TX', '49': 'UT', '50': 'VT', '51': 'VA', '53': 'WA', '54': 'WV', '55': 'WI',
+  '56': 'WY',
+})
+
+// Each state's bounding box in plain [lon, lat], from the same Census
+// geometry the map draws -- so "search Texas" frames exactly the Texas
+// the basemap and the state lines show, not a second, hand-typed guess.
+// Used by the Map page's search (src/components/map/placeSearch.js).
+function stateBounds(features) {
+  return features
+    .map((f) => {
+      const abbr = USPS_BY_FIPS[f.id]
+      if (!abbr) throw new Error(`build:map -- no USPS code for FIPS ${f.id} (${f.properties?.name}); add it to USPS_BY_FIPS`)
+      let minLon = Infinity
+      let maxLon = -Infinity
+      let minLat = Infinity
+      let maxLat = -Infinity
+      const polygons = f.geometry.type === 'Polygon' ? [f.geometry.coordinates] : f.geometry.coordinates
+      for (const polygon of polygons) {
+        for (const [lon, lat] of polygon[0]) {
+          if (lon < minLon) minLon = lon
+          if (lon > maxLon) maxLon = lon
+          if (lat < minLat) minLat = lat
+          if (lat > maxLat) maxLat = lat
+        }
+      }
+      const r = (n) => Number(n.toFixed(4))
+      return { id: f.id, abbr, name: f.properties?.name ?? String(f.id), bbox: [r(minLon), r(minLat), r(maxLon), r(maxLat)] }
+    })
+    .sort((a, b) => a.name.localeCompare(b.name))
+}
+
 function build() {
   const topology = JSON.parse(readFileSync(ATLAS_PATH, 'utf8'))
 
@@ -192,6 +238,15 @@ function build() {
   lines.push('export const STATE_PATHS = [')
   for (const s of statePaths) {
     lines.push(`  { id: ${JSON.stringify(s.id)}, name: ${JSON.stringify(s.name)}, d: ${JSON.stringify(s.d)} },`)
+  }
+  lines.push(']')
+  lines.push('')
+  // Last on purpose: the backend's facilities seed reads NATION_RINGS by
+  // slicing this file up to the NEXT export, so anything new goes after
+  // the exports that already exist, never between them.
+  lines.push('export const STATE_BOUNDS = [')
+  for (const b of stateBounds(continentalStatesFC.features)) {
+    lines.push(`  ${JSON.stringify(b)},`)
   }
   lines.push(']')
   lines.push('')
