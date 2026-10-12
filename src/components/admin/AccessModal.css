@@ -1,7 +1,7 @@
 .admin-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--scrim);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -16,7 +16,7 @@
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 22px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 50px var(--shadow);
 }
 
 .admin-modal-head {

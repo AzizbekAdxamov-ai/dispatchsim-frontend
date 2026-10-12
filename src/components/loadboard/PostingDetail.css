@@ -2,7 +2,7 @@
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: rgba(0, 0, 0, 0.35);
+  background: var(--scrim-soft);
   display: flex;
   justify-content: flex-end;
 }
@@ -143,8 +143,8 @@
   gap: 8px;
   padding: 10px 12px;
   border-radius: 8px;
-  background: var(--amber-bg, rgba(217, 159, 51, 0.1));
-  color: var(--amber-strong, #b8860b);
+  background: var(--amber-bg);
+  color: var(--amber-strong);
   font-size: 12px;
   line-height: 1.5;
   margin-bottom: 12px;
@@ -161,8 +161,8 @@
   gap: 8px;
   padding: 10px 12px;
   border-radius: 8px;
-  background: var(--red-bg, rgba(220, 53, 69, 0.1));
-  color: var(--red-strong, #dc3545);
+  background: var(--red-bg);
+  color: var(--red-strong);
   font-size: 12px;
   line-height: 1.5;
   margin-bottom: 12px;
@@ -179,8 +179,8 @@
   gap: 8px;
   padding: 10px 12px;
   border-radius: 8px;
-  background: var(--green-bg, rgba(40, 167, 69, 0.1));
-  color: var(--green-strong, #28a745);
+  background: var(--green-bg);
+  color: var(--green-strong);
   font-size: 12px;
   line-height: 1.5;
   margin-bottom: 12px;
@@ -229,7 +229,7 @@
   border-radius: 8px;
   border: none;
   background: var(--blue);
-  color: #fff;
+  color: var(--on-blue);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -249,7 +249,7 @@
    icon. A dispatcher has to read the rating and the payment days and make
    the call; a red badge would make that judgement for them. */
 .lb-broker-card {
-  border-top: 1px solid var(--line, rgba(0, 0, 0, 0.08));
+  border-top: 1px solid var(--border-soft);
   padding: 14px 18px 4px;
 }
 
@@ -257,7 +257,7 @@
   font-size: 11px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--text-2, #6b6b6b);
+  color: var(--text-2);
   margin-bottom: 8px;
 }
 
@@ -275,7 +275,7 @@
 }
 
 .lb-broker-facts dt {
-  color: var(--text-2, #6b6b6b);
+  color: var(--text-2);
 }
 
 .lb-broker-facts dd {
@@ -287,7 +287,7 @@
   margin: 0 0 10px;
   font-size: 12.5px;
   line-height: 1.45;
-  color: var(--text-2, #6b6b6b);
+  color: var(--text-2);
 }
 
 /* The dispatcher's own lookup, shown only if they made one. Reads as a

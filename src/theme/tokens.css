@@ -63,6 +63,28 @@
   --red-strong: #F0605C;
 
   --shadow: rgba(0, 0, 0, 0.22);
+
+  /* Text and icons ON a filled colour. The accent is lime here and blue in
+     light, so one fixed text colour cannot sit on both: white on this lime
+     is 1.24:1 and could not be read (the Dispatch, Hire and Assign buttons
+     used #fff until 2026-10-08). */
+  --on-accent: #1B1F0C;
+  /* The far end of a progress bar's gradient. */
+  --accent-deep: #B8DA3E;
+  --amber-deep: #E0A32E;
+  --on-blue: #FFFFFF;
+  --on-green: #08170E;
+
+  /* Behind a modal or a side panel. */
+  --scrim: rgba(0, 0, 0, 0.5);
+  --scrim-soft: rgba(0, 0, 0, 0.35);
+
+  --amber-border: rgba(245, 185, 66, 0.35);
+  --amber-sep: rgba(245, 185, 66, 0.5);
+
+  /* The cargo layout's own highlight -- one place, not a literal in its CSS. */
+  --violet: #6E3FF3;
+  --violet-bg: rgba(110, 63, 243, 0.16);
 }
 
 :root[data-theme="light"] {
@@ -96,4 +118,21 @@
   --red-strong: #96332B;
 
   --shadow: rgba(58, 50, 41, 0.16);
+
+  --on-accent: #FFFFFF;
+  /* Blue to blue here: the light accent is blue, and until 2026-10-08 the
+     bar ran blue into the dark theme's lime. */
+  --accent-deep: #2C5CA8;
+  --amber-deep: #E0A32E;
+  --on-blue: #FFFFFF;
+  --on-green: #08170E;
+
+  --scrim: rgba(0, 0, 0, 0.5);
+  --scrim-soft: rgba(0, 0, 0, 0.35);
+
+  --amber-border: #EDD9AE;
+  --amber-sep: #D9BE8C;
+
+  --violet: #6E3FF3;
+  --violet-bg: rgba(110, 63, 243, 0.16);
 }

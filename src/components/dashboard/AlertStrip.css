@@ -3,7 +3,7 @@
   align-items: center;
   gap: 10px;
   background: var(--amber-bg);
-  border: 1px solid #EDD9AE;
+  border: 1px solid var(--amber-border);
   color: var(--amber-strong);
   padding: 9px 14px;
   border-radius: 8px;
@@ -18,5 +18,5 @@
 }
 
 .alert-strip .sep {
-  color: #D9BE8C;
+  color: var(--amber-sep);
 }

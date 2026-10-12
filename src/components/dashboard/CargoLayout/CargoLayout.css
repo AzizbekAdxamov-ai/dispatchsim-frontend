@@ -13,8 +13,8 @@
   --cargo-text: var(--text);
   --cargo-text-2: var(--text-2);
   --cargo-text-3: var(--text-3);
-  --cargo-accent: #6E3FF3;
-  --cargo-accent-bg: rgba(110, 63, 243, 0.16);
+  --cargo-accent: var(--violet);
+  --cargo-accent-bg: var(--violet-bg);
   --cargo-slot-bg: var(--panel-2);
   --cargo-slot-border: var(--border-soft);
   --cargo-red: var(--red);

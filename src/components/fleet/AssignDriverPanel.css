@@ -20,7 +20,7 @@
   border-radius: 6px;
   border: 1px solid transparent;
   background: var(--accent, var(--blue));
-  color: #fff;
+  color: var(--on-accent);
   font-size: 12.5px;
   font-weight: 600;
   cursor: pointer;
