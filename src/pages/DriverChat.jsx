@@ -5,6 +5,7 @@ import { listThreads, openConversation, getThread, sendMessage } from '../api/dr
 import { useResource } from '../hooks/useResource'
 import { ApiError } from '../api/client'
 import { chatLimitMessage } from '../utils/chatBudget.js'
+import { describeWait } from '../utils/describeWait.js'
 import './DriverChat.css'
 
 // Texting your drivers.
@@ -160,7 +161,7 @@ export default function DriverChat() {
               <div className="dc-standing">
                 <span className="mono">{money(standing.owedUsd)}</span> owed across{' '}
                 {standing.unpaidCount} settlement{standing.unpaidCount === 1 ? '' : 's'}
-                {standing.daysOverdue > 0 && `, oldest ${standing.daysOverdue} days past due`}
+                {standing.daysOverdue > 0 && `, oldest ${describeWait(standing.daysOverdue)} past due`}
                 {STAGE_LINE[standing.stage] && ` — ${STAGE_LINE[standing.stage]}`}
                 {!standing.willWork && (
                   <Link to="/finance/settlements" className="dc-standing-link">

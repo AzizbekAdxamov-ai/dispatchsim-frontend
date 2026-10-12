@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import { listSettlements, listOwed, runPayroll } from '../api/payroll'
 import { useResource } from '../hooks/useResource'
 import { formatMoney } from '../utils/format'
+import { describeWait } from '../utils/describeWait.js'
 import './PageHeader.css'
 import './FinanceSettlements.css'
 
@@ -112,7 +113,7 @@ export default function FinanceSettlements() {
               <span className="payroll-driver-name">{d.driverName}</span>
               <span className="payroll-driver-owed mono">{formatMoney(d.owedUsd)}</span>
               <span className="payroll-driver-stage">
-                {d.daysOverdue} days late · {STAGE_LABEL[d.stage]}
+                {describeWait(d.daysOverdue)} late · {STAGE_LABEL[d.stage]}
               </span>
             </div>
           ))}
@@ -176,7 +177,7 @@ export default function FinanceSettlements() {
                   {s.status === 'paid' && 'Paid'}
                   {s.status === 'accrued' && 'Accruing'}
                   {/* The number, not a colour. How late it is, is a fact. */}
-                  {s.status === 'overdue' && `${s.daysOverdue} days late`}
+                  {s.status === 'overdue' && `${describeWait(s.daysOverdue)} late`}
                 </td>
               </tr>
             ))}

@@ -3,6 +3,7 @@ import { dispatchLoad, getDispatchCheck } from '../../api/loads'
 import { listDrivers } from '../../api/drivers'
 import { ApiError } from '../../api/client'
 import { useResource } from '../../hooks/useResource'
+import { describeWait } from '../../utils/describeWait.js'
 import './DispatchPanel.css'
 
 // Putting a driver on a booked load.
@@ -58,7 +59,7 @@ function errorText(err) {
     if (d?.owedUsd != null) {
       return `${d.driverName} is owed ${money(d.owedUsd)} across ` +
         `${d.unpaidCount} settlement${d.unpaidCount === 1 ? '' : 's'}, ` +
-        `${d.daysOverdue} days past due, and is not taking new loads until it is paid. ` +
+        `${describeWait(d.daysOverdue)} past due, and is not taking new loads until it is paid. ` +
         'Run payroll in Finance → Settlements.'
     }
     return 'That driver is not taking new loads right now.'
