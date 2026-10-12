@@ -88,6 +88,20 @@
   color: var(--text-3);
 }
 
+/* The market under the rate: DAT's regional benchmarks, as facts. */
+.rd-market {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.rd-market .rd-facts { margin-top: 6px; }
+
+.rd-market-note {
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
 .rd-contact,
 .rd-driver {
   margin-top: 12px;

@@ -11,6 +11,8 @@ import { downloadBol, downloadPod } from '../api/documents'
 import { ApiError } from '../api/client'
 import DispatchPanel from '../components/loads/DispatchPanel'
 import RoadEventPanel from '../components/loads/RoadEventPanel'
+import { liveTrackingLines } from '../components/loads/liveTrackingLines'
+import { factText } from '../components/loads/factText'
 import { useResource } from '../hooks/useResource'
 import { formatMoney, formatWeight, formatDateTime, formatCdl, formatHos, formatPlace, formatDistance } from '../utils/format'
 import '../components/dashboard/Panel.css'
@@ -34,6 +36,9 @@ function timelineTime(step, load) {
   if (step.step === 'delivered' && load.status === 'crit') return 'Running late'
   return 'Pending'
 }
+
+// Shown once a load is dispatched, under its appointments.
+const RUN_CLOCK_NOTE = 'Appointments are the broker\'s dates. The run itself is timed from the dispatch on the company clock — its arrival and the promise are in the Trip plan.'
 
 function initials(name) {
   return (name || '')
@@ -94,13 +99,6 @@ export default function LoadDetail() {
         ease: 'back.out(1.6)',
       })
       tl.from('.ld-progress-fill', { width: 0, duration: 0.6, ease: 'power2.out' }, '-=0.2')
-
-      gsap.to('.ld-map-route', {
-        strokeDashoffset: -12,
-        duration: 1.2,
-        repeat: -1,
-        ease: 'none',
-      })
     })
   }, { scope: pageRef, dependencies: [load?.id] })
 
@@ -232,7 +230,7 @@ export default function LoadDetail() {
                     {load.stopPlanFacts.map((f, i) => (
                       <li key={i}>
                         {f.cfr && <span className="ld-tripplan-cfr mono">{f.cfr}</span>}
-                        <span>{f.detail}</span>
+                        <span>{factText(f.detail)}</span>
                       </li>
                     ))}
                   </ul>
@@ -260,11 +258,22 @@ export default function LoadDetail() {
               <div className="ld-detail-grid">
                 <div><div className="ld-detail-label">Broker</div><div className="ld-detail-value">{load.broker}</div></div>
                 <div><div className="ld-detail-label">Rate</div><div className="ld-detail-value mono">{formatMoney(load.rateUsd)}</div></div>
-                <div><div className="ld-detail-label">Pickup</div><div className="ld-detail-value">{formatDateTime(load.pickupAt)} — {originLabel}</div></div>
-                <div><div className="ld-detail-label">Delivery</div><div className="ld-detail-value">{formatDateTime(load.deliveryAt)} — {destinationLabel}</div></div>
+                {/* The broker's appointments, from the posting -- the dates the
+                    rate confirmation and the broker chat use. A dispatched run
+                    is timed from the dispatch on the company clock instead, so
+                    on 2026-10-08 this panel said "Delivery Oct 8" beside a Trip
+                    plan arriving Oct 6. Both are true; the labels now say which
+                    is which. */}
+                <div><div className="ld-detail-label">Pickup appointment</div><div className="ld-detail-value">{formatDateTime(load.pickupAt)} — {originLabel}</div></div>
+                <div><div className="ld-detail-label">Delivery appointment</div><div className="ld-detail-value">{formatDateTime(load.deliveryAt)} — {destinationLabel}</div></div>
                 <div><div className="ld-detail-label">Weight</div><div className="ld-detail-value mono">{formatWeight(load.weightLbs)}</div></div>
                 <div><div className="ld-detail-label">Equipment</div><div className="ld-detail-value">{formatEquipment({ equipmentType: load.equipmentType, equipmentLength: `${load.equipmentLengthFt}ft` })}</div></div>
               </div>
+              {load.dispatchedAt && (
+                <div className="ld-detail-note">
+                  {RUN_CLOCK_NOTE}
+                </div>
+              )}
             </div>
           </div>
 
@@ -390,24 +399,12 @@ export default function LoadDetail() {
               <div className="ld-progress-track">
                 <div className="ld-progress-fill" style={{ width: load.progress + '%' }} />
               </div>
-              <svg viewBox="0 0 320 140" className="ld-map-svg">
-                <defs>
-                  <pattern id={'ldMapGrid' + load.id} width="20" height="20" patternUnits="userSpaceOnUse">
-                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="var(--border-soft)" strokeWidth="1" />
-                  </pattern>
-                </defs>
-                <rect width="320" height="140" fill={'url(#ldMapGrid' + load.id + ')'} />
-                <path
-                  className="ld-map-route"
-                  d="M 30 115 C 80 90, 60 50, 130 45 S 230 30, 290 25"
-                  fill="none"
-                  stroke="var(--amber)"
-                  strokeWidth="2.5"
-                  strokeDasharray="6 6"
-                />
-                <circle cx="30" cy="115" r="5" fill="var(--green)" />
-                <circle cx="290" cy="25" r="5" fill="var(--red)" />
-              </svg>
+              {/* Was a drawn curve, the same on every load, with no truck on
+                  it. These lines are the map's own position (tracking, from
+                  the backend's liveTracking.js) said in words. */}
+              {liveTrackingLines(load.tracking, load).map((line, i) => (
+                <div key={line} className={i === 0 ? 'ld-track-line lead' : 'ld-track-line'}>{line}</div>
+              ))}
               {hosAlert && (
                 <div className="ld-hos-strip">
                   <Warning size={14} weight="fill" aria-hidden="true" /> {hosAlert}

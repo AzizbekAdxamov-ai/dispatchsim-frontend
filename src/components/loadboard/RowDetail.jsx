@@ -13,6 +13,7 @@ import {
   formatWeight,
   formatHos,
 } from '../../utils/format'
+import { marketLines } from './marketLines'
 import './RowDetail.css'
 
 // The row, opened.
@@ -37,6 +38,7 @@ export default function RowDetail({ posting, deadheadFrom, deadheadTo }) {
   const { data: checkData } = useResource(fetchChecks, [])
 
   const eq = EQUIPMENT_TYPES[posting.equipmentType]
+  const market = marketLines(posting.market)
   const myCheck = posting.brokerMcNumber
     ? (checkData?.checks ?? []).find((c) => c.mcNumber === posting.brokerMcNumber && c.brokerId != null)
     : null
@@ -116,6 +118,24 @@ export default function RowDetail({ posting, deadheadFrom, deadheadTo }) {
           <div><dt>Posted</dt><dd className="mono">{formatDateTime(posting.postedAt)}</dd></div>
           <div><dt>Expires</dt><dd className="mono">{formatDateTime(posting.expiresAt)}</dd></div>
         </dl>
+
+        {market && (
+          <div className="rd-market">
+            <div className="rd-label">{market.heading}</div>
+            <dl className="rd-facts">
+              {market.lines.map((line) => (
+                <div key={line.label}>
+                  <dt>{line.label}</dt>
+                  <dd className="mono">
+                    {line.value}
+                    {line.note && <span className="rd-sub"> · {line.note}</span>}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+            <div className="rd-sub rd-market-note">{market.footnote}</div>
+          </div>
+        )}
 
         <Link
           className="rd-route-btn"

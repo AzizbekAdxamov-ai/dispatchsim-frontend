@@ -15,6 +15,7 @@ import {
 import { ApiError } from '../api/client'
 import { useResource } from '../hooks/useResource'
 import { formatMoney } from '../utils/format'
+import { talkSummary } from '../components/brokerChat/talkSummary'
 import '../components/dashboard/Panel.css'
 import './BrokerChat.css'
 
@@ -353,6 +354,17 @@ export default function BrokerChat() {
                   ))}
                 </ul>
               )}
+
+              {(() => {
+                const summary = talkSummary(thread?.talk, convo?.status)
+                return summary && (
+                  <div className="bc-talk">
+                    <div>{summary.raised}</div>
+                    {summary.notRaised && <div className="bc-talk-sub">{summary.notRaised}</div>}
+                    <div className="bc-talk-sub">{summary.words}</div>
+                  </div>
+                )
+              })()}
 
               {convo?.status === 'agreed' && (
                 <div className="bc-agreed-bar">

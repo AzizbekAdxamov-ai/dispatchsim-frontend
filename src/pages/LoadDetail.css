@@ -97,7 +97,7 @@
 
 .load-detail-btn.primary {
   background: var(--accent);
-  color: #1B1F0C;
+  color: var(--on-accent);
   border: none;
 }
 
@@ -137,13 +137,13 @@
 
 .ld-tl-step.done .ld-tl-dot {
   background: var(--green);
-  color: #08170E;
+  color: var(--on-green);
   border: none;
 }
 
 .ld-tl-step.current .ld-tl-dot {
   background: var(--accent);
-  color: #1B1F0C;
+  color: var(--on-accent);
   border: none;
   box-shadow: 0 0 0 4px var(--accent-dim);
 }
@@ -410,18 +410,21 @@
 
 .ld-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--accent), #B8DA3E);
+  background: linear-gradient(90deg, var(--accent), var(--accent-deep));
   border-radius: 3px;
   transition: width 0.3s ease;
 }
 
-.ld-map-svg {
-  width: 100%;
-  height: auto;
-  background: var(--panel-2);
-  border: 1px solid var(--border-soft);
-  border-radius: 8px;
-  margin-bottom: 12px;
+.ld-track-line {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-2);
+  margin-bottom: 6px;
+}
+
+.ld-track-line.lead {
+  color: var(--text);
+  font-weight: 600;
 }
 
 .ld-hos-strip {
@@ -497,7 +500,7 @@
   padding: 4px 9px;
   border-radius: 20px;
 
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
+  box-shadow: 0 2px 6px var(--shadow);
 }
 
 .ld-vehicle-spec {
@@ -637,4 +640,11 @@
 .ld-tripplan-stop-reason.rest {
   background: var(--amber-bg);
   color: var(--amber-strong);
+}
+
+.ld-detail-note {
+  margin-top: 14px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-2);
 }
