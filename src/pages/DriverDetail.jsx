@@ -2,6 +2,8 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Phone, Envelope } from '@phosphor-icons/react'
 import { getDriver } from '../api/drivers'
+import AssignTruckPanel from '../components/drivers/AssignTruckPanel'
+import { driverRequests } from '../components/drivers/driverRequests'
 import { useResource } from '../hooks/useResource'
 import { getDriverStatus } from '../utils/driverStatus'
 import { formatCdl, formatPlace, formatUnit, formatMiles, formatMonthYear, formatMoney, formatEta } from '../utils/format'
@@ -60,7 +62,7 @@ export default function DriverDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
 
-  const { data: driver, error, loading } = useResource((signal) => getDriver(id, signal), [id], { pollMs: 20000 })
+  const { data: driver, error, loading, refetch } = useResource((signal) => getDriver(id, signal), [id], { pollMs: 20000 })
 
   if (loading) {
     return <div className="panel driver-detail-missing"><p>Loading driver…</p></div>
@@ -85,6 +87,7 @@ export default function DriverDetail() {
   }
 
   const status = getDriverStatus(driver)
+  const requests = driverRequests(driver.preferences)
   const history = driver.recentLoads ?? []
   const currentLoad = driver.currentLoad
   const hosPct = driver.hosRemainingMin != null ? Math.max(0, Math.min(100, Math.round((driver.hosRemainingMin / MAX_HOS_MIN) * 100))) : 0
@@ -132,12 +135,19 @@ export default function DriverDetail() {
                 <div><div className="dd-detail-label">CDL</div><div className="dd-detail-value mono">{formatCdl(driver.cdlClass, driver.cdlNumber)}</div></div>
                 <div><div className="dd-detail-label">License expires</div><div className="dd-detail-value">{formatMonthYear(driver.licenseExpiresOn)}</div></div>
                 <div><div className="dd-detail-label">Home base</div><div className="dd-detail-value">{formatPlace(driver.homeBaseCity, driver.homeBaseState)}</div></div>
-                <div><div className="dd-detail-label">Assigned unit</div><div className="dd-detail-value">{formatUnit(driver.truck)}</div></div>
+                <div>
+                  <div className="dd-detail-label">Assigned unit</div>
+                  <div className="dd-detail-value">
+                    {/* No truck: the dispatcher can put this driver in one
+                        from here -- the same assignment fleet makes from the
+                        truck's side (AssignTruckPanel). */}
+                    {driver.truck ? formatUnit(driver.truck) : <AssignTruckPanel driverId={driver.id} onAssigned={refetch} />}
+                  </div>
+                </div>
                 <div><div className="dd-detail-label">Total miles</div><div className="dd-detail-value mono">{formatMiles(driver.totalMiles)}</div></div>
                 <div><div className="dd-detail-label">Safety rating</div><div className="dd-detail-value mono">{driver.safetyRating} / 100</div></div>
                 <div><div className="dd-detail-label">Now in</div><div className="dd-detail-value">{formatPlace(driver.currentCity, driver.currentState)}</div></div>
                 <div><div className="dd-detail-label">Pay plan</div><div className="dd-detail-value">{formatPayPlan(driver)}</div></div>
-                <div><div className="dd-detail-label">Truck</div><div className="dd-detail-value">{formatUnit(driver.truck)}</div></div>
                 <div><div className="dd-detail-label">Odometer</div><div className="dd-detail-value mono">{driver.truck?.odometerMi != null ? formatMiles(driver.truck.odometerMi) : '—'}</div></div>
                 <div><div className="dd-detail-label">Fuel</div><div className="dd-detail-value mono">{driver.truck?.fuelPercent != null ? `${driver.truck.fuelPercent}%` : '—'}</div></div>
                 <div><div className="dd-detail-label">Telegram</div><div className="dd-detail-value">{driver.telegram ? 'Yes — replies there' : '—'}</div></div>
@@ -171,6 +181,20 @@ export default function DriverDetail() {
             <div className="panel">
               <div className="panel-head"><div className="panel-title">About</div></div>
               <div className="dd-about-body">{driver.bio.trim()}</div>
+            </div>
+          ) : null}
+
+          {/* What this driver has asked not to be given. Shown where the
+              dispatcher reads about the person, and again as a line in the
+              dispatch check -- never enforced: sending them anyway is the
+              dispatcher's call, and the driver will say what they think. */}
+          {requests ? (
+            <div className="panel">
+              <div className="panel-head"><div className="panel-title">Asked not to run</div></div>
+              <div className="dd-about-body">
+                <div className="mono">{requests.places}</div>
+                {requests.why && <div className="dd-requests-why">{requests.why}</div>}
+              </div>
             </div>
           ) : null}
 

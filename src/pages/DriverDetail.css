@@ -102,7 +102,7 @@
 
 .driver-detail-btn.primary {
   background: var(--accent);
-  color: #1B1F0C;
+  color: var(--on-accent);
   border: none;
 }
 
@@ -219,13 +219,13 @@
 
 .dd-hos-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--accent), #B8DA3E);
+  background: linear-gradient(90deg, var(--accent), var(--accent-deep));
   border-radius: 3px;
   transition: width 0.3s ease;
 }
 
 .dd-hos-fill.amber {
-  background: linear-gradient(90deg, var(--amber), #E0A32E);
+  background: linear-gradient(90deg, var(--amber), var(--amber-deep));
 }
 
 .dd-current-load {
@@ -274,4 +274,10 @@
   color: var(--text-2);
   font-size: 13px;
   line-height: 1.55;
+}
+
+.dd-requests-why {
+  margin-top: 6px;
+  color: var(--text-3);
+  font-size: 12.5px;
 }

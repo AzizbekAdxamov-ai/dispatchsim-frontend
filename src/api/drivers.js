@@ -9,3 +9,17 @@ export function listDrivers(signal) {
 export function getDriver(id, signal) {
   return api.get(`/drivers/${encodeURIComponent(id)}`, { auth: true, signal })
 }
+
+// The trucks nobody drives, for "Assign truck" on a driver's page. Every
+// driverless truck comes back, with `assignable` and a `reason` for the
+// ones that cannot be taken -- the page shows those rather than hiding
+// them.
+export function getTruckOptions(id, signal) {
+  return api.get(`/drivers/${encodeURIComponent(id)}/truck-options`, { auth: true, signal })
+}
+
+// The same assignment fleet does from the truck's page, asked from the
+// driver's side. Server-side it is one function, not two.
+export function assignTruck(id, truckId, signal) {
+  return api.post(`/drivers/${encodeURIComponent(id)}/truck`, { truckId }, { auth: true, signal })
+}
