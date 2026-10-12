@@ -4,6 +4,7 @@ import { useTheme } from '../../theme/ThemeProvider'
 import WorkspaceSwitcher from './WorkspaceSwitcher'
 import CashChip from './CashChip'
 import AlertsBell from './AlertsBell'
+import ZoneClocks from './ZoneClocks'
 // The order lives in its own plain-.js module (quickLinks.js) so
 // node:test can pin it -- node:test cannot import JSX, and an untestable
 // rule is a rule that is quietly reordered. Icons attach here, by `to`.
@@ -22,8 +23,8 @@ export default function Topbar({ title }) {
   return (
     <div className="topbar">
       <div className="topbar-title">{title}</div>
-      {/* Where the timezone clocks used to sit. NavLink, not Link: the
-          chip you are on reads as selected, not just tappable. */}
+      {/* NavLink, not Link: the chip you are on reads as selected, not
+          just tappable. */}
       <nav className="topbar-links" aria-label="Quick links">
         {QUICK_LINKS.map(({ to, label }) => {
           const Icon = LINK_ICONS[to] ?? Package
@@ -40,6 +41,10 @@ export default function Topbar({ title }) {
         })}
       </nav>
       <div className="topbar-spacer"></div>
+      {/* Back on 2026-10-01, with the day and the right daylight-time
+          names -- see utils/zoneClocks.js for why they left and why they
+          came back. On the right, so the quick links keep their place. */}
+      <ZoneClocks />
       {/* Back after a day out: the balance is the one number this project
           insists stays in front of whoever is spending it, and CashChip's
           own header says why. Leaving it out made the component dead code
