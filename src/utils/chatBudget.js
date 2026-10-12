@@ -24,5 +24,5 @@ export function chatLimitMessage(err) {
 
   // details are stripped in some deployments. The generic line is the
   // floor, not the intent.
-  return err?.message || 'Bugungi xabar limiti tugadi. Ertaga yangilanadi.'
+  return err?.message || "Today's chat limit is used up. It resets tomorrow."
 }

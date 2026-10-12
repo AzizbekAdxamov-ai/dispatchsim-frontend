@@ -158,7 +158,7 @@ export default function DriverQualification() {
         Document states are re-read against the company calendar every time this page loads —
         a certificate that was valid when seeded ages into its renewal window as sessions pass.
         CDL 49 CFR 383 · Medical 391.43 · MVR 391.25 · Drug &amp; alcohol 382. Day counts are
-        simulated days: one day every two minutes.
+        company days: one day every two minutes.
       </div>
     </>
   )

@@ -20,11 +20,11 @@ export default function FleetAlerts() {
       title="Alerts"
       sub="Fleet conditions that are true right now."
       families={FLEET_FAMILIES}
-      note={
-        'Not yet tracked: fuel level, tyre wear and maintenance intervals. ' +
-        'Those columns exist but nothing updates them while the simulator runs, ' +
-        'so an alert built on them would never fire.'
-      }
+      // Was "nothing updates them while the simulator runs": a banned word,
+      // and no longer true -- fuel and tire wear move with every run since
+      // migration 032 (alerts.catalog.js). What is still true: no alert
+      // family reads them yet.
+      note="Not alerted on yet: fuel level, tire wear and maintenance intervals."
     />
   )
 }

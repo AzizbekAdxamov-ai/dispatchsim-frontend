@@ -108,7 +108,7 @@ export default function UserTable({ users, onManage, onDelete, selectedIds, onTo
                   <button type="button" className="admin-manage-btn" onClick={() => onManage(user)}>
                     Manage
                   </button>
-                  <button type="button" className="admin-manage-btn" style={{ marginLeft: 6, color: 'var(--danger, #ef4444)' }} onClick={() => onDelete(user)}>
+                  <button type="button" className="admin-manage-btn" style={{ marginLeft: 6, color: 'var(--red)' }} onClick={() => onDelete(user)}>
                     Delete
                   </button>
                 </td>
