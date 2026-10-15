@@ -161,7 +161,7 @@ export default function Sidebar({ items = DEFAULT_NAV_ITEMS, sections, settings,
   }
 
   return (
-    <div className={'sidebar' + (collapsed ? ' collapsed' : '')}>
+    <div className={'sidebar' + (sections ? ' dispatch-sections' : '') + (collapsed ? ' collapsed' : '')}>
       <div className="brand">
         <button
           type="button"
