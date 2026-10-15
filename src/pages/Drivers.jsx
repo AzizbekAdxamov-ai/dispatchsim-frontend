@@ -43,7 +43,7 @@ function initials(name) {
     .slice(0, 2)
 }
 
-export default function Drivers() {
+export default function Drivers({ resultNouns }) {
   const navigate = useNavigate()
   const [tab, setTab] = useState('all')
   const [query, setQuery] = useState('')
@@ -99,7 +99,7 @@ export default function Drivers() {
           />
         </div>
         <div className="page-toolbar-spacer" />
-        <div className="page-result-count">{loading ? '…' : `${filtered.length} drivers`}</div>
+        <div className="page-result-count">{loading ? '…' : `${filtered.length} ${filtered.length === 1 ? resultNouns.singular : resultNouns.plural}`}</div>
       </div>
 
       <div className="panel load-board">

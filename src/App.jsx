@@ -78,7 +78,7 @@ export default function App() {
             <Route path="load-board" element={<LoadBoard />} />
             <Route path="tracking" element={<Tracking />} />
             <Route path="map" element={<MapPage />} />
-            <Route path="drivers" element={<Drivers />} />
+            <Route path="drivers" element={<Drivers resultNouns={{ singular: 'driver', plural: 'drivers' }} />} />
             <Route path="drivers/:id" element={<DriverDetail />} />
             <Route path="broker-chat" element={<BrokerChat />} />
             <Route path="driver-chat" element={<DriverChat />} />
