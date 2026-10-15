@@ -9,6 +9,17 @@
   padding: 10px 12px 14px;
 }
 
+.chart-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 224px;
+  padding: 16px;
+  color: var(--text-3);
+  font-size: 12px;
+  text-align: center;
+}
+
 .chart-tooltip {
   background: var(--panel);
   border: 1px solid var(--border-soft);

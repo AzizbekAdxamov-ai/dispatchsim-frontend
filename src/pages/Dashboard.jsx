@@ -22,6 +22,12 @@ const DRIVER_PANEL_LIMIT = 6
 // LoadBoard here is a "what's moving right now" preview, not the full
 // board (Loads.jsx is that) — capped for the same reason.
 const LOAD_BOARD_LIMIT = 8
+const ON_TIME_CHART_LABELS = {
+  title: 'On-time delivery performance',
+  subtitle: 'Daily on-time delivery percentage',
+  value: 'On time',
+  empty: 'No deliveries recorded yet.',
+}
 
 export default function Dashboard() {
   const fetchAll = useCallback(async (signal) => {
@@ -67,7 +73,10 @@ export default function Dashboard() {
         <UtilizationChart data={utilizationTrendData} />
       </div>
       <div style={{ marginTop: 16 }}>
-        <OnTimeChart data={onTimeTrendData} />
+        <OnTimeChart
+          data={onTimeTrendData}
+          labels={ON_TIME_CHART_LABELS}
+        />
       </div>
 
       <div style={{ marginTop: 16 }}>
