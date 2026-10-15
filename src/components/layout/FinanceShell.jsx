@@ -31,11 +31,11 @@ export default function FinanceShell() {
   const pastDueCount = overview?.pastDueCount
 
   const FINANCE_NAV_ITEMS = [
-    { to: '/finance', icon: Receipt, label: 'Financial overview', end: true },
+    { to: '/finance', icon: Receipt, label: 'Financial overview', shortLabel: 'Overview', end: true },
     { to: '/finance/invoices', icon: Invoice, label: 'Invoices', badge: pastDueCount },
-    { to: '/finance/settlements', icon: UsersThree, label: 'Driver settlements' },
+    { to: '/finance/settlements', icon: UsersThree, label: 'Driver settlements', shortLabel: 'Payouts' },
     { to: '/finance/expenses', icon: CurrencyDollar, label: 'Expenses' },
-    { to: '/finance/cashflow', icon: Bank, label: 'Cash flow' },
+    { to: '/finance/cashflow', icon: Bank, label: 'Cash flow', shortLabel: 'Cash' },
     { to: '/finance/settings', icon: Gear, label: 'Settings' },
   ]
 

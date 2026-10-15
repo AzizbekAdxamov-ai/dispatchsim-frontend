@@ -8,7 +8,7 @@ import { useLiveDataHealth } from '../../hooks/useLiveDataHealth'
 
 const ADMIN_NAV_ITEMS = [
   { to: '/admin', icon: UsersThree, label: 'Users', end: true },
-  { to: '/admin/invites', icon: Ticket, label: 'Invite codes' },
+  { to: '/admin/invites', icon: Ticket, label: 'Invite codes', shortLabel: 'Invites' },
 ]
 
 const TITLES = {

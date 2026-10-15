@@ -18,7 +18,7 @@ import {
 } from '@phosphor-icons/react'
 import { useAuth } from '../../context/AuthContext'
 import { roleLabel } from '../../data/roleRoutes'
-import { locate } from './navSections'
+import { locate, railLabel } from './navSections'
 import './Sidebar.css'
 
 const DEFAULT_NAV_ITEMS = [
@@ -73,7 +73,7 @@ function isEditable(target) {
   return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target.isContentEditable
 }
 
-function NavEntry({ to, end, icon: Icon, label, badge, active, collapsed }) {
+function NavEntry({ to, end, icon: Icon, label, shortLabel, badge, active, collapsed }) {
   return (
     <NavLink
       to={to}
@@ -81,7 +81,6 @@ function NavEntry({ to, end, icon: Icon, label, badge, active, collapsed }) {
       className={'nav-item' + (active ? ' active' : '')}
       aria-current={active ? 'page' : undefined}
       aria-label={collapsed ? label : undefined}
-      data-tip={collapsed ? label : undefined}
     >
       {active && (
         <motion.div
@@ -93,7 +92,7 @@ function NavEntry({ to, end, icon: Icon, label, badge, active, collapsed }) {
       <span className="nav-icon" aria-hidden="true">
         <Icon size={20} weight={active ? 'fill' : 'regular'} />
       </span>
-      <span className="nav-label">{label}</span>
+      <span className="nav-label">{collapsed ? railLabel({ label, shortLabel }) : label}</span>
       {badge != null && <span className="nav-badge">{badge}</span>}
     </NavLink>
   )
@@ -129,7 +128,7 @@ export default function Sidebar({ items = DEFAULT_NAV_ITEMS, sections, settings,
     return () => window.removeEventListener('keydown', onKey)
   }, [toggle])
 
-  const adminEntry = { to: '/admin', icon: ShieldCheck, label: 'Administration', end: true }
+  const adminEntry = { to: '/admin', icon: ShieldCheck, label: 'Administration', shortLabel: 'Admin', end: true }
 
   let entries
   if (sections) {
@@ -140,6 +139,7 @@ export default function Sidebar({ items = DEFAULT_NAV_ITEMS, sections, settings,
       end: section.tabs[0].end,
       icon: section.icon,
       label: section.label,
+      shortLabel: section.shortLabel,
       active: section === activeSection,
     }))
   } else {
@@ -161,7 +161,7 @@ export default function Sidebar({ items = DEFAULT_NAV_ITEMS, sections, settings,
   }
 
   return (
-    <div className={'sidebar' + (sections ? ' dispatch-sections' : '') + (collapsed ? ' collapsed' : '')}>
+    <div className={'sidebar' + (collapsed ? ' collapsed' : '')}>
       <div className="brand">
         <button
           type="button"
@@ -169,8 +169,7 @@ export default function Sidebar({ items = DEFAULT_NAV_ITEMS, sections, settings,
           onClick={toggle}
           aria-expanded={!collapsed}
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          data-tip={collapsed ? 'Expand sidebar (Ctrl+B)' : undefined}
-          title={collapsed ? undefined : 'Collapse sidebar (Ctrl+B)'}
+          title={collapsed ? 'Expand sidebar (Ctrl+B)' : 'Collapse sidebar (Ctrl+B)'}
         >
           <span className="brand-mark">DS</span>
         </button>
@@ -194,7 +193,7 @@ export default function Sidebar({ items = DEFAULT_NAV_ITEMS, sections, settings,
         </nav>
       )}
 
-      <div className="sidebar-footer" data-tip={collapsed ? (user?.name ?? '') : undefined}>
+      <div className="sidebar-footer" title={collapsed ? user?.name : undefined}>
         <div className="avatar">{initials(user?.name ?? '')}</div>
         <div className="sidebar-footer-text">
           <div className="user-name">{user?.name ?? '—'}</div>

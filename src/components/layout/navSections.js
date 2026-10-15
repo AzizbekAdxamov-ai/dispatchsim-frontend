@@ -62,6 +62,7 @@ export const DISPATCH_SECTIONS = [
     // between Fleet and Dispatch in its menu.
     id: 'compliance',
     label: 'Compliance',
+    shortLabel: 'HOS',
     icon: ClipboardText,
     tabs: [
       // end: true -- every other compliance page's path starts with
@@ -99,6 +100,7 @@ export const DISPATCH_SECTIONS = [
   {
     id: 'documents',
     label: 'Documents',
+    shortLabel: 'Docs',
     icon: FileText,
     tabs: [
       { to: '/documents', label: 'Documents' },
@@ -108,6 +110,15 @@ export const DISPATCH_SECTIONS = [
 
 // Settings sits at the bottom of the sidebar, apart from the work.
 export const DISPATCH_SETTINGS = { to: '/settings', label: 'Settings' }
+
+// The collapsed rail shows each entry's name under its icon, in a 60px
+// column. `shortLabel` is the form that fits; entries whose full label
+// already fits leave it out. Every shell's nav reads through railLabel.
+export const RAIL_LABEL_MAX = 8
+
+export function railLabel({ label, shortLabel }) {
+  return shortLabel ?? label
+}
 
 function tabMatches(tab, pathname) {
   if (tab.end) return pathname === tab.to

@@ -7,12 +7,12 @@ import LiveDataNotice from './LiveDataNotice'
 import { useLiveDataHealth } from '../../hooks/useLiveDataHealth'
 
 const FLEET_NAV_ITEMS = [
-  { to: '/fleet', icon: Truck, label: 'Fleet overview', end: true },
-  { to: '/fleet/market', icon: Storefront, label: 'Truck market' },
-  { to: '/fleet/maintenance', icon: Wrench, label: 'Maintenance' },
+  { to: '/fleet', icon: Truck, label: 'Fleet overview', shortLabel: 'Fleet', end: true },
+  { to: '/fleet/market', icon: Storefront, label: 'Truck market', shortLabel: 'Market' },
+  { to: '/fleet/maintenance', icon: Wrench, label: 'Maintenance', shortLabel: 'Service' },
   { to: '/fleet/dvir', icon: ClipboardText, label: 'DVIR' },
   { to: '/fleet/alerts', icon: Warning, label: 'Alerts' },
-  { to: '/fleet/documents', icon: FileText, label: 'Documents' },
+  { to: '/fleet/documents', icon: FileText, label: 'Documents', shortLabel: 'Docs' },
   { to: '/fleet/settings', icon: Gear, label: 'Settings' },
 ]
 

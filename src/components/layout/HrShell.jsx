@@ -31,8 +31,8 @@ export default function HrShell() {
   const openCount = overview?.meta?.total
 
   const HR_NAV_ITEMS = [
-    { to: '/hr', icon: UserPlus, label: 'Applicant market', end: true, badge: openCount },
-    { to: '/hr/drivers', icon: SteeringWheel, label: 'Hired drivers' },
+    { to: '/hr', icon: UserPlus, label: 'Applicant market', shortLabel: 'Market', end: true, badge: openCount },
+    { to: '/hr/drivers', icon: SteeringWheel, label: 'Hired drivers', shortLabel: 'Drivers' },
   ]
 
   return (
