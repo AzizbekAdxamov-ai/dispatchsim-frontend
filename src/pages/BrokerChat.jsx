@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { standingMessage } from '../utils/companyStanding'
 import { chatLimitMessage } from '../utils/chatBudget.js'
+import { carrierCheckMessage } from '../utils/carrierCheck.js'
 import { Link, useSearchParams } from 'react-router-dom'
 import { ChatCircle, DownloadSimple, FileText, CheckCircle } from '@phosphor-icons/react'
 import {
@@ -38,6 +39,10 @@ function actionErrorText(err) {
   switch (code) {
     case 'CHAT_DAILY_LIMIT':
       return chatLimitMessage(err) ?? err.message
+    // Agreeing or accepting with an MC that is missing or wrong: the broker's
+    // own sentence, as the server wrote it.
+    case 'CARRIER_NOT_VERIFIED':
+      return carrierCheckMessage(err) ?? err.message
     case 'CHAT_UNAVAILABLE':
       return 'The broker cannot be reached right now. Try again in a moment.'
     case 'RATE_OUT_OF_BAND':
