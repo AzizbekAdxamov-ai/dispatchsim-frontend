@@ -89,8 +89,12 @@ export default function BrokerChat({ emailCopy = BROKER_EMAIL_COPY }) {
   const sendInFlight = useRef(false)
   const selectedIdRef = useRef(selectedId)
   useEffect(() => { selectedIdRef.current = selectedId }, [selectedId])
-  const [downloading, setDownloading] = useState(false)
-  const [accepting, setAccepting] = useState(false)
+  const [downloadingId, setDownloading] = useState(null)
+  const downloadInFlight = useRef(new Set())
+  const [acceptingId, setAccepting] = useState(null)
+  const acceptInFlight = useRef(new Set())
+  const downloading = downloadingId === selectedId
+  const accepting = acceptingId === selectedId
   const [acceptWarnings, setAcceptWarnings] = useState([])
   const threadEndRef = useRef(null)
 
@@ -194,30 +198,38 @@ export default function BrokerChat({ emailCopy = BROKER_EMAIL_COPY }) {
   // that was agreed — the server reads it from the conversation, so a
   // dispatcher who accepted without opening the PDF finds out here.
   async function handleAccept() {
-    if (accepting || !selectedId) return
+    if (!selectedId || acceptInFlight.current.has(selectedId)) return
+    const conversationId = selectedId
+    acceptInFlight.current.add(conversationId)
     setActionError('')
-    setAccepting(true)
+    setAccepting(conversationId)
     try {
-      const res = await acceptRateCon(selectedId)
-      setAcceptWarnings(res.warnings ?? [])
-      reload()
+      const res = await acceptRateCon(conversationId)
+      // A completed signature belongs to its initiating thread, even after navigation.
+      if (selectedIdRef.current === conversationId) {
+        setAcceptWarnings(res.warnings ?? [])
+        reload()
+      } else refetch()
     } catch (err) {
-      setActionError(actionErrorText(err))
+      if (selectedIdRef.current === conversationId) setActionError(actionErrorText(err))
     } finally {
-      setAccepting(false)
+      acceptInFlight.current.delete(conversationId)
+      setAccepting((current) => current === conversationId ? null : current)
     }
   }
 
   async function handleDownload(conversationId) {
-    if (downloading) return
+    if (downloadInFlight.current.has(conversationId)) return
+    downloadInFlight.current.add(conversationId)
     setActionError('')
-    setDownloading(true)
+    setDownloading(conversationId)
     try {
       await downloadRateConfirmation(conversationId)
     } catch (err) {
-      setActionError(actionErrorText(err))
+      if (selectedIdRef.current === conversationId) setActionError(actionErrorText(err))
     } finally {
-      setDownloading(false)
+      downloadInFlight.current.delete(conversationId)
+      setDownloading((current) => current === conversationId ? null : current)
     }
   }
 
@@ -240,6 +252,7 @@ export default function BrokerChat({ emailCopy = BROKER_EMAIL_COPY }) {
               key={c.id}
               className={`bc-item ${c.id === selectedId ? 'active' : ''}`}
               onClick={() => {
+                selectedIdRef.current = c.id
                 setSelectedId(c.id)
                 setActionError('')
                 setAcceptWarnings([])
