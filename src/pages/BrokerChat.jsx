@@ -9,10 +9,11 @@ import {
   openConversation,
   getThread,
   sendMessage,
-  agreeRate,
   acceptRateCon,
   downloadRateConfirmation,
 } from '../api/brokerChat'
+import { getCarrier } from '../api/carrier'
+import { BROKER_EMAIL_COPY, emailShareText } from '../components/brokerChat/emailShare.js'
 import { ApiError } from '../api/client'
 import { useResource } from '../hooks/useResource'
 import { formatMoney } from '../utils/format'
@@ -72,7 +73,7 @@ function actionErrorText(err) {
   }
 }
 
-export default function BrokerChat() {
+export default function BrokerChat({ emailCopy = BROKER_EMAIL_COPY }) {
   // "Contact broker" on the load board links here with ?posting=<id>. That
   // opens (or reopens) the thread for that posting and selects it, so the
   // dispatcher lands in the conversation instead of a list they then have
@@ -85,8 +86,9 @@ export default function BrokerChat() {
   const [messageText, setMessageText] = useState('')
   const [sending, setSending] = useState(false)
   const [actionError, setActionError] = useState('')
-  const [rateInput, setRateInput] = useState('')
-  const [agreeing, setAgreeing] = useState(false)
+  const sendInFlight = useRef(false)
+  const selectedIdRef = useRef(selectedId)
+  useEffect(() => { selectedIdRef.current = selectedId }, [selectedId])
   const [downloading, setDownloading] = useState(false)
   const [accepting, setAccepting] = useState(false)
   const [acceptWarnings, setAcceptWarnings] = useState([])
@@ -135,9 +137,15 @@ export default function BrokerChat() {
   )
   const { data: thread, refetch: refetchThread } = useResource(fetchThread, [selectedId], { pollMs: 6000 })
 
+  const fetchCarrier = useCallback((signal) => getCarrier(signal), [])
+  const { data: carrier } = useResource(fetchCarrier, [], { pollMs: 15000 })
+
   const conversations = data?.conversations ?? []
   const selected = conversations.find((c) => c.id === selectedId)
-  const messages = thread?.messages ?? []
+  // useResource retains the last value while fetching a different thread.
+  // Never offer another broker's email action or document during that gap.
+  const currentThread = thread?.conversation?.id === selectedId ? thread : null
+  const messages = currentThread?.messages ?? []
 
   // Auto-scroll has to live BELOW `messages`, not above it. `const` is not
   // hoisted the way `function` is -- reading it earlier in the component
@@ -149,45 +157,35 @@ export default function BrokerChat() {
       threadEndRef.current?.scrollIntoView({ behavior: 'smooth' })
     }
   }, [messages.length])
-  const awaitingReply = thread?.awaitingReply ?? false
+  const awaitingReply = currentThread?.awaitingReply ?? false
   // The conversation from the thread endpoint is fresher than the list's
   // copy, which can be up to 15 seconds behind.
-  const convo = thread?.conversation ?? selected
+  const convo = currentThread?.conversation ?? selected
 
   function reload() {
     refetch()
     refetchThread()
   }
 
-  async function handleSend() {
-    if (!messageText.trim() || sending || !selectedId) return
+  async function handleSend(text = messageText, isEmailShare = false) {
+    const content = text.trim()
+    if (!content || sendInFlight.current || !selectedId || convo?.status === 'booked') return
+    if (isEmailShare && !emailShareText(currentThread?.conversation, carrier, emailCopy, awaitingReply)) return
+    const conversationId = selectedId
+    sendInFlight.current = true
     setActionError('')
     setSending(true)
     try {
-      await sendMessage(selectedId, messageText.trim())
-      setMessageText('')
-      reload()
+      await sendMessage(conversationId, content)
+      if (selectedIdRef.current === conversationId) {
+        if (!isEmailShare) setMessageText('')
+        reload()
+      } else refetch()
     } catch (err) {
-      setActionError(actionErrorText(err))
+      if (selectedIdRef.current === conversationId) setActionError(actionErrorText(err))
     } finally {
+      sendInFlight.current = false
       setSending(false)
-    }
-  }
-
-  async function handleAgree() {
-    if (!rateInput || agreeing || !selectedId) return
-    const rateUsd = Number(rateInput)
-    if (isNaN(rateUsd) || rateUsd <= 0) return
-    setActionError('')
-    setAgreeing(true)
-    try {
-      await agreeRate(selectedId, rateUsd)
-      setRateInput('')
-      reload()
-    } catch (err) {
-      setActionError(actionErrorText(err))
-    } finally {
-      setAgreeing(false)
     }
   }
 
@@ -361,7 +359,7 @@ export default function BrokerChat() {
               )}
 
               {(() => {
-                const summary = talkSummary(thread?.talk, convo?.status)
+                const summary = talkSummary(currentThread?.talk, convo?.status)
                 return summary && (
                   <div className="bc-talk">
                     <div>{summary.raised}</div>
@@ -374,26 +372,20 @@ export default function BrokerChat() {
               {convo?.status === 'agreed' && (
                 <div className="bc-agreed-bar">
                   <span>You agreed: {formatMoney(convo.agreedRateUsd)}</span>
-                  {awaitingReply && <span className="bc-agreed-sub">paperwork on its way</span>}
+                  {convo.negotiationStage === 'paper_pending' && <span className="bc-agreed-sub">{emailCopy.paperPending}</span>}
                 </div>
               )}
 
-              {convo?.status !== 'agreed' && convo?.status !== 'booked' && (
-                <div className="bc-rate-row">
-                  <input
-                    type="number"
-                    placeholder="Agreed rate ($)"
-                    value={rateInput}
-                    onChange={(e) => setRateInput(e.target.value)}
-                    className="bc-rate-input"
-                  />
+              {emailShareText(currentThread?.conversation, carrier, emailCopy, awaitingReply) && (
+                <div className="bc-email-share">
+                  <span className="bc-email-address">{carrier.effectiveEmail}</span>
                   <button
                     type="button"
-                    className="bc-agree-btn"
-                    disabled={agreeing || !rateInput}
-                    onClick={handleAgree}
+                    className="bc-download-btn"
+                    disabled={sending || awaitingReply}
+                    onClick={() => handleSend(emailShareText(currentThread.conversation, carrier, emailCopy, awaitingReply), true)}
                   >
-                    {agreeing ? 'Saving…' : 'Agree'}
+                    {sending ? emailCopy.sharing : emailCopy.share}
                   </button>
                 </div>
               )}
@@ -411,7 +403,7 @@ export default function BrokerChat() {
                   type="button"
                   className="bc-send-btn"
                   disabled={sending || !messageText.trim() || convo?.status === 'booked'}
-                  onClick={handleSend}
+                  onClick={() => handleSend()}
                 >
                   {sending ? '…' : 'Send'}
                 </button>

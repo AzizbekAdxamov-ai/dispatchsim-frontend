@@ -21,10 +21,6 @@ export function sendMessage(conversationId, text, signal) {
   return api.post(`/broker-chat/${encodeURIComponent(conversationId)}/messages`, { text }, { auth: true, signal })
 }
 
-export function agreeRate(conversationId, rateUsd, signal) {
-  return api.post(`/broker-chat/${encodeURIComponent(conversationId)}/agree`, { rateUsd }, { auth: true, signal })
-}
-
 // Sign the rate confirmation. This is what creates a load — there is no
 // booking button on the board any more.
 export function acceptRateCon(conversationId, signal) {

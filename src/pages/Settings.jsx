@@ -20,7 +20,9 @@ function initials(name) {
     .slice(0, 2)
 }
 
-export default function Settings() {
+const SETTINGS_EMAIL_COPY = { label: 'Sign-in email' }
+
+export default function Settings({ emailCopy = SETTINGS_EMAIL_COPY }) {
   const { user, logout } = useAuth()
   const { theme, setTheme } = useTheme()
   const navigate = useNavigate()
@@ -63,6 +65,10 @@ export default function Settings() {
               <div className="settings-field">
                 <label htmlFor="settings-name">Full name</label>
                 <input id="settings-name" value={name} readOnly placeholder="Full name" />
+              </div>
+              <div className="settings-field">
+                <label htmlFor="settings-email">{emailCopy.label}</label>
+                <input id="settings-email" type="email" value={user?.email ?? ''} readOnly />
               </div>
               <div className="settings-field">
                 <label htmlFor="settings-company">Company / team name</label>
