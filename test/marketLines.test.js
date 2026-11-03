@@ -52,7 +52,7 @@ test('the week is the one DAT measured, and the footnote says what the number le
   assert.equal(m.heading, 'Market · week ending Sep 25')
   assert.match(m.footnote, /fuel excluded/)
   assert.match(m.footnote, /not a quote for this lane/)
-  assert.match(m.footnote, /Board rates include fuel/)
+  assert.match(m.footnote, /posting quote for its fuel breakdown/)
 })
 
 // Kills: never saying a figure is old, or saying it about this week's.

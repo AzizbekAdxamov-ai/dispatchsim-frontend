@@ -13,6 +13,7 @@ import {
   formatWeight,
   formatHos,
 } from '../../utils/format'
+import { rateQuote, RATE_LABELS } from '../../utils/rateQuote'
 import { marketLines } from './marketLines'
 import './RowDetail.css'
 
@@ -29,7 +30,7 @@ function checkedOn(iso) {
   return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 }
 
-export default function RowDetail({ posting, deadheadFrom, deadheadTo }) {
+export default function RowDetail({ posting, deadheadFrom, deadheadTo, rateLabels = RATE_LABELS }) {
   // The dispatcher's own lookup journal. Matched by MC number rather than
   // fetched per posting, because it is small and this way the panel needs
   // no new endpoint. A broker they have never run shows nothing at all --
@@ -37,6 +38,7 @@ export default function RowDetail({ posting, deadheadFrom, deadheadTo }) {
   const fetchChecks = useCallback(async (signal) => await listChecks(signal), [])
   const { data: checkData } = useResource(fetchChecks, [])
 
+  const quote = rateQuote(posting)
   const eq = EQUIPMENT_TYPES[posting.equipmentType]
   const market = marketLines(posting.market)
   const myCheck = posting.brokerMcNumber
@@ -86,16 +88,20 @@ export default function RowDetail({ posting, deadheadFrom, deadheadTo }) {
 
         <dl className="rd-facts rd-facts-wide">
           <div>
-            <dt>Total</dt>
+            <dt>{rateLabels.total}</dt>
             <dd className="rd-total mono">
-              {posting.rateHidden ? <span className="rd-ask">Call for rate</span> : formatMoney(posting.rateUsd)}
+              {posting.rateHidden ? <span className="rd-ask">Call for rate</span> : formatMoney(quote.totalUsd)}
             </dd>
           </div>
+          {quote.split && <>
+            <div><dt>{rateLabels.linehaul}</dt><dd className="mono">{formatMoney(quote.linehaulUsd)}</dd></div>
+            <div><dt>{rateLabels.fuel}</dt><dd className="mono">{formatMoney(quote.fuelSurchargeUsd)}</dd></div>
+          </>}
           <div><dt>Trip</dt><dd className="mono">{formatDistance(posting.distanceMi)}</dd></div>
           <div>
             <dt>Rate per mile</dt>
             <dd className="mono">
-              {posting.rateHidden ? <span className="rd-ask">—</span> : formatRatePerMile(posting.rateUsd, posting.distanceMi)}
+              {posting.rateHidden ? <span className="rd-ask">—</span> : formatRatePerMile(quote.totalUsd, posting.distanceMi)}
             </dd>
           </div>
           <div>

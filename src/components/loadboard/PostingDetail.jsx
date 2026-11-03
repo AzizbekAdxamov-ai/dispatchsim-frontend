@@ -15,6 +15,7 @@ import {
   formatWeight,
   formatHos,
 } from '../../utils/format'
+import { rateQuote, RATE_LABELS } from '../../utils/rateQuote'
 import './PostingDetail.css'
 
 function formatCheckedAt(iso) {
@@ -22,7 +23,7 @@ function formatCheckedAt(iso) {
   return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 }
 
-export default function PostingDetail({ posting, onClose }) {
+export default function PostingDetail({ posting, onClose, rateLabels = RATE_LABELS }) {
   // The dispatcher's own lookup journal. Matched by MC number rather than
   // fetched per posting, because it is small (100 rows) and this way the
   // panel needs no new endpoint. A broker they have never run shows
@@ -32,6 +33,7 @@ export default function PostingDetail({ posting, onClose }) {
 
   if (!posting) return null
 
+  const quote = rateQuote(posting)
   const eq = EQUIPMENT_TYPES[posting.equipmentType]
 
   const myCheck = posting.brokerMcNumber
@@ -87,18 +89,22 @@ export default function PostingDetail({ posting, onClose }) {
 
           <div className="lb-detail-grid">
             <div className="lb-detail-field">
-              <div className="lb-detail-label">Rate</div>
+              <div className="lb-detail-label">{quote.split ? rateLabels.totalRate : rateLabels.rate}</div>
               {/* Stated, not hinted at. "Call for rate" is a fact about
                   the posting, not a missing value — the broker knows the
                   number and expects to be asked for it. */}
               <div className="lb-detail-value mono">
-                {posting.rateHidden ? <span className="lb-ask">Call for rate</span> : formatMoney(posting.rateUsd)}
+                {posting.rateHidden ? <span className="lb-ask">Call for rate</span> : formatMoney(quote.totalUsd)}
               </div>
             </div>
+            {quote.split && <>
+              <div className="lb-detail-field"><div className="lb-detail-label">{rateLabels.linehaul}</div><div className="lb-detail-value mono">{formatMoney(quote.linehaulUsd)}</div></div>
+              <div className="lb-detail-field"><div className="lb-detail-label">{rateLabels.fuel}</div><div className="lb-detail-value mono">{formatMoney(quote.fuelSurchargeUsd)}</div></div>
+            </>}
             <div className="lb-detail-field">
               <div className="lb-detail-label">$/mi</div>
               <div className="lb-detail-value mono">
-                {posting.rateHidden ? <span className="lb-ask">—</span> : formatRatePerMile(posting.rateUsd, posting.distanceMi)}
+                {posting.rateHidden ? <span className="lb-ask">—</span> : formatRatePerMile(quote.totalUsd, posting.distanceMi)}
               </div>
             </div>
             <div className="lb-detail-field">
