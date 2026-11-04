@@ -35,6 +35,12 @@
   white-space: nowrap;
 }
 
+.sb-radius-hint {
+  flex-basis: 100%;
+  color: var(--text-2);
+  font-size: 12px;
+}
+
 .sb-input {
   width: 100%;
   height: 32px;

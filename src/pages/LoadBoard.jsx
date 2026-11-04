@@ -171,7 +171,7 @@ export default function LoadBoard({ rateLabels = RATE_LABELS }) {
             the board says whose. */}
         <div className="lbh-ref">
           {from?.kind === 'location' && <span>DH-O from {from.city}, {from.state}</span>}
-          {from?.kind === 'driver' && <span>DH-O from the nearest driver — {from.driverName}</span>}
+          {from?.kind === 'driver' && <span>DH-O from the nearest available driver for each load</span>}
           {to && <span>DH-D to {to.city}, {to.state}</span>}
         </div>
       </div>

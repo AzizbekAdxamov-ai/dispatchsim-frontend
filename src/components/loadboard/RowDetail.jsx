@@ -109,7 +109,7 @@ export default function RowDetail({ posting, deadheadFrom, deadheadTo, rateLabel
             <dd className="mono">
               {formatDeadhead(posting.deadheadMi)}
               {deadheadFrom?.kind === 'location' && <span className="rd-sub"> from {deadheadFrom.city}, {deadheadFrom.state}</span>}
-              {deadheadFrom?.kind === 'driver' && <span className="rd-sub"> — {deadheadFrom.driverName}</span>}
+              {deadheadFrom?.kind === 'driver' && posting.nearestDriverName && <span className="rd-sub"> — {posting.nearestDriverName}</span>}
             </dd>
           </div>
           {deadheadTo && (

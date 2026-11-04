@@ -15,6 +15,7 @@ import { liveTrackingLines } from '../components/loads/liveTrackingLines'
 import { factText } from '../components/loads/factText'
 import { useResource } from '../hooks/useResource'
 import { formatMoney, formatWeight, formatDateTime, formatCdl, formatHos, formatPlace, formatDistance } from '../utils/format'
+import { rateQuote, RATE_LABELS } from '../utils/rateQuote'
 import '../components/dashboard/Panel.css'
 import './LoadDetail.css'
 
@@ -50,7 +51,7 @@ function initials(name) {
     .slice(0, 2)
 }
 
-export default function LoadDetail() {
+export default function LoadDetail({ rateLabels = RATE_LABELS }) {
   const { id } = useParams()
   const navigate = useNavigate()
   const pageRef = useRef(null)
@@ -124,6 +125,7 @@ export default function LoadDetail() {
     )
   }
 
+  const quote = rateQuote(load)
   const equip = EQUIPMENT_TYPES[load.equipmentType]
   const EquipIcon = equip?.icon
   const truckImg = equip ? (theme === 'dark' ? equip.image.dark : equip.image.light) : null
@@ -257,7 +259,11 @@ export default function LoadDetail() {
             <div className="ld-detail-body">
               <div className="ld-detail-grid">
                 <div><div className="ld-detail-label">Broker</div><div className="ld-detail-value">{load.broker}</div></div>
-                <div><div className="ld-detail-label">Rate</div><div className="ld-detail-value mono">{formatMoney(load.rateUsd)}</div></div>
+                <div><div className="ld-detail-label">{quote.split ? rateLabels.totalRate : rateLabels.rate}</div><div className="ld-detail-value mono">{formatMoney(quote.totalUsd)}</div></div>
+                {quote.split && <>
+                  <div><div className="ld-detail-label">{rateLabels.linehaul}</div><div className="ld-detail-value mono">{formatMoney(quote.linehaulUsd)}</div></div>
+                  <div><div className="ld-detail-label">{rateLabels.fuel}</div><div className="ld-detail-value mono">{formatMoney(quote.fuelSurchargeUsd)}</div></div>
+                </>}
                 {/* The broker's appointments, from the posting -- the dates the
                     rate confirmation and the broker chat use. A dispatched run
                     is timed from the dispatch on the company clock instead, so

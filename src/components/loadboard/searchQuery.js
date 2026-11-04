@@ -124,16 +124,16 @@ export function matchPlaces(text, cities) {
 // The draft the bar holds -> the query the API takes. One place, so that
 // the page, the poll and the saved search all send the same thing.
 //
-// A radius without a city is dropped rather than sent: the server measures
-// a radius from a point, and a state has no point. The input is disabled
-// in that state, but a saved search can carry both.
+// City searches measure from the chosen point. Without an origin the
+// server measures from the nearest available truck. A state or zone is a
+// market search, so a fleet radius would silently hide distant markets.
 export function toFilters(draft) {
   const origin = originParams(draft.origin)
   const destination = destinationParams(draft.destination)
   const filters = { ...origin, ...destination }
 
   if (draft.equipmentType?.length > 0) filters.equipmentType = draft.equipmentType
-  if (draft.dhO != null && draft.origin?.kind === 'city') filters.maxDeadheadMi = draft.dhO
+  if (draft.dhO != null && (!draft.origin || draft.origin.kind === 'city')) filters.maxDeadheadMi = draft.dhO
   if (draft.dhD != null && draft.destination?.kind === 'city') filters.maxDeadheadDestMi = draft.dhD
   if (draft.maxLengthFt != null) filters.maxLengthFt = draft.maxLengthFt
   if (draft.maxWeightLbs != null) filters.maxWeightLbs = draft.maxWeightLbs
