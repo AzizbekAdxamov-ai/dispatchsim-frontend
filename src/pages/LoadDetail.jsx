@@ -391,6 +391,11 @@ export default function LoadDetail({ rateLabels = RATE_LABELS }) {
                  buying are two separate decisions, and the empty list is
                  what says so. */
               <DispatchPanel load={load} onDispatched={refetch} />
+            ) : load.status === 'cancelled' ? (
+              /* The broker withdrew the agreement before anyone was put on
+                 it, so "no driver assigned yet" would promise a dispatch
+                 that can no longer happen. */
+              <div className="ld-driver-empty">This load was cancelled. No driver was assigned.</div>
             ) : (
               <div className="ld-driver-empty">No driver assigned yet.</div>
             )}
