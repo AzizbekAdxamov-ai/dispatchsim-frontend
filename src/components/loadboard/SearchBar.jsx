@@ -15,9 +15,11 @@ import './SearchBar.css'
 // one per keystroke.
 //
 // A place is a city, a state or a zone, because those are the three things
-// the server can narrow by. A radius only means something from a point, so
-// DH-O and DH-D are disabled until the field next to them holds a city --
-// disabled and explained, rather than accepted and quietly ignored.
+// the server can narrow by. DH-O measures from a city or the nearest
+// available truck when origin is blank. State and zone searches show the
+// whole market, because neither is a single point. DH-D still needs a
+// destination city -- the server has no other point to measure it from --
+// so only that input is disabled and explained.
 
 // The radius the board opens with. Not a rule about anything: a starting
 // point the dispatcher changes, and the first thing most of them change.
@@ -151,6 +153,7 @@ export default function SearchBar({ draft, cities, onDraftChange, onSearch }) {
   const set = (patch) => onDraftChange({ ...draft, ...patch })
 
   const originIsCity = draft.origin?.kind === 'city'
+  const originIsMarket = draft.origin?.kind === 'state' || draft.origin?.kind === 'zone'
   const destIsCity = draft.destination?.kind === 'city'
 
   function swap() {
@@ -179,8 +182,8 @@ export default function SearchBar({ draft, cities, onDraftChange, onSearch }) {
           type="number"
           min="0"
           max="5000"
-          disabled={!originIsCity}
-          title={originIsCity ? 'Miles the truck will run empty to reach the pickup' : 'Pick a city to measure a radius from'}
+          disabled={originIsMarket}
+          title={originIsMarket ? 'Choose a city to search within a radius. State and zone searches show the whole market.' : originIsCity ? 'Miles from the selected city to pickup' : 'Miles from the nearest available truck to pickup'}
           value={draft.dhO ?? ''}
           onChange={(e) => set({ dhO: e.target.value === '' ? null : Number(e.target.value) })}
         />
@@ -283,6 +286,7 @@ export default function SearchBar({ draft, cities, onDraftChange, onSearch }) {
         <MagnifyingGlass size={15} aria-hidden="true" />
         Search
       </button>
+      {originIsMarket && <span className="sb-radius-hint">Choose an origin city to use DH-O. State and zone searches show all matching loads.</span>}
     </form>
   )
 }

@@ -331,43 +331,18 @@
   cursor: not-allowed;
 }
 
-.bc-rate-row {
+.bc-email-share {
   display: flex;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 10px;
 }
 
-.bc-rate-input {
-  flex: 1;
-  min-width: 0;
-  background: var(--panel-2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 8px 12px;
-  color: var(--text);
-  font-size: 12.5px;
-  font-family: inherit;
-  outline: none;
-}
-
-.bc-rate-input:focus {
-  border-color: var(--accent);
-}
-
-.bc-agree-btn {
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 12.5px;
-  font-weight: 500;
-  cursor: pointer;
-  border: none;
-  background: var(--accent);
-  color: var(--on-accent);
-}
-
-.bc-agree-btn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
+.bc-email-address {
+  color: var(--text-2);
+  font-size: 12px;
+  overflow-wrap: anywhere;
 }
 
 .bc-send-row {

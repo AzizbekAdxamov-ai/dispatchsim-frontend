@@ -16,6 +16,14 @@ import { useResource } from '../../hooks/useResource'
 // Changing it is an administrator's act -- renaming the company mid-run
 // rewrites every document it sends from then on.
 
+export const CARRIER_COPY = {
+  emailLabel: 'Rate confirmation email',
+  emailPlaceholder: 'Company email (optional)',
+  accountFallback: (email) => `Using your sign-in email: ${email}. Leave this field blank to keep using it.`,
+  overrideHint: 'Use a company email for rate confirmations, or clear it to use your sign-in email.',
+  missingEmail: 'Add a company email for rate confirmations.',
+}
+
 const FIELDS = [
   { key: 'name', label: 'Carrier name', hint: 'As it appears on the rate confirmation' },
   { key: 'mcNumber', label: 'MC number', hint: 'MC-123456' },
@@ -27,7 +35,7 @@ const FIELDS = [
   { key: 'postalCode', label: 'ZIP', hint: 'Five digits' },
 ]
 
-export default function CarrierPanel({ isAdmin = false }) {
+export default function CarrierPanel({ isAdmin = false, copy = CARRIER_COPY }) {
   const fetchCarrier = useCallback((signal) => getCarrier(signal), [])
   const { data, error, refetch } = useResource(fetchCarrier, [])
 
@@ -40,10 +48,12 @@ export default function CarrierPanel({ isAdmin = false }) {
   const changed = Object.keys(edits).filter((key) => edits[key] !== (data?.[key] ?? ''))
 
   async function onSave() {
+    if (saving || !isAdmin || changed.length === 0) return
     setSaving(true)
     setSaveError('')
     try {
       const patch = Object.fromEntries(changed.map((key) => [key, edits[key]]))
+      if ('email' in patch) patch.email = patch.email.trim() || null
       await updateCarrier(patch)
       setEdits({})
       setSaved(true)
@@ -79,6 +89,28 @@ export default function CarrierPanel({ isAdmin = false }) {
             />
           </div>
         ))}
+
+        {data && (
+          <div className="settings-field">
+            <label htmlFor="carrier-email">{copy.emailLabel}</label>
+            <input
+              id="carrier-email"
+              type="email"
+              autoComplete="email"
+              value={value('email')}
+              readOnly={!isAdmin}
+              disabled={saving}
+              placeholder={data.emailSource === 'account' ? data.effectiveEmail : copy.emailPlaceholder}
+              aria-describedby="carrier-email-hint"
+              onChange={isAdmin ? (e) => { setEdits({ ...edits, email: e.target.value }); setSaved(false) } : undefined}
+            />
+            <div id="carrier-email-hint" className="settings-row-desc">
+              {data.emailSource === 'account' && !value('email')
+                ? copy.accountFallback(data.effectiveEmail)
+                : data.effectiveEmail ? copy.overrideHint : copy.missingEmail}
+            </div>
+          </div>
+        )}
 
         <div className="settings-row-desc">
           {isAdmin

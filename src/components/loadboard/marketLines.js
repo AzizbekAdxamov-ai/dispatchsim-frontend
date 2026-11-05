@@ -49,6 +49,6 @@ export function marketLines(market, now = new Date()) {
       sideLine('Reload out of', market.destination),
       { label: 'National', value: rpm(market.national), note: null },
     ],
-    footnote: `${market.source} linehaul, fuel excluded — a regional average, not a quote for this lane. Board rates include fuel.`,
+    footnote: `${market.source} linehaul, fuel excluded — a regional average, not a quote for this lane. See the posting quote for its fuel breakdown.`,
   }
 }

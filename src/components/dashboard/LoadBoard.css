@@ -88,6 +88,10 @@
 .badge.done { background: var(--blue-dim); color: var(--blue-strong); }
 .badge.done .dot { background: var(--blue); }
 
+/* Withdrawn by the broker: muted, not an alert colour. */
+.badge.cancelled { background: var(--panel-2); color: var(--text-3); }
+.badge.cancelled .dot { background: var(--text-3); }
+
 .rate {
   font-weight: 500;
 }

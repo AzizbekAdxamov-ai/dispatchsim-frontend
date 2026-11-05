@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { listPostings, listCities } from '../api/loadBoard'
 import { useResource } from '../hooks/useResource'
 import { EQUIPMENT_TYPES } from '../data/equipmentTypes'
-import { formatMoney, formatWeight } from '../utils/format'
+import { rateQuote, RATE_LABELS } from '../utils/rateQuote'
+import { formatMoney, formatWeight, formatRatePerMile } from '../utils/format'
 import SearchBar, { DEFAULT_RADIUS_MI } from '../components/loadboard/SearchBar'
 import { toFilters } from '../components/loadboard/searchQuery'
 import RowDetail from '../components/loadboard/RowDetail'
@@ -82,7 +83,7 @@ function saveDraft(draft) {
   try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(draft)) } catch { /* private window */ }
 }
 
-export default function LoadBoard() {
+export default function LoadBoard({ rateLabels = RATE_LABELS }) {
   const [draft, setDraft] = useState(loadDraft)
   // What was actually asked for. Separate from the draft on purpose: the
   // board answers a question that was finished, not one being typed.
@@ -170,7 +171,7 @@ export default function LoadBoard() {
             the board says whose. */}
         <div className="lbh-ref">
           {from?.kind === 'location' && <span>DH-O from {from.city}, {from.state}</span>}
-          {from?.kind === 'driver' && <span>DH-O from the nearest driver — {from.driverName}</span>}
+          {from?.kind === 'driver' && <span>DH-O from the nearest available driver for each load</span>}
           {to && <span>DH-D to {to.city}, {to.state}</span>}
         </div>
       </div>
@@ -180,7 +181,7 @@ export default function LoadBoard() {
           <thead>
             <tr>
               <th className="lbt-r">Age</th>
-              <th className="lbt-r">Rate</th>
+              <th className="lbt-r">{rateLabels.totalRate}</th>
               <th className="lbt-r">Trip</th>
               <th>Origin</th>
               <th className="lbt-r">DH-O</th>
@@ -211,13 +212,14 @@ export default function LoadBoard() {
               </tr>
             )}
             {postings.map((p) => {
+              const quote = rateQuote(p)
               const eq = EQUIPMENT_TYPES[p.equipmentType]
               const open = openId === p.id
               return [
                 <tr
                   key={p.id}
                   className={`lbt-row${open ? ' open' : ''}`}
-                  onClick={() => setOpenId(open ? null : p.id)}
+                  onClick={() => !p.blockedByBroker && setOpenId(open ? null : p.id)}
                 >
                   <td className="lbt-r mono lbt-age">{ageLabel(p.postedAt)}</td>
                   {/* "Call for rate" — about one posting in ten goes up
@@ -229,9 +231,10 @@ export default function LoadBoard() {
                       <span className="lbt-ask">Call for rate</span>
                     ) : (
                       <>
-                        <div className="mono">{formatMoney(p.rateUsd)}</div>
+                        <div className="mono">{formatMoney(quote.totalUsd)}</div>
+                        {quote.split && <div className="lbt-sub">{rateLabels.split}</div>}
                         <div className="lbt-sub mono">
-                          ${(p.rateUsd / Math.max(1, p.distanceMi)).toFixed(2)}/mi
+                          {formatRatePerMile(quote.totalUsd, p.distanceMi)}
                         </div>
                       </>
                     )}
@@ -246,13 +249,13 @@ export default function LoadBoard() {
                   <td className="lbt-r mono">{p.equipmentLengthFt} ft</td>
                   <td className="lbt-r mono">{formatWeight(p.weightLbs)}</td>
                   <td>Full</td>
-                  <td className="lbt-company">{p.broker}</td>
+                  <td className="lbt-company">{p.blockedByBroker ? <span className="lbt-blocked">Blocked by broker</span> : p.broker}</td>
                   <td className="lbt-contact">{p.brokerContactName ?? '—'}</td>
                 </tr>,
                 open && (
                   <tr key={`${p.id}-detail`} className="lbt-detail-row">
                     <td colSpan={14}>
-                      <RowDetail posting={p} deadheadFrom={from} deadheadTo={to} />
+                      <RowDetail rateLabels={rateLabels} posting={p} deadheadFrom={from} deadheadTo={to} />
                     </td>
                   </tr>
                 ),

@@ -84,7 +84,7 @@ export function setUnauthorizedHandler(fn) {
   onUnauthorized = fn
 }
 
-async function request(path, { method = 'GET', body, auth = false, signal } = {}) {
+async function request(path, { method = 'GET', body, auth = false, signal, responseType = 'json' } = {}) {
   const headers = { 'Content-Type': 'application/json' }
   if (auth) {
     const token = getToken()
@@ -103,6 +103,9 @@ async function request(path, { method = 'GET', body, auth = false, signal } = {}
     if (err?.name === 'AbortError') throw err
     throw new ApiError('NETWORK_ERROR', 'Cannot reach the server', 0)
   }
+
+  // Successful binary downloads share authentication and error handling with JSON calls.
+  if (res.ok && responseType === 'blob') return res.blob()
 
   let data = null
   try {
@@ -132,6 +135,7 @@ async function request(path, { method = 'GET', body, auth = false, signal } = {}
 
 export const api = {
   get: (path, opts) => request(path, { ...opts, method: 'GET' }),
+  blob: (path, opts) => request(path, { ...opts, method: 'GET', responseType: 'blob' }),
   post: (path, body, opts) => request(path, { ...opts, method: 'POST', body }),
   patch: (path, body, opts) => request(path, { ...opts, method: 'PATCH', body }),
   del: (path, opts) => request(path, { ...opts, method: 'DELETE' }),

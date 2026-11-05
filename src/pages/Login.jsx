@@ -1,19 +1,20 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
 import { roleHomePath } from '../data/roleRoutes'
 import { ApiError } from '../api/client'
+import { LOGIN_FEEDBACK, cooldownSeconds } from '../data/loginFeedback'
 import truckBg from '../assets/truck-bg.webp'
 import './Login.css'
 
 function loginErrorMessage(err) {
   if (err instanceof ApiError) {
-    if (err.code === 'INVALID_CREDENTIALS') return 'Email or password is incorrect'
-    if (err.code === 'RATE_LIMITED') return 'Too many attempts. Try again in a few minutes.'
-    if (err.code === 'NETWORK_ERROR') return 'Cannot reach the server. Is the API running?'
+    if (err.code === 'INVALID_CREDENTIALS') return LOGIN_FEEDBACK.invalid
+    if (err.code === 'RATE_LIMITED') return LOGIN_FEEDBACK.limited
+    if (err.code === 'NETWORK_ERROR') return LOGIN_FEEDBACK.network
   }
-  return 'Something went wrong. Please try again.'
+  return LOGIN_FEEDBACK.unknown
 }
 
 export default function Login() {
@@ -24,17 +25,39 @@ export default function Login() {
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [remember, setRemember] = useState(true)
+  const inFlight = useRef(false)
+  const cooldownUntil = useRef(0)
+  const [remaining, setRemaining] = useState(0)
+  const coolingDown = remaining > 0
+
+  useEffect(() => {
+    if (!coolingDown) return
+    const timer = setInterval(() => {
+      setRemaining(Math.max(0, Math.ceil((cooldownUntil.current - Date.now()) / 1000)))
+    }, 250)
+    return () => clearInterval(timer)
+  }, [coolingDown])
 
   async function handleSubmit(e) {
     e.preventDefault()
+    // React state updates are deferred; the ref also blocks same-tick Enter/click.
+    if (inFlight.current || Date.now() < cooldownUntil.current) return
+    inFlight.current = true
     setError('')
     setSubmitting(true)
     try {
       const user = await login(email, password, remember)
       navigate(roleHomePath(user.activeRole))
     } catch (err) {
-      setError(loginErrorMessage(err))
+      if (err instanceof ApiError && err.code === 'RATE_LIMITED') {
+        const seconds = cooldownSeconds(err.details)
+        cooldownUntil.current = Date.now() + seconds * 1000
+        setRemaining(seconds)
+      } else {
+        setError(loginErrorMessage(err))
+      }
     } finally {
+      inFlight.current = false
       setSubmitting(false)
     }
   }
@@ -88,7 +111,7 @@ export default function Login() {
             />
           </div>
 
-          {error && <div className="login-error">{error}</div>}
+          {(remaining > 0 || error) && <div className="login-error" role="status" aria-live="polite">{remaining > 0 ? LOGIN_FEEDBACK.cooldown(remaining) : error}</div>}
 
           <div className="login-row-between">
             <label className="login-remember">
@@ -101,8 +124,8 @@ export default function Login() {
             <button type="button" className="login-forgot">Forgot password?</button>
           </div>
 
-          <button type="submit" className="login-btn" disabled={submitting}>
-            {submitting ? 'Signing in…' : 'Sign in'}
+          <button type="submit" className="login-btn" disabled={submitting || remaining > 0}>
+            {submitting ? LOGIN_FEEDBACK.signingIn : LOGIN_FEEDBACK.signIn}
           </button>
         </form>
 

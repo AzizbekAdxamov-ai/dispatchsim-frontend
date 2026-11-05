@@ -79,10 +79,9 @@ test('the exclusive end of a day is the next day, across a clock change', () => 
   assert.equal(dayAfter('2026-11-01').toISOString(), '2026-11-02T06:00:00.000Z')
 })
 
-// Kills: sending a radius with a state or a zone. The server measures a
-// radius from a point; a state has no point, and the filter would narrow
-// against something that was never asked for.
-test('a radius is only sent when the place it measures from is a city', () => {
+// Kills: applying a fleet radius to a state or zone market search, and
+// sending DH-D without a destination city.
+test('radii use a city, or the fleet when the origin is blank', () => {
   const base = { equipmentType: [], sort: 'posted' }
   const withCity = toFilters({
     ...base,
@@ -103,6 +102,15 @@ test('a radius is only sent when the place it measures from is a city', () => {
   assert.equal(withState.maxDeadheadDestMi, undefined)
   assert.equal(withState.originState, 'TX')
   assert.equal(withState.destinationZone, 'northeast')
+
+  const withZone = toFilters({ ...base, origin: { kind: 'zone', zone: 'midwest' }, dhO: 150 })
+  assert.equal(withZone.maxDeadheadMi, undefined)
+  assert.equal(withZone.originZone, 'midwest')
+
+  // No place at all: same fleet-deadhead reading for DH-O.
+  const withNoPlace = toFilters({ ...base, dhO: 150, dhD: 100 })
+  assert.equal(withNoPlace.maxDeadheadMi, 150)
+  assert.equal(withNoPlace.maxDeadheadDestMi, undefined)
 })
 
 // Kills: leaving the window open when only one day is picked. A single

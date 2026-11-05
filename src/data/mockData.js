@@ -8,4 +8,5 @@ export const STATUS_LABEL = {
   crit: 'Delayed',
   neutral: 'Pending pickup',
   done: 'Delivered',
+  cancelled: 'Cancelled',
 }
