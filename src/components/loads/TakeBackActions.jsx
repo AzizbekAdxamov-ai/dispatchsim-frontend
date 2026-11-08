@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useReducer, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { confirmStep, CONFIRM_ACTIONS } from './takeBackConfirm'
 import './TakeBackActions.css'
 
 // Copy for the two ways of taking a load back. Overridable by props.
@@ -15,6 +16,8 @@ export const TAKE_BACK_COPY = Object.freeze({
   deliveredError: 'This load has already been delivered.',
   unassignError: 'Could not take the load back.',
   cancelError: 'Could not cancel the booking.',
+  notCancellableError: 'This booking can no longer be cancelled.',
+  brokerBlockedError: 'This broker has blocked this carrier, so the booking cannot be cancelled from here.',
   cancelledNote: 'This load was cancelled with the broker.',
 })
 
@@ -24,7 +27,21 @@ const CONFIRM_SECONDS = 0.18
 // options: takeBackOptions(load). Cancel booking is irreversible, so it asks
 // twice: the first press only opens "Confirm cancel".
 export default function TakeBackActions({ options, busy = null, error = '', onUnassign, onCancelBooking, copy = TAKE_BACK_COPY }) {
-  const [confirming, setConfirming] = useState(false)
+  const [step, dispatch] = useReducer((state, action) => confirmStep(state, action), { confirming: false, fire: false })
+  const { confirming } = step
+  const cancelBtnRef = useRef(null)
+  const keepBtnRef = useRef(null)
+  // Focus follows the row: into it when it opens, back out when kept. Never
+  // left on a button that is about to disappear or be disabled.
+  useEffect(() => {
+    if (confirming) keepBtnRef.current?.focus()
+  }, [confirming])
+  function press(action) {
+    const next = confirmStep(step, action)
+    dispatch(action)
+    if (next.fire) onCancelBooking()
+    if (action === CONFIRM_ACTIONS.KEEP) cancelBtnRef.current?.focus()
+  }
   if (!options.unassign && !options.cancelBooking) return null
   const disabled = busy !== null
 
@@ -43,8 +60,10 @@ export default function TakeBackActions({ options, busy = null, error = '', onUn
           <button
             type="button"
             className="ld-cancel-btn"
-            disabled={disabled || confirming}
-            onClick={() => setConfirming(true)}
+            ref={cancelBtnRef}
+            disabled={disabled}
+            aria-expanded={confirming}
+            onClick={() => press(CONFIRM_ACTIONS.OPEN)}
           >
             {busy === 'cancel' ? copy.cancelling : copy.cancelBooking}
           </button>
@@ -62,11 +81,11 @@ export default function TakeBackActions({ options, busy = null, error = '', onUn
                   type="button"
                   className="ld-cancel-btn tb-confirm-btn"
                   disabled={disabled}
-                  onClick={async () => { await onCancelBooking(); setConfirming(false) }}
+                  onClick={() => press(CONFIRM_ACTIONS.CONFIRM)}
                 >
                   {copy.confirm}
                 </button>
-                <button type="button" className="ld-cancel-btn" disabled={disabled} onClick={() => setConfirming(false)}>
+                <button type="button" ref={keepBtnRef} className="ld-cancel-btn" disabled={disabled} onClick={() => press(CONFIRM_ACTIONS.KEEP)}>
                   {copy.keep}
                 </button>
               </motion.div>

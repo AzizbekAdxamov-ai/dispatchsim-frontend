@@ -14,6 +14,7 @@ import DispatchPanel from '../components/loads/DispatchPanel'
 import RoadEventPanel from '../components/loads/RoadEventPanel'
 import TakeBackActions, { TAKE_BACK_COPY } from '../components/loads/TakeBackActions'
 import { takeBackOptions } from '../components/loads/takeBackOptions'
+import { takeBackErrorText } from '../components/loads/takeBackConfirm'
 import { liveTrackingLines } from '../components/loads/liveTrackingLines'
 import { factText } from '../components/loads/factText'
 import { useResource } from '../hooks/useResource'
@@ -157,11 +158,9 @@ export default function LoadDetail({ rateLabels = RATE_LABELS, brokerChatCopy = 
       refetch()
     } catch (err) {
       if (err?.name === 'AbortError') return
-      setCancelError(
-        err instanceof ApiError && err.code === 'LOAD_NOT_CANCELLABLE'
-          ? takeBackCopy.deliveredError
-          : err?.message || fallback,
-      )
+      setCancelError(takeBackErrorText({
+        kind, code: err instanceof ApiError ? err.code : null, message: err?.message || fallback, copy: takeBackCopy,
+      }))
     } finally {
       setTakeBackBusy(null)
     }
