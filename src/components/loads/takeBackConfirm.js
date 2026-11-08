@@ -12,12 +12,10 @@ export function confirmStep(state, action) {
 }
 
 const NOT_CANCELLABLE = 'LOAD_NOT_CANCELLABLE'
-const BROKER_BLOCKED = 'BROKER_BLOCKED'
 
 // kind: 'unassign' | 'cancel'. A delivered load is "already delivered" only
 // for the unassign; for the booking it is "can no longer be cancelled".
 export function takeBackErrorText({ kind, code, message, copy }) {
   if (code === NOT_CANCELLABLE) return kind === 'cancel' ? copy.notCancellableError : copy.deliveredError
-  if (kind === 'cancel' && code === BROKER_BLOCKED) return copy.brokerBlockedError
   return message || (kind === 'cancel' ? copy.cancelError : copy.unassignError)
 }

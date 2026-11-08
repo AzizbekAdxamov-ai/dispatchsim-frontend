@@ -17,7 +17,6 @@ export const TAKE_BACK_COPY = Object.freeze({
   unassignError: 'Could not take the load back.',
   cancelError: 'Could not cancel the booking.',
   notCancellableError: 'This booking can no longer be cancelled.',
-  brokerBlockedError: 'This broker has blocked this carrier, so the booking cannot be cancelled from here.',
   cancelledNote: 'This load was cancelled with the broker.',
 })
 

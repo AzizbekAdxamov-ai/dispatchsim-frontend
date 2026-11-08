@@ -5,7 +5,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { confirmStep, CONFIRM_ACTIONS, takeBackErrorText } from '../src/components/loads/takeBackConfirm.js'
 
-const TAKE_BACK_COPY = { deliveredError: 'delivered', notCancellableError: 'not cancellable', brokerBlockedError: 'blocked', cancelError: 'c', unassignError: 'u' }
+const TAKE_BACK_COPY = { deliveredError: 'delivered', notCancellableError: 'not cancellable', cancelError: 'c', unassignError: 'u' }
 const IDLE = { confirming: false }
 
 // Kills: the first "Cancel booking" press calling the cancel at once
@@ -38,9 +38,10 @@ test('LOAD_NOT_CANCELLABLE reads differently for unassign and cancel', () => {
   assert.equal(takeBackErrorText({ kind: 'cancel', code: 'LOAD_NOT_CANCELLABLE', copy }), copy.notCancellableError)
 })
 
-// Kills: a blocked broker showing the raw/unhelpful message on cancel
-test('BROKER_BLOCKED on cancel has its own copy; other errors keep their message', () => {
+// Kills: the server's message being swallowed, or a stale BROKER_BLOCKED-only wording coming back
+test('other errors keep their message, with a fallback when there is none', () => {
   const copy = TAKE_BACK_COPY
-  assert.equal(takeBackErrorText({ kind: 'cancel', code: 'BROKER_BLOCKED', copy }), copy.brokerBlockedError)
-  assert.equal(takeBackErrorText({ kind: 'cancel', code: 'X', message: 'boom', copy }), 'boom')
+  assert.equal(takeBackErrorText({ kind: 'cancel', code: 'BROKER_BLOCKED', message: 'boom', copy }), 'boom')
+  assert.equal(takeBackErrorText({ kind: 'cancel', code: 'X', copy }), copy.cancelError)
+  assert.equal(takeBackErrorText({ kind: 'unassign', code: 'X', copy }), copy.unassignError)
 })
