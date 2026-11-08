@@ -3,21 +3,22 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
 import { roleHomePath } from '../data/roleRoutes'
+import { LOGIN_FEEDBACK } from '../data/loginFeedback'
 import { ApiError } from '../api/client'
 import truckBg from '../assets/truck-bg.webp'
 import './Login.css'
 
 function registerErrorMessage(err) {
   if (err instanceof ApiError) {
-    if (err.code === 'EMAIL_TAKEN') return 'This email is already registered'
-    if (err.code === 'VALIDATION_ERROR') return 'Password must be at least 8 characters'
+    if (err.code === 'EMAIL_TAKEN') return LOGIN_FEEDBACK.emailTaken
+    if (err.code === 'VALIDATION_ERROR') return LOGIN_FEEDBACK.passwordShort
     if (err.code === 'INVITE_INVALID') {
-      return 'This invite link is no longer valid — ask your instructor for a new one, or continue without it.'
+      return LOGIN_FEEDBACK.inviteInvalid
     }
-    if (err.code === 'RATE_LIMITED') return 'Too many attempts. Try again in a few minutes.'
-    if (err.code === 'NETWORK_ERROR') return 'Cannot reach the server. Is the API running?'
+    if (err.code === 'RATE_LIMITED') return LOGIN_FEEDBACK.limited
+    if (err.code === 'NETWORK_ERROR') return LOGIN_FEEDBACK.network
   }
-  return 'Something went wrong. Please try again.'
+  return LOGIN_FEEDBACK.unknown
 }
 
 export default function Register() {
