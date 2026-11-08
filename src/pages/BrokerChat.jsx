@@ -17,6 +17,7 @@ import { getCarrier } from '../api/carrier'
 import { BROKER_EMAIL_COPY, emailShareText } from '../components/brokerChat/emailShare.js'
 import { ApiError } from '../api/client'
 import { useResource } from '../hooks/useResource'
+import { visibleMessages, showTyping } from '../utils/chatView'
 import { formatMoney } from '../utils/format'
 import { talkSummary } from '../components/brokerChat/talkSummary'
 import { rateConLine } from '../components/brokerChat/rateConLine.js'
@@ -175,7 +176,7 @@ export default function BrokerChat({ emailCopy = BROKER_EMAIL_COPY, bookedBarCop
   // useResource retains the last value while fetching a different thread.
   // Never offer another broker's email action or document during that gap.
   const currentThread = thread?.conversation?.id === selectedId ? thread : null
-  const messages = currentThread?.messages ?? []
+  const messages = visibleMessages(currentThread?.messages)
 
   // Auto-scroll has to live BELOW `messages`, not above it. `const` is not
   // hoisted the way `function` is -- reading it earlier in the component
@@ -188,6 +189,7 @@ export default function BrokerChat({ emailCopy = BROKER_EMAIL_COPY, bookedBarCop
     }
   }, [messages.length])
   const awaitingReply = currentThread?.awaitingReply ?? false
+  const typing = showTyping({ awaitingReply, sending })
   // The conversation from the thread endpoint is fresher than the list's
   // copy, which can be up to 15 seconds behind.
   const convo = currentThread?.conversation ?? selected
@@ -320,7 +322,7 @@ export default function BrokerChat({ emailCopy = BROKER_EMAIL_COPY, bookedBarCop
             </div>
 
             <div className="bc-thread-body">
-              {messages.length === 0 && !awaitingReply && (
+              {messages.length === 0 && !typing && (
                 <div className="bc-empty" style={{ padding: 24 }}>
                   Nothing sent yet. Ask about the lane, the weight, or the rate.
                 </div>
@@ -370,7 +372,7 @@ export default function BrokerChat({ emailCopy = BROKER_EMAIL_COPY, bookedBarCop
                 ),
               )}
 
-              {awaitingReply && (
+              {typing && (
                 <div className="bc-waiting">
                   Waiting on {selected.brokerContactName || selected.brokerName}…
                 </div>

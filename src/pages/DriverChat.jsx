@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ChatCircle, PaperPlaneTilt } from '@phosphor-icons/react'
 import { listThreads, openConversation, getThread, sendMessage } from '../api/driverChat'
 import { useResource } from '../hooks/useResource'
+import { visibleMessages, showTyping } from '../utils/chatView'
 import { ApiError } from '../api/client'
 import { chatLimitMessage } from '../utils/chatBudget.js'
 import { describeWait } from '../utils/describeWait.js'
@@ -51,10 +52,11 @@ export default function DriverChat() {
     useResource(fetchThread, [conversationId], { pollMs: 5000 })
 
   const threads = listData?.threads ?? []
-  const messages = thread?.messages ?? []
+  const messages = visibleMessages(thread?.messages)
   const standing = thread?.standing ?? null
   const driver = thread?.driver ?? null
   const awaitingReply = thread?.awaitingReply ?? false
+  const typing = showTyping({ awaitingReply, sending })
 
   // Declared BELOW `messages` on purpose. An auto-scroll effect that
   // referenced it above its own const blanked this whole app once already
@@ -64,7 +66,7 @@ export default function DriverChat() {
   useEffect(() => {
     const el = bodyRef.current
     if (el) el.scrollTop = el.scrollHeight
-  }, [messages.length, awaitingReply])
+  }, [messages.length, typing])
 
   async function onOpen(row) {
     setSendError('')
@@ -182,7 +184,7 @@ export default function DriverChat() {
                   Could not open this conversation — {threadError.message}
                 </div>
               )}
-              {!threadError && messages.length === 0 && !awaitingReply && (
+              {!threadError && messages.length === 0 && !typing && (
                 <div className="dc-empty" style={{ padding: 24 }}>
                   Nothing sent yet.
                 </div>
@@ -192,9 +194,9 @@ export default function DriverChat() {
                   {m.content}
                 </div>
               ))}
-              {awaitingReply && (
+              {typing && (
                 <div className="dc-waiting">
-                  {driver?.dutyStatus === 'driving'
+                  {awaitingReply && driver?.dutyStatus === 'driving'
                     ? 'Driving — will answer at the next stop'
                     : 'Typing…'}
                 </div>
