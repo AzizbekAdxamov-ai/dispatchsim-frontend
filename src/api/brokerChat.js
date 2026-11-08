@@ -47,3 +47,9 @@ export async function downloadRateConfirmation(conversationId) {
   document.body.removeChild(a)
   URL.revokeObjectURL(url)
 }
+
+// Cancel the booking with the broker from the load page. Irreversible: the
+// broker is told, the rate con is voided and the load is cancelled.
+export function cancelBookingForLoad(loadId, signal) {
+  return api.post(`/broker-chat/loads/${encodeURIComponent(loadId)}/cancel`, {}, { auth: true, signal })
+}
