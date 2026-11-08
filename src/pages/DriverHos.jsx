@@ -8,6 +8,7 @@ import '../components/dashboard/Panel.css'
 import '../components/dashboard/LoadBoard.css'
 import './PageHeader.css'
 import './DriverHos.css'
+import { COMPANY_DAY_PHRASE } from '../data/companyClock.js'
 
 // Compliance > Driver HOS. Columns and their order follow the fleet
 // platform's Hours of Service report (vault: 01-Projects/Dispatch-
@@ -143,7 +144,7 @@ export default function DriverHos() {
         </table>
       </div>
       <div className="hos-footnote">
-        Clocks are hours of service, not wall-clock time: the company calendar runs one day every two minutes.
+        Clocks are hours of service, not wall-clock time: the company calendar runs {COMPANY_DAY_PHRASE}.
         Cycle is 70 hours in 8 days (49 CFR 395.3(b)(2)).
       </div>
     </>
