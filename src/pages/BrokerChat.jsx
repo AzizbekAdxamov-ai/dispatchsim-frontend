@@ -7,6 +7,7 @@ import { ChatCircle, DownloadSimple, FileText, CheckCircle } from '@phosphor-ico
 import {
   listConversations,
   openConversation,
+  openLoadConversation,
   getThread,
   sendMessage,
   acceptRateCon,
@@ -18,6 +19,7 @@ import { ApiError } from '../api/client'
 import { useResource } from '../hooks/useResource'
 import { formatMoney } from '../utils/format'
 import { talkSummary } from '../components/brokerChat/talkSummary'
+import { canSendBrokerMessage, BOOKED_BAR_COPY } from '../components/brokerChat/sendGate.js'
 import '../components/dashboard/Panel.css'
 import './BrokerChat.css'
 
@@ -66,6 +68,10 @@ function actionErrorText(err) {
       return 'The broker has not sent the rate confirmation yet.'
     case 'ALREADY_BOOKED':
       return 'This rate confirmation has already been accepted.'
+    case 'BROKER_BLOCKED':
+      return 'This broker will not take your messages right now.'
+    case 'LOAD_HAS_NO_BROKER_THREAD':
+      return 'There is no broker conversation for this load.'
     case 'BROKER_UNAVAILABLE':
       return 'This posting has no broker on file.'
     default:
@@ -73,13 +79,15 @@ function actionErrorText(err) {
   }
 }
 
-export default function BrokerChat({ emailCopy = BROKER_EMAIL_COPY }) {
+export default function BrokerChat({ emailCopy = BROKER_EMAIL_COPY, bookedBarCopy = BOOKED_BAR_COPY }) {
   // "Contact broker" on the load board links here with ?posting=<id>. That
   // opens (or reopens) the thread for that posting and selects it, so the
   // dispatcher lands in the conversation instead of a list they then have
   // to search. The param is consumed once and cleared from the URL.
   const [searchParams, setSearchParams] = useSearchParams()
   const postingParam = searchParams.get('posting')
+  // "Message the broker" on a load page links here with ?load=<id>.
+  const loadParam = searchParams.get('load')
   const openedRef = useRef(null)
 
   const [selectedId, setSelectedId] = useState(null)
@@ -131,6 +139,23 @@ export default function BrokerChat({ emailCopy = BROKER_EMAIL_COPY }) {
       .finally(() => setSearchParams({}, { replace: true }))
   }, [postingParam, refetch, setSearchParams])
 
+  // Same once-only pattern for ?load=<id>, which opens the thread behind a
+  // booked load.
+  useEffect(() => {
+    if (!loadParam || openedRef.current === `load:${loadParam}`) return
+    openedRef.current = `load:${loadParam}`
+    openLoadConversation(loadParam)
+      .then((res) => {
+        setSelectedId(res.conversation.id)
+        refetch()
+      })
+      .catch((err) => {
+        if (err?.name === 'AbortError') return
+        setActionError(actionErrorText(err))
+      })
+      .finally(() => setSearchParams({}, { replace: true }))
+  }, [loadParam, refetch, setSearchParams])
+
   // The open thread is polled faster than the list, because this is where
   // a delayed reply lands. Six seconds is well under the shortest delay an
   // A-rated broker can draw (20s), so nothing sits visible-but-unshown for
@@ -173,7 +198,7 @@ export default function BrokerChat({ emailCopy = BROKER_EMAIL_COPY }) {
 
   async function handleSend(text = messageText, isEmailShare = false) {
     const content = text.trim()
-    if (!content || sendInFlight.current || !selectedId || convo?.status === 'booked') return
+    if (!content || sendInFlight.current || !selectedId || currentThread?.blocked) return
     if (isEmailShare && !emailShareText(currentThread?.conversation, carrier, emailCopy, awaitingReply)) return
     const conversationId = selectedId
     sendInFlight.current = true
@@ -358,7 +383,7 @@ export default function BrokerChat({ emailCopy = BROKER_EMAIL_COPY }) {
               {convo?.status === 'booked' && (
                 <div className="bc-booked-bar">
                   <CheckCircle size={15} weight="fill" />
-                  <span>Accepted — the load is on the board.</span>
+                  <span>{bookedBarCopy[currentThread?.loadStage] ?? bookedBarCopy.booked}</span>
                   <Link to="/loads" className="bc-booked-link">View loads →</Link>
                 </div>
               )}
@@ -415,7 +440,7 @@ export default function BrokerChat({ emailCopy = BROKER_EMAIL_COPY }) {
                 <button
                   type="button"
                   className="bc-send-btn"
-                  disabled={sending || !messageText.trim() || convo?.status === 'booked'}
+                  disabled={!canSendBrokerMessage({ sending, text: messageText, blocked: currentThread?.blocked })}
                   onClick={() => handleSend()}
                 >
                   {sending ? '…' : 'Send'}

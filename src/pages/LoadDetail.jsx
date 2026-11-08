@@ -51,7 +51,13 @@ function initials(name) {
     .slice(0, 2)
 }
 
-export default function LoadDetail({ rateLabels = RATE_LABELS }) {
+// Copy for the broker chat panel, overridable by props like the rate labels.
+const BROKER_CHAT_COPY = Object.freeze({
+  open: 'Message the broker',
+  none: 'No broker conversation for this load.',
+})
+
+export default function LoadDetail({ rateLabels = RATE_LABELS, brokerChatCopy = BROKER_CHAT_COPY }) {
   const { id } = useParams()
   const navigate = useNavigate()
   const pageRef = useRef(null)
@@ -323,9 +329,13 @@ export default function LoadDetail({ rateLabels = RATE_LABELS }) {
 
           <div className="panel">
             <div className="panel-head"><div className="panel-title">Broker chat</div></div>
-            {/* Broker messaging is out of scope this round — see BrokerChat.jsx,
-                which is not touched in this pass. */}
-            <div className="ld-driver-empty">No messages yet.</div>
+            {load.brokerThreadAvailable ? (
+              <Link className="ld-broker-link" to={`/broker-chat?load=${encodeURIComponent(load.id)}`}>
+                {brokerChatCopy.open}
+              </Link>
+            ) : (
+              <div className="ld-driver-empty">{brokerChatCopy.none}</div>
+            )}
           </div>
         </div>
 

@@ -10,6 +10,11 @@ export function openConversation(postingId, signal) {
   return api.post(`/broker-chat/postings/${encodeURIComponent(postingId)}`, {}, { auth: true, signal })
 }
 
+// The thread behind a booked load (from the load page).
+export function openLoadConversation(loadId, signal) {
+  return api.post(`/broker-chat/loads/${encodeURIComponent(loadId)}`, {}, { auth: true, signal })
+}
+
 // The thread itself. Polled while a conversation is open, because a broker
 // reply is written the moment you send but only becomes visible when it
 // comes due — see replyTiming.js on the server.
