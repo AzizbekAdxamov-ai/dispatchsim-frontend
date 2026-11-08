@@ -441,6 +441,15 @@
   margin-bottom: 11px;
 }
 
+/* The figures printed on the paper: numbers read in the mono face. */
+.bc-ratecon-amount {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin: -4px 0 11px;
+}
+
 .bc-ratecon-actions {
   display: flex;
   flex-wrap: wrap;

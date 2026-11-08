@@ -19,6 +19,7 @@ import { ApiError } from '../api/client'
 import { useResource } from '../hooks/useResource'
 import { formatMoney } from '../utils/format'
 import { talkSummary } from '../components/brokerChat/talkSummary'
+import { rateConLine } from '../components/brokerChat/rateConLine.js'
 import { canSendBrokerMessage, BOOKED_BAR_COPY } from '../components/brokerChat/sendGate.js'
 import '../components/dashboard/Panel.css'
 import './BrokerChat.css'
@@ -333,6 +334,7 @@ export default function BrokerChat({ emailCopy = BROKER_EMAIL_COPY, bookedBarCop
                       <span>Rate confirmation</span>
                     </div>
                     <div className="bc-ratecon-body">{m.content}</div>
+                    {rateConLine(m) && <div className="bc-ratecon-amount">{rateConLine(m)}</div>}
                     <div className="bc-ratecon-actions">
                       <button
                         type="button"
