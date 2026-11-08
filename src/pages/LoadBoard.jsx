@@ -166,7 +166,7 @@ export default function LoadBoard({ rateLabels = RATE_LABELS, boardCopy = BOARD_
               {note.nearbyLabel}
             </span>
           )}
-          {note.noReference && <span className="lbh-nearby">{note.emptyNote}</span>}
+          {note.noReference && postings.length > 0 && <span className="lbh-nearby">{note.emptyNote}</span>}
         </div>
 
         <label className="lbh-sort">
