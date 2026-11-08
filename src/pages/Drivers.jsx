@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { MagnifyingGlass } from '@phosphor-icons/react'
 import { listDrivers } from '../api/drivers'
 import { useResource } from '../hooks/useResource'
-import { getDriverStatus } from '../utils/driverStatus'
+import { getDriverStatus, driverPlace } from '../utils/driverStatus'
 import { formatUnit, formatPlace } from '../utils/format'
 import '../components/dashboard/Panel.css'
 import '../components/dashboard/LoadBoard.css'
@@ -62,8 +62,9 @@ export default function Drivers({ resultNouns }) {
       if (!activeTab.match(d)) return false
       if (!q) return true
       const home = formatPlace(d.homeBaseCity, d.homeBaseState).toLowerCase()
+      const place = driverPlace(d).toLowerCase()
       const unit = (d.truck?.id ?? '').toLowerCase()
-      return d.name.toLowerCase().includes(q) || home.includes(q) || unit.includes(q)
+      return d.name.toLowerCase().includes(q) || home.includes(q) || place.includes(q) || unit.includes(q)
     })
   }, [enriched, tab, query])
 
@@ -108,7 +109,7 @@ export default function Drivers({ resultNouns }) {
             <tr>
               <th>Driver</th>
               <th>Status</th>
-              <th>Home base</th>
+              <th>Location</th>
               <th>Unit</th>
               <th>Current load</th>
               <th>HOS</th>
@@ -155,7 +156,7 @@ export default function Drivers({ resultNouns }) {
                         {driver.status}
                       </span>
                     </td>
-                    <td>{formatPlace(driver.homeBaseCity, driver.homeBaseState)}</td>
+                    <td>{driverPlace(driver)}</td>
                     <td className="mono">{formatUnit(driver.truck)}</td>
                     <td className="mono">{driver.currentLoad ? '#' + driver.currentLoad.id : '—'}</td>
                     <td className={'mono' + (driver.state === 'hos' ? ' drivers-hos-amber' : '')}>{driver.hos}</td>

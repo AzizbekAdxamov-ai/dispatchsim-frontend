@@ -130,3 +130,19 @@ for (const name of ['handleAccept', 'handleDownload']) {
    assert.equal(h.state.reload, 1)
    assert.equal(h.state.busy, null)
  })
+
+// Kills: the load-page link posting to the wrong path or with an unescaped id
+test('openLoadConversation posts to /broker-chat/loads/:loadId', async () => {
+  const { openLoadConversation } = await import(`data:text/javascript;base64,${Buffer.from(brokerSource).toString('base64')}`)
+  const originalFetch = globalThis.fetch
+  let seen
+  try {
+    globalThis.fetch = async (url, init) => { seen = { url: String(url), method: init?.method }; return Response.json({ conversation: { id: 'c1' } }) }
+    const res = await openLoadConversation('600010')
+    assert.equal(res.conversation.id, 'c1')
+    assert.match(seen.url, /\/broker-chat\/loads\/600010$/)
+    assert.equal(seen.method, 'POST')
+  } finally {
+    globalThis.fetch = originalFetch
+  }
+})

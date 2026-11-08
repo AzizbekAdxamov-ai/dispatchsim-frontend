@@ -9,6 +9,7 @@ import '../components/dashboard/LoadBoard.css'
 import './PageHeader.css'
 import './DriverHos.css'
 import './ComplianceOverview.css'
+import { COMPANY_DAY_PHRASE } from '../data/companyClock.js'
 
 // Compliance > Overview. One screen answering "how clean is the
 // operation right now", from the readings each compliance screen already
@@ -123,7 +124,7 @@ export default function ComplianceOverview() {
 
       <div className="hos-footnote">
         Every tile reads the same source its screen does — nothing is recomputed here.
-        Days are company days: one day every two minutes. An expired or missing document
+        Days are company days: {COMPANY_DAY_PHRASE}. An expired or missing document
         does not stop a dispatch; it is a fact the next audit asks about.
       </div>
     </>

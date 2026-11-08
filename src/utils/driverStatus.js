@@ -5,7 +5,7 @@
 // are not real facts, they are a presentation of the three raw ones), so
 // this is their new home. CLAUDE.md: no hardcoded UI copy lives on the
 // backend, so this mapping belongs here, not in a service file.
-import { formatHos, formatPlace } from './format'
+import { formatHos, formatPlace } from './format.js'
 
 // A driver actively driving with under an hour of HOS left needs to
 // surface as an HOS-limit warning before anything else, same priority the
@@ -13,12 +13,22 @@ import { formatHos, formatPlace } from './format'
 // left → "HOS limit", not "On route").
 const HOS_WARNING_THRESHOLD_MIN = 60
 
+// The ONE place name every driver screen shows: the server's whereNow
+// (open event stop, the run, the parked city, then home base). Home base
+// is only the fallback for a payload that lacks it.
+export function driverPlace(driver) {
+  const here = driver?.whereNow
+  if (here?.city) return formatPlace(here.city, here.state)
+  return formatPlace(driver?.homeBaseCity, driver?.homeBaseState)
+}
+
 export function getDriverStatus(driver) {
   if (!driver) {
     return { state: 'off', status: 'Off duty', meta: '', hos: '—', hosLabel: 'off duty' }
   }
 
   const home = formatPlace(driver.homeBaseCity, driver.homeBaseState)
+  const here = driverPlace(driver)
   const dest = driver.currentLoad
     ? formatPlace(driver.currentLoad.destinationCity, driver.currentLoad.destinationState)
     : null
@@ -34,15 +44,15 @@ export function getDriverStatus(driver) {
   } else if (driver.dutyStatus === 'driving') {
     state = 'on'
     status = 'On route'
-    meta = driver.currentLocation ? `Driving — ${driver.currentLocation}` : dest ? `Driving — approaching ${dest}` : 'Driving'
+    meta = driver.whereNow?.city ? `Driving — near ${here}` : dest ? `Driving — approaching ${dest}` : 'Driving'
   } else if (driver.dutyStatus === 'on-duty') {
     state = 'on'
     status = 'Available'
-    meta = `Available — ${home} yard`
+    meta = `Available — ${here}`
   } else if (driver.dutyStatus === 'resting') {
     state = 'off'
     status = 'Off duty'
-    meta = driver.currentLocation ? `Off duty — ${driver.currentLocation}` : `Off duty — ${home}`
+    meta = `Off duty — ${here}`
   } else {
     state = 'off'
     status = 'Home'

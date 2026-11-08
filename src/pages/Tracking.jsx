@@ -34,8 +34,8 @@ import './Tracking.css'
 // The board answers three questions per load: where is it (the map dot),
 // how far along (the bar), and is it late (the badge). All three come from
 // the same computed position server-side, so they cannot disagree. Polling
-// every 10s moves dots smoothly -- the clock compresses a sim day into two
-// real minutes, so a poll much slower than that reads as a frozen board.
+// every 10s moves dots smoothly -- the company clock compresses a day into thirty
+// real minutes (two, until 2026-11-08); a poll of seconds still reads smooth.
 
 const POLL_MS = 10000
 

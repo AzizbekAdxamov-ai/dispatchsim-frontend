@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { motion } from 'framer-motion'
 import { listPostings, listCities } from '../api/loadBoard'
 import { useResource } from '../hooks/useResource'
 import { EQUIPMENT_TYPES } from '../data/equipmentTypes'
@@ -6,11 +7,17 @@ import { rateQuote, RATE_LABELS } from '../utils/rateQuote'
 import { formatMoney, formatWeight, formatRatePerMile } from '../utils/format'
 import SearchBar, { DEFAULT_RADIUS_MI } from '../components/loadboard/SearchBar'
 import { toFilters } from '../components/loadboard/searchQuery'
+import { PAGE_SIZE, MAX_PAGE_LIMIT, boardCountLabel, nextView, boardPager } from '../components/loadboard/boardCount'
 import RowDetail from '../components/loadboard/RowDetail'
 import './PageHeader.css'
 import './LoadBoard.css'
 
-const PAGE_SIZE = 50
+// The words under the table; a prop so the page carries no copy of its own.
+export const BOARD_COPY = {
+  showMore: 'Show more',
+  previous: 'Previous',
+  rows: (from, to) => `Rows ${from.toLocaleString('en-US')}–${to.toLocaleString('en-US')}`,
+}
 
 const SORTS = [
   { key: 'rate', label: 'Rate – highest' },
@@ -83,12 +90,14 @@ function saveDraft(draft) {
   try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(draft)) } catch { /* private window */ }
 }
 
-export default function LoadBoard({ rateLabels = RATE_LABELS }) {
+export default function LoadBoard({ rateLabels = RATE_LABELS, boardCopy = BOARD_COPY }) {
   const [draft, setDraft] = useState(loadDraft)
   // What was actually asked for. Separate from the draft on purpose: the
   // board answers a question that was finished, not one being typed.
   const [filters, setFilters] = useState(() => toFilters(loadDraft()))
   const [openId, setOpenId] = useState(null)
+  // How much of the answer is on screen: starts at one page and grows.
+  const [view, setView] = useState({ limit: PAGE_SIZE, page: 1 })
   const [cities, setCities] = useState([])
 
   useEffect(() => {
@@ -103,25 +112,27 @@ export default function LoadBoard({ rateLabels = RATE_LABELS }) {
   const filterKey = useMemo(() => JSON.stringify(filters), [filters])
 
   const fetchPostings = useCallback(
-    async (signal) => listPostings({ ...filters, limit: PAGE_SIZE }, signal),
+    async (signal) => listPostings({ ...filters, limit: view.limit, page: view.page }, signal),
     // eslint-disable-next-line react-hooks/exhaustive-deps -- filterKey is the value of filters
-    [filterKey],
+    [filterKey, view.limit, view.page],
   )
 
   // Polled, because postings drip on and expire underneath the board with
   // nothing the dispatcher clicked to cause it. `loading` stays false
   // during a poll, so the list does not flash.
-  const { data, error, loading } = useResource(fetchPostings, [filterKey], { pollMs: 30000 })
+  const { data, error, loading } = useResource(fetchPostings, [filterKey, view.limit, view.page], { pollMs: 30000 })
 
   function runSearch(next = draft) {
     setDraft(next)
     saveDraft(next)
     setFilters(toFilters(next))
+    setView({ limit: PAGE_SIZE, page: 1 })
     setOpenId(null)
   }
 
   const postings = data?.postings ?? []
   const meta = data?.meta
+  const pager = boardPager({ limit: view.limit, page: view.page, total: meta?.total, shown: postings.length })
   const from = meta?.deadheadFrom
   const to = meta?.deadheadTo
 
@@ -144,7 +155,7 @@ export default function LoadBoard({ rateLabels = RATE_LABELS }) {
       <div className="lbh">
         <div className="lbh-counts">
           <span className="lbh-total">
-            {loading && !data ? '…' : `${(meta?.total ?? 0).toLocaleString('en-US')} results`}
+            {loading && !data ? '…' : boardCountLabel({ shown: postings.length, total: meta?.total ?? 0 })}
           </span>
           {/* The second number is what the same search finds with the
               circle widened. Stated, never acted on: the board does not
@@ -264,6 +275,29 @@ export default function LoadBoard({ rateLabels = RATE_LABELS }) {
           </tbody>
         </table>
       </div>
+
+      {data && (pager.hasMore || pager.hasPrev) && (
+        <motion.div
+          className="lbf"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.18, ease: 'easeOut' }}
+        >
+          {view.limit >= MAX_PAGE_LIMIT && (
+            <span className="lbf-range mono">{boardCopy.rows(pager.from, pager.to)}</span>
+          )}
+          {pager.hasPrev && (
+            <button type="button" className="lbf-btn" onClick={() => setView((v) => ({ ...v, page: v.page - 1 }))}>
+              {boardCopy.previous}
+            </button>
+          )}
+          {pager.hasMore && (
+            <button type="button" className="lbf-btn" onClick={() => setView(nextView)}>
+              {boardCopy.showMore}
+            </button>
+          )}
+        </motion.div>
+      )}
     </>
   )
 }

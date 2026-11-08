@@ -10,6 +10,7 @@ import '../components/dashboard/LoadBoard.css'
 import './PageHeader.css'
 import './DriverHos.css'
 import './DriverQualification.css'
+import { COMPANY_DAY_PHRASE } from '../data/companyClock.js'
 
 // Compliance > Driver Qualification. The carrier's paperwork duty -- 49
 // CFR 391 Subpart E -- read as one row per driver with each document's
@@ -158,7 +159,7 @@ export default function DriverQualification() {
         Document states are re-read against the company calendar every time this page loads —
         a certificate that was valid when seeded ages into its renewal window as sessions pass.
         CDL 49 CFR 383 · Medical 391.43 · MVR 391.25 · Drug &amp; alcohol 382. Day counts are
-        company days: one day every two minutes.
+        company days: {COMPANY_DAY_PHRASE}.
       </div>
     </>
   )

@@ -5,6 +5,7 @@ import { formatMoney } from '../utils/format'
 import '../components/dashboard/Panel.css'
 import './PageHeader.css'
 import './DispatchBoard.css'
+import { COMPANY_DAY_PHRASE } from '../data/companyClock.js'
 
 // Dispatch > Board. The workflow the dispatch module IS, as four columns:
 // what can move, what is paired but not yet rolling (the ELD's own
@@ -127,8 +128,7 @@ export default function DispatchBoard() {
 
       <div className="hos-footnote">
         Assigned is the ELD's own window: dispatched, but the driver's log has no driving minute
-        yet — owed rest at the origin lives here. Times run on the company calendar, one day
-        every two minutes.
+        yet — owed rest at the origin lives here. Times run on the company calendar, {COMPANY_DAY_PHRASE}.
       </div>
     </>
   )

@@ -5,7 +5,7 @@ import { getDriver } from '../api/drivers'
 import AssignTruckPanel from '../components/drivers/AssignTruckPanel'
 import { driverRequests } from '../components/drivers/driverRequests'
 import { useResource } from '../hooks/useResource'
-import { getDriverStatus } from '../utils/driverStatus'
+import { getDriverStatus, driverPlace } from '../utils/driverStatus'
 import { formatCdl, formatPlace, formatUnit, formatMiles, formatMonthYear, formatMoney, formatEta } from '../utils/format'
 import '../components/dashboard/Panel.css'
 import './DriverDetail.css'
@@ -111,7 +111,7 @@ export default function DriverDetail() {
                 {status.status}
               </span>
             </div>
-            <div className="driver-detail-sub">{formatCdl(driver.cdlClass, driver.cdlNumber)} &nbsp;·&nbsp; {formatUnit(driver.truck)} &nbsp;·&nbsp; {formatPlace(driver.homeBaseCity, driver.homeBaseState)}{driver.telegram ? ' · Answers on Telegram' : ''}</div>
+            <div className="driver-detail-sub">{formatCdl(driver.cdlClass, driver.cdlNumber)} &nbsp;·&nbsp; {formatUnit(driver.truck)} &nbsp;·&nbsp; {driverPlace(driver)}{driver.telegram ? ' · Answers on Telegram' : ''}</div>
           </div>
         </div>
         <div className="driver-detail-actions">
@@ -146,7 +146,7 @@ export default function DriverDetail() {
                 </div>
                 <div><div className="dd-detail-label">Total miles</div><div className="dd-detail-value mono">{formatMiles(driver.totalMiles)}</div></div>
                 <div><div className="dd-detail-label">Safety rating</div><div className="dd-detail-value mono">{driver.safetyRating} / 100</div></div>
-                <div><div className="dd-detail-label">Now in</div><div className="dd-detail-value">{formatPlace(driver.currentCity, driver.currentState)}</div></div>
+                <div><div className="dd-detail-label">Now in</div><div className="dd-detail-value">{driverPlace(driver)}</div></div>
                 <div><div className="dd-detail-label">Pay plan</div><div className="dd-detail-value">{formatPayPlan(driver)}</div></div>
                 <div><div className="dd-detail-label">Odometer</div><div className="dd-detail-value mono">{driver.truck?.odometerMi != null ? formatMiles(driver.truck.odometerMi) : '—'}</div></div>
                 <div><div className="dd-detail-label">Fuel</div><div className="dd-detail-value mono">{driver.truck?.fuelPercent != null ? `${driver.truck.fuelPercent}%` : '—'}</div></div>

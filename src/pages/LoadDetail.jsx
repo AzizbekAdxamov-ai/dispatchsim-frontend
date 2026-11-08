@@ -7,10 +7,14 @@ import { STATUS_LABEL } from '../data/mockData'
 import { EQUIPMENT_TYPES, formatEquipment } from '../data/equipmentTypes'
 import { useTheme } from '../theme/ThemeProvider'
 import { getLoad, cancelDispatch } from '../api/loads'
+import { cancelBookingForLoad } from '../api/brokerChat'
 import { downloadBol, downloadPod } from '../api/documents'
 import { ApiError } from '../api/client'
 import DispatchPanel from '../components/loads/DispatchPanel'
 import RoadEventPanel from '../components/loads/RoadEventPanel'
+import TakeBackActions, { TAKE_BACK_COPY } from '../components/loads/TakeBackActions'
+import { takeBackOptions } from '../components/loads/takeBackOptions'
+import { takeBackErrorText } from '../components/loads/takeBackConfirm'
 import { liveTrackingLines } from '../components/loads/liveTrackingLines'
 import { factText } from '../components/loads/factText'
 import { useResource } from '../hooks/useResource'
@@ -51,7 +55,13 @@ function initials(name) {
     .slice(0, 2)
 }
 
-export default function LoadDetail({ rateLabels = RATE_LABELS }) {
+// Copy for the broker chat panel, overridable by props like the rate labels.
+const BROKER_CHAT_COPY = Object.freeze({
+  open: 'Message the broker',
+  none: 'No broker conversation for this load.',
+})
+
+export default function LoadDetail({ rateLabels = RATE_LABELS, brokerChatCopy = BROKER_CHAT_COPY, takeBackCopy = TAKE_BACK_COPY }) {
   const { id } = useParams()
   const navigate = useNavigate()
   const pageRef = useRef(null)
@@ -62,7 +72,8 @@ export default function LoadDetail({ rateLabels = RATE_LABELS }) {
   // until the user reloaded.
   // Undoing a dispatch. A load sent to the wrong driver used to have no
   // way back — 'ontime' led only to the tick, and the tick only to 'done'.
-  const [cancelling, setCancelling] = useState(false)
+  // Which of the two take-back actions is running: 'unassign' | 'cancel' | null.
+  const [takeBackBusy, setTakeBackBusy] = useState(null)
   const [cancelError, setCancelError] = useState('')
 
   // BOL/POD downloads used to fire and forget -- a network blip or a 409
@@ -136,24 +147,26 @@ export default function LoadDetail({ rateLabels = RATE_LABELS }) {
       ? `Driver has ${formatHos(load.driver.hosRemainingMin)} left before mandatory rest`
       : null
 
-  async function handleCancel() {
-    if (cancelling) return
+  // Two different actions: unassign the driver (the load stays booked) and
+  // cancel the booking (the broker is told, the load is cancelled).
+  async function runTakeBack(kind, action, fallback) {
+    if (takeBackBusy) return
     setCancelError('')
-    setCancelling(true)
+    setTakeBackBusy(kind)
     try {
-      await cancelDispatch(id)
+      await action()
       refetch()
     } catch (err) {
       if (err?.name === 'AbortError') return
-      setCancelError(
-        err instanceof ApiError && err.code === 'LOAD_NOT_CANCELLABLE'
-          ? 'This load has already been delivered.'
-          : err?.message || 'Could not take the load back.',
-      )
+      setCancelError(takeBackErrorText({
+        kind, code: err instanceof ApiError ? err.code : null, message: err?.message || fallback, copy: takeBackCopy,
+      }))
     } finally {
-      setCancelling(false)
+      setTakeBackBusy(null)
     }
   }
+  const handleUnassign = () => runTakeBack('unassign', () => cancelDispatch(id), takeBackCopy.unassignError)
+  const handleCancelBooking = () => runTakeBack('cancel', () => cancelBookingForLoad(id), takeBackCopy.cancelError)
 
   return (
     <div ref={pageRef}>
@@ -323,9 +336,13 @@ export default function LoadDetail({ rateLabels = RATE_LABELS }) {
 
           <div className="panel">
             <div className="panel-head"><div className="panel-title">Broker chat</div></div>
-            {/* Broker messaging is out of scope this round — see BrokerChat.jsx,
-                which is not touched in this pass. */}
-            <div className="ld-driver-empty">No messages yet.</div>
+            {load.brokerThreadAvailable ? (
+              <Link className="ld-broker-link" to={`/broker-chat?load=${encodeURIComponent(load.id)}`}>
+                {brokerChatCopy.open}
+              </Link>
+            ) : (
+              <div className="ld-driver-empty">{brokerChatCopy.none}</div>
+            )}
           </div>
         </div>
 
@@ -366,17 +383,14 @@ export default function LoadDetail({ rateLabels = RATE_LABELS }) {
                     <Link to={'/drivers/' + load.driver.id} className="row-primary-link">{load.driver.name}</Link>
                   </div>
                   <div className="ld-driver-meta">{formatCdl(load.driver.cdlClass, load.driver.cdlNumber)} · {formatHos(load.driver.hosRemainingMin)} HOS</div>
-                  {load.status !== 'done' && (
-                    <button
-                      type="button"
-                      className="ld-cancel-btn"
-                      disabled={cancelling}
-                      onClick={handleCancel}
-                    >
-                      {cancelling ? 'Cancelling…' : 'Take load back'}
-                    </button>
-                  )}
-                  {cancelError && <div className="ld-cancel-error" role="alert">{cancelError}</div>}
+                  <TakeBackActions
+                    options={takeBackOptions(load)}
+                    busy={takeBackBusy}
+                    error={cancelError}
+                    onUnassign={handleUnassign}
+                    onCancelBooking={handleCancelBooking}
+                    copy={takeBackCopy}
+                  />
                 </div>
                 {/* Call and Message are gone: neither had a handler, and a
                     control that looks live and does nothing is worse than
@@ -390,12 +404,21 @@ export default function LoadDetail({ rateLabels = RATE_LABELS }) {
                  Only drivers who have a truck can be picked — hiring and
                  buying are two separate decisions, and the empty list is
                  what says so. */
-              <DispatchPanel load={load} onDispatched={refetch} />
+              <>
+                <DispatchPanel load={load} onDispatched={refetch} />
+                <TakeBackActions
+                  options={takeBackOptions(load)}
+                  busy={takeBackBusy}
+                  error={cancelError}
+                  onCancelBooking={handleCancelBooking}
+                  copy={takeBackCopy}
+                />
+              </>
             ) : load.status === 'cancelled' ? (
               /* The broker withdrew the agreement before anyone was put on
                  it, so "no driver assigned yet" would promise a dispatch
                  that can no longer happen. */
-              <div className="ld-driver-empty">This load was cancelled. No driver was assigned.</div>
+              <div className="ld-driver-empty">{takeBackCopy.cancelledNote}</div>
             ) : (
               <div className="ld-driver-empty">No driver assigned yet.</div>
             )}
