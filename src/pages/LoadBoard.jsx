@@ -7,7 +7,7 @@ import { rateQuote, RATE_LABELS } from '../utils/rateQuote'
 import { formatMoney, formatWeight, formatRatePerMile } from '../utils/format'
 import SearchBar, { DEFAULT_RADIUS_MI } from '../components/loadboard/SearchBar'
 import { toFilters } from '../components/loadboard/searchQuery'
-import { PAGE_SIZE, MAX_PAGE_LIMIT, boardCountLabel, nextView, boardPager } from '../components/loadboard/boardCount'
+import { PAGE_SIZE, MAX_PAGE_LIMIT, boardCountLabel, radiusNote, nextView, boardPager } from '../components/loadboard/boardCount'
 import RowDetail from '../components/loadboard/RowDetail'
 import './PageHeader.css'
 import './LoadBoard.css'
@@ -132,6 +132,7 @@ export default function LoadBoard({ rateLabels = RATE_LABELS, boardCopy = BOARD_
 
   const postings = data?.postings ?? []
   const meta = data?.meta
+  const note = radiusNote(meta)
   const pager = boardPager({ limit: view.limit, page: view.page, total: meta?.total, shown: postings.length })
   const from = meta?.deadheadFrom
   const to = meta?.deadheadTo
@@ -160,11 +161,12 @@ export default function LoadBoard({ rateLabels = RATE_LABELS, boardCopy = BOARD_
           {/* The second number is what the same search finds with the
               circle widened. Stated, never acted on: the board does not
               widen anything by itself. */}
-          {meta?.nearby > 0 && (
+          {note.nearbyLabel && (
             <span className="lbh-nearby" title="Matching everything else, outside the DH-O / DH-D radius">
-              +{meta.nearby.toLocaleString('en-US')} outside the radius
+              {note.nearbyLabel}
             </span>
           )}
+          {note.noReference && postings.length > 0 && <span className="lbh-nearby">{note.emptyNote}</span>}
         </div>
 
         <label className="lbh-sort">
@@ -218,7 +220,7 @@ export default function LoadBoard({ rateLabels = RATE_LABELS, boardCopy = BOARD_
               <tr>
                 <td colSpan={14} className="lbt-empty">
                   Nothing matches this search.
-                  {meta?.nearby > 0 && ` ${meta.nearby.toLocaleString('en-US')} postings match everything except the radius.`}
+                  {note.emptyNote && ` ${note.emptyNote}`}
                 </td>
               </tr>
             )}

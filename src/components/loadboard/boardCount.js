@@ -38,3 +38,24 @@ export function boardPager({ limit, page, total, shown }) {
     hasPrev: page > 1,
   }
 }
+
+export const NO_REFERENCE_MESSAGE = 'Add a driver or type an origin city to measure deadhead.'
+
+// What the board says about the radius. With no reference point (no driver
+// with a position, no origin typed) nothing can be "outside the radius", so
+// the answer is the instruction instead. Returns { noReference, nearbyLabel,
+// emptyNote } -- empty strings when there is nothing to say.
+export function radiusNote(meta) {
+  if (meta?.deadheadFrom?.kind === 'none') {
+    return { noReference: true, nearbyLabel: '', emptyNote: NO_REFERENCE_MESSAGE }
+  }
+  const n = meta?.nearby ?? 0
+  if (n > 0) {
+    return {
+      noReference: false,
+      nearbyLabel: `+${fmt(n)} outside the radius`,
+      emptyNote: `${fmt(n)} postings match everything except the radius.`,
+    }
+  }
+  return { noReference: false, nearbyLabel: '', emptyNote: '' }
+}
