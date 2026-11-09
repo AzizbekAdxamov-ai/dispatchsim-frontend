@@ -15,6 +15,7 @@ import {
 } from '../../utils/format'
 import { rateQuote, RATE_LABELS } from '../../utils/rateQuote'
 import { marketLines } from './marketLines'
+import { nearestDriverNote, NEAREST_DRIVER_COPY } from './nearestDriverNote'
 import './RowDetail.css'
 
 // The row, opened.
@@ -30,7 +31,8 @@ function checkedOn(iso) {
   return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 }
 
-export default function RowDetail({ posting, deadheadFrom, deadheadTo, rateLabels = RATE_LABELS }) {
+export default function RowDetail({ posting, deadheadFrom, deadheadTo, rateLabels = RATE_LABELS, driverCopy = NEAREST_DRIVER_COPY }) {
+  const driverNote = nearestDriverNote(posting, deadheadFrom, driverCopy, EQUIPMENT_TYPES[posting.equipmentType]?.label ?? posting.equipmentType)
   // The dispatcher's own lookup journal. Matched by MC number rather than
   // fetched per posting, because it is small and this way the panel needs
   // no new endpoint. A broker they have never run shows nothing at all --
@@ -184,6 +186,13 @@ export default function RowDetail({ posting, deadheadFrom, deadheadTo, rateLabel
               {posting.nearestDriverName}
               <span className="rd-sub"> · {formatDeadhead(posting.deadheadMi)} away · HOS {formatHos(posting.nearestDriverHosRemainingMin)}</span>
             </div>
+          </div>
+        )}
+
+        {driverNote && (
+          <div className="rd-driver">
+            <div className="rd-label">Nearest driver</div>
+            <div className="rd-sub">{driverNote}</div>
           </div>
         )}
 
