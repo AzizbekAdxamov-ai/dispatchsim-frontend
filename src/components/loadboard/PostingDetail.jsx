@@ -16,6 +16,7 @@ import {
   formatHos,
 } from '../../utils/format'
 import { rateQuote, RATE_LABELS } from '../../utils/rateQuote'
+import { nearestDriverNote, NEAREST_DRIVER_COPY } from './nearestDriverNote'
 import './PostingDetail.css'
 
 function formatCheckedAt(iso) {
@@ -23,7 +24,7 @@ function formatCheckedAt(iso) {
   return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 }
 
-export default function PostingDetail({ posting, onClose, rateLabels = RATE_LABELS }) {
+export default function PostingDetail({ posting, onClose, rateLabels = RATE_LABELS, driverCopy = NEAREST_DRIVER_COPY }) {
   // The dispatcher's own lookup journal. Matched by MC number rather than
   // fetched per posting, because it is small (100 rows) and this way the
   // panel needs no new endpoint. A broker they have never run shows
@@ -150,7 +151,7 @@ export default function PostingDetail({ posting, onClose, rateLabels = RATE_LABE
 
           {needsAdvisory && (
             <div className="lb-advisory">
-              <span>No available driver near this origin.</span>
+              <span>{nearestDriverNote(posting, null, driverCopy, EQUIPMENT_TYPES[posting.equipmentType]?.label ?? posting.equipmentType)}</span>
             </div>
           )}
 
