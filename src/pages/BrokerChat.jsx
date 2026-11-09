@@ -20,6 +20,7 @@ import { useResource } from '../hooks/useResource'
 import { visibleMessages, showTyping } from '../utils/chatView'
 import { formatMoney } from '../utils/format'
 import { talkSummary } from '../components/brokerChat/talkSummary'
+import { PRE_SIGN_COPY, preSignWarnings } from '../components/brokerChat/preSignWarnings.js'
 import { rateConLine } from '../components/brokerChat/rateConLine.js'
 import { canSendBrokerMessage, BOOKED_BAR_COPY } from '../components/brokerChat/sendGate.js'
 import '../components/dashboard/Panel.css'
@@ -33,11 +34,6 @@ import './BrokerChat.css'
 // Warnings ride back with the accept. They are facts about the fleet at
 // the moment the load was created, not a verdict on the decision — the
 // dispatcher has already committed; this is what they now have to solve.
-const WARNING_TEXT = {
-  'no-matching-equipment': 'No truck in the fleet is set up for this trailer type.',
-  'no-available-driver': 'No driver is free for this pickup right now.',
-  'tight-pickup-window': 'The nearest driver may not reach this pickup within their remaining hours.',
-}
 
 function actionErrorText(err) {
   const code = err instanceof ApiError ? err.code : null
@@ -347,6 +343,11 @@ export default function BrokerChat({ emailCopy = BROKER_EMAIL_COPY, bookedBarCop
                         <DownloadSimple size={14} />
                         {downloading ? 'Opening…' : 'Open the document'}
                       </button>
+                      {preSignWarnings(currentThread, convo?.status).length > 0 && (
+                        <ul className="bc-booked-warnings">
+                          {preSignWarnings(currentThread, convo?.status).map((line) => <li key={line}>{line}</li>)}
+                        </ul>
+                      )}
                       {convo?.status === 'agreed' && (
                         <button
                           type="button"
@@ -395,7 +396,7 @@ export default function BrokerChat({ emailCopy = BROKER_EMAIL_COPY, bookedBarCop
               {acceptWarnings.length > 0 && convo?.status === 'booked' && (
                 <ul className="bc-booked-warnings">
                   {acceptWarnings.map((w, i) => (
-                    <li key={i}>{WARNING_TEXT[w] || w}</li>
+                    <li key={i}>{PRE_SIGN_COPY[w] || w}</li>
                   ))}
                 </ul>
               )}
