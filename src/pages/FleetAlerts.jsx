@@ -12,7 +12,7 @@ import AlertsBoard from '../components/alerts/AlertsBoard'
 //
 // So the page shows the fleet conditions the data can actually answer, and
 // says which ones it cannot.
-const FLEET_FAMILIES = ['driver.idle', 'driver.no-truck', 'listing.leaving']
+const FLEET_FAMILIES = ['driver.idle', 'driver.no-truck', 'driver.pay-overdue', 'listing.leaving']
 
 export default function FleetAlerts() {
   return (
