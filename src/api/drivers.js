@@ -23,3 +23,9 @@ export function getTruckOptions(id, signal) {
 export function assignTruck(id, truckId, signal) {
   return api.post(`/drivers/${encodeURIComponent(id)}/truck`, { truckId }, { auth: true, signal })
 }
+
+// Takes the driver off the truck; the server refuses while a load is moving
+// on it, and writes the lease owed up to now.
+export function unassignTruck(id, signal) {
+  return api.del(`/drivers/${encodeURIComponent(id)}/truck`, { auth: true, signal })
+}

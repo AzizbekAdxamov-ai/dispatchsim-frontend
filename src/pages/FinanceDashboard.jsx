@@ -6,6 +6,7 @@ import CashFlowChart from '../components/finance/CashFlowChart'
 import DsoGauge from '../components/finance/DsoGauge'
 import ArAgingChart from '../components/finance/ArAgingChart'
 import LoadProfitTable from '../components/finance/LoadProfitTable'
+import TruckLeaseTable from '../components/finance/TruckLeaseTable'
 import { getOverview, listInvoices, listSettlements } from '../api/finance'
 import { useResource } from '../hooks/useResource'
 import { formatMoney } from '../utils/format'
@@ -125,6 +126,7 @@ export default function FinanceDashboard() {
 
       <div className="finance-profit-section">
         <LoadProfitTable loads={overview.loadProfitability} />
+        <TruckLeaseTable rows={overview.truckLease ?? []} />
       </div>
     </>
   )

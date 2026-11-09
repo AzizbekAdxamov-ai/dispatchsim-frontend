@@ -21,6 +21,7 @@ const KIND_LABEL = {
   settlement: 'Driver settlement',
   insurance: 'Insurance',
   interest: 'Credit line interest',
+  truck_lease: 'Truck lease',
   adjustment: 'Adjustment',
 }
 
