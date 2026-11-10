@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { GasPump, Wrench, ShieldCheck, RoadHorizon, Receipt } from '@phosphor-icons/react'
+import { GasPump, Wrench, ShieldCheck, RoadHorizon, Receipt, Truck } from '@phosphor-icons/react'
 import { EXPENSE_CATEGORIES } from '../data/financeData'
 import { listExpenses, getOverview } from '../api/finance'
 import { useResource } from '../hooks/useResource'
@@ -13,6 +13,7 @@ const CATEGORY_ICON = {
   fuel: GasPump,
   maintenance: Wrench,
   insurance: ShieldCheck,
+  truck_lease: Truck,
   tolls: RoadHorizon,
   other: Receipt,
 }

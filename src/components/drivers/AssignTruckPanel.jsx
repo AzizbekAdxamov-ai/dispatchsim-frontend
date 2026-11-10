@@ -2,7 +2,9 @@ import { useState, useCallback } from 'react'
 import { getTruckOptions, assignTruck } from '../../api/drivers'
 import { ApiError } from '../../api/client'
 import { useResource } from '../../hooks/useResource'
-import { truckOptionLabel, assignErrorText } from './truckOptions'
+import { EQUIPMENT_TYPES } from '../../data/equipmentTypes'
+import { truckOptionLabel, assignErrorText, leaseNoteFor } from './truckOptions'
+import { ASSIGN_TRUCK_COPY } from './assignTruckCopy'
 import './AssignTruckPanel.css'
 
 // Putting a driver in a truck from the DRIVER's page -- the dispatcher's
@@ -13,7 +15,9 @@ import './AssignTruckPanel.css'
 // Shown only while the driver has no truck. A driver in a truck sees the
 // truck, not this.
 
-export default function AssignTruckPanel({ driverId, onAssigned }) {
+const equipmentLabel = (key) => EQUIPMENT_TYPES[key]?.label ?? key
+
+export default function AssignTruckPanel({ driverId, onAssigned, copy = ASSIGN_TRUCK_COPY }) {
   const [open, setOpen] = useState(false)
   const [truckId, setTruckId] = useState('')
   const [busy, setBusy] = useState(false)
@@ -26,6 +30,7 @@ export default function AssignTruckPanel({ driverId, onAssigned }) {
   const { data, loading, error: loadError } = useResource(fetchOptions, [driverId, open])
   const trucks = data?.trucks ?? []
   const assignable = trucks.filter((t) => t.assignable)
+  const leaseNote = leaseNoteFor(trucks.find((t) => t.id === truckId), copy)
 
   async function handleAssign() {
     if (!truckId || busy) return
@@ -47,35 +52,36 @@ export default function AssignTruckPanel({ driverId, onAssigned }) {
     return (
       <span className="atp-inline">
         <span>—</span>
-        <button type="button" className="atp-link" onClick={() => setOpen(true)}>Assign truck</button>
+        <button type="button" className="atp-link" onClick={() => setOpen(true)}>{copy.assign}</button>
       </span>
     )
   }
 
-  if (loading) return <div className="atp-note">Loading trucks…</div>
+  if (loading) return <div className="atp-note">{copy.loading}</div>
   // Loud, not silent: a list that failed to load is not an empty fleet.
-  if (loadError) return <div className="atp-error" role="alert">Trucks could not load — {loadError.message}</div>
+  if (loadError) return <div className="atp-error" role="alert">{copy.loadFailed} — {loadError.message}</div>
 
   if (trucks.length === 0) {
-    return <div className="atp-note">Every truck in the fleet already has a driver.</div>
+    return <div className="atp-note">{copy.fleetFull}</div>
   }
 
   return (
     <div className="atp-body">
       <select className="atp-select" value={truckId} onChange={(e) => setTruckId(e.target.value)}>
-        <option value="">{assignable.length > 0 ? 'Choose a truck…' : 'No truck can be assigned right now'}</option>
+        <option value="">{assignable.length > 0 ? copy.choose : copy.noneAssignable}</option>
         {trucks.map((t) => (
           <option key={t.id} value={t.id} disabled={!t.assignable}>
-            {truckOptionLabel(t)}{t.assignable ? '' : ` — ${t.reason}`}
+            {truckOptionLabel(t, equipmentLabel)}{t.assignable ? '' : ` — ${t.reason}`}
           </option>
         ))}
       </select>
+      {leaseNote && <div className="atp-note atp-lease">{leaseNote}</div>}
       <div className="atp-actions">
         <button type="button" className="atp-btn" disabled={busy || !truckId} onClick={handleAssign}>
-          {busy ? 'Assigning…' : 'Assign'}
+          {busy ? copy.confirming : copy.confirm}
         </button>
         <button type="button" className="atp-link" disabled={busy} onClick={() => { setOpen(false); setError('') }}>
-          Cancel
+          {copy.cancel}
         </button>
       </div>
       {error && <div className="atp-error" role="alert">{error}</div>}

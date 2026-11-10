@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Phone, Envelope } from '@phosphor-icons/react'
 import { getDriver } from '../api/drivers'
 import AssignTruckPanel from '../components/drivers/AssignTruckPanel'
+import UnassignTruckButton from '../components/drivers/UnassignTruckButton'
 import { driverRequests } from '../components/drivers/driverRequests'
 import { useResource } from '../hooks/useResource'
 import { getDriverStatus, driverPlace } from '../utils/driverStatus'
@@ -141,7 +142,7 @@ export default function DriverDetail() {
                     {/* No truck: the dispatcher can put this driver in one
                         from here -- the same assignment fleet makes from the
                         truck's side (AssignTruckPanel). */}
-                    {driver.truck ? formatUnit(driver.truck) : <AssignTruckPanel driverId={driver.id} onAssigned={refetch} />}
+                    {driver.truck ? <>{formatUnit(driver.truck)} <UnassignTruckButton driverId={driver.id} onDone={refetch} /></> : <AssignTruckPanel driverId={driver.id} onAssigned={refetch} />}
                   </div>
                 </div>
                 <div><div className="dd-detail-label">Total miles</div><div className="dd-detail-value mono">{formatMiles(driver.totalMiles)}</div></div>

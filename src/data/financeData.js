@@ -21,6 +21,7 @@ export const EXPENSE_CATEGORIES = {
   fuel: { label: 'Fuel', tone: 'amber' },
   maintenance: { label: 'Maintenance', tone: 'blue' },
   insurance: { label: 'Insurance', tone: 'green' },
+  truck_lease: { label: 'Truck lease', tone: 'blue' },
   tolls: { label: 'Tolls & permits', tone: 'accent' },
   other: { label: 'Other', tone: 'text-2' },
 }
