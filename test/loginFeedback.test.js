@@ -45,3 +45,11 @@ test('cooldown is bounded and uses an unambiguous countdown', () => {
   assert.equal(cooldownSeconds({ retryAfterSeconds: 9999 }), 900)
   assert.equal(LOGIN_FEEDBACK.cooldown(65), 'Too many attempts. Try again in 1:05.')
 })
+
+test('a closed registration says what to do, in the server\'s words', () => {
+  // Kills: dropping the INVITE_REQUIRED line (page falls back to "Something went wrong").
+  assert.equal(
+    LOGIN_FEEDBACK.inviteRequired,
+    'Registration requires an invite code. Ask your administrator for an invite link.',
+  )
+})
