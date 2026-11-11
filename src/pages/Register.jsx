@@ -15,6 +15,7 @@ function registerErrorMessage(err) {
     if (err.code === 'INVITE_INVALID') {
       return LOGIN_FEEDBACK.inviteInvalid
     }
+    if (err.code === 'INVITE_REQUIRED') return LOGIN_FEEDBACK.inviteRequired
     if (err.code === 'RATE_LIMITED') return LOGIN_FEEDBACK.limited
     if (err.code === 'NETWORK_ERROR') return LOGIN_FEEDBACK.network
   }

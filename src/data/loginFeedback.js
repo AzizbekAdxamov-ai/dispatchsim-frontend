@@ -6,6 +6,7 @@ export const LOGIN_FEEDBACK = {
   emailTaken: 'This email is already registered',
   passwordShort: 'Password must be at least 8 characters',
   inviteInvalid: 'This invite link is no longer valid — ask your instructor for a new one, or continue without it.',
+  inviteRequired: 'Registration requires an invite code. Ask your administrator for an invite link.',
   signingIn: 'Signing in…',
   signIn: 'Sign in',
   cooldown: seconds => `Too many attempts. Try again in ${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}.`,
