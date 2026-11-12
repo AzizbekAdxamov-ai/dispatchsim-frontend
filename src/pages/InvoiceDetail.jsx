@@ -3,9 +3,12 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { DownloadSimple, PaperPlaneTilt } from '@phosphor-icons/react'
 import { INVOICE_STATUS_LABEL, PAYMENT_TERMS } from '../data/financeData'
 import { EQUIPMENT_TYPES } from '../data/equipmentTypes'
-import { getInvoice } from '../api/finance'
+import { getInvoice, sendInvoice, sendInvoiceReminder } from '../api/finance'
 import { downloadInvoicePdf } from '../api/documents'
 import { useResource } from '../hooks/useResource'
+import { ApiError } from '../api/client'
+import { invoiceAction } from '../utils/invoiceActions'
+import { INVOICE_ACTION_KINDS, INVOICE_ACTION_COPY } from '../data/invoiceActionCopy'
 import { formatMoney, formatDate, formatPlace, formatWeight, formatDateTime, formatDistance } from '../utils/format'
 import '../components/dashboard/Panel.css'
 import '../components/dashboard/LoadBoard.css'
@@ -40,7 +43,12 @@ export default function InvoiceDetail() {
   // network blip or a 409 used to leave this click with no visible result.
   const [downloadFailed, setDownloadFailed] = useState(false)
 
-  const { data: invoice, error, loading } = useResource((signal) => getInvoice(id, signal), [id], { pollMs: 20000 })
+  // Send / remind: one button, chosen by invoiceAction. Errors show inline, like downloadFailed.
+  const [acting, setActing] = useState(false)
+  const [actionError, setActionError] = useState('')
+  const [reminded, setReminded] = useState(false)
+
+  const { data: invoice, error, loading, refetch } = useResource((signal) => getInvoice(id, signal), [id], { pollMs: 20000 })
 
   if (loading) {
     return <div className="panel invoice-detail-missing"><p>Loading invoice…</p></div>
@@ -67,6 +75,27 @@ export default function InvoiceDetail() {
   const load = invoice.load
   const equip = load ? EQUIPMENT_TYPES[load.equipmentType] : null
   const outstanding = daysOutstanding(invoice)
+  const action = invoiceAction(invoice)
+
+  async function handleAction() {
+    if (acting || action.disabled || !action.kind) return
+    setActionError('')
+    setReminded(false)
+    setActing(true)
+    try {
+      if (action.kind === INVOICE_ACTION_KINDS.remind) {
+        await sendInvoiceReminder(invoice.id)
+        setReminded(true)
+      } else {
+        await sendInvoice(invoice.id)
+      }
+      refetch()
+    } catch (err) {
+      setActionError(err instanceof ApiError ? err.message : INVOICE_ACTION_COPY.failed)
+    } finally {
+      setActing(false)
+    }
+  }
 
   async function handleDownload() {
     if (downloading) return
@@ -110,12 +139,23 @@ export default function InvoiceDetail() {
             <DownloadSimple size={14} aria-hidden="true" />
             {downloading ? 'Preparing…' : downloadFailed ? 'Retry download' : 'Download PDF'}
           </button>
-          <button className="invoice-detail-btn primary">
-            <PaperPlaneTilt size={14} aria-hidden="true" />
-            {invoice.status === 'draft' ? 'Send invoice' : 'Send reminder'}
-          </button>
+          {action.kind && (
+            <button
+              type="button"
+              className="invoice-detail-btn primary"
+              disabled={acting || action.disabled}
+              title={action.reason}
+              onClick={handleAction}
+            >
+              <PaperPlaneTilt size={14} aria-hidden="true" />
+              {acting ? INVOICE_ACTION_COPY.busy : INVOICE_ACTION_COPY[action.kind]}
+            </button>
+          )}
         </div>
       </div>
+
+      {actionError && <div className="invoice-detail-action-note failed" role="alert">{actionError}</div>}
+      {reminded && !actionError && <div className="invoice-detail-action-note" role="status">{INVOICE_ACTION_COPY.reminded}</div>}
 
       <div className="invoice-stat-mini-row">
         <div className="invoice-stat-mini">
@@ -131,6 +171,10 @@ export default function InvoiceDetail() {
           <div className="invoice-stat-mini-value mono">
             {outstanding === null ? '—' : outstanding + ' days'}
           </div>
+        </div>
+        <div className="invoice-stat-mini">
+          <div className="invoice-stat-mini-label">{INVOICE_ACTION_COPY.sentLabel}</div>
+          <div className="invoice-stat-mini-value">{invoice.sentAt ? formatDate(invoice.sentAt) : INVOICE_ACTION_COPY.none}</div>
         </div>
         <div className="invoice-stat-mini">
           <div className="invoice-stat-mini-label">Expected payment</div>

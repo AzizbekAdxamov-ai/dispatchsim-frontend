@@ -1,6 +1,6 @@
 import { Outlet, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Truck, Wrench, Warning, FileText, Gear, Storefront, ClipboardText } from '@phosphor-icons/react'
+import { Truck, Wrench, Warning, Gear, Storefront, ClipboardText } from '@phosphor-icons/react'
 import Sidebar from './Sidebar'
 import Topbar from './Topbar'
 import LiveDataNotice from './LiveDataNotice'
@@ -12,7 +12,6 @@ const FLEET_NAV_ITEMS = [
   { to: '/fleet/maintenance', icon: Wrench, label: 'Maintenance', shortLabel: 'Service' },
   { to: '/fleet/dvir', icon: ClipboardText, label: 'DVIR' },
   { to: '/fleet/alerts', icon: Warning, label: 'Alerts' },
-  { to: '/fleet/documents', icon: FileText, label: 'Documents', shortLabel: 'Docs' },
   { to: '/fleet/settings', icon: Gear, label: 'Settings' },
 ]
 
@@ -22,7 +21,6 @@ const TITLES = {
   '/fleet/maintenance': 'Maintenance',
   '/fleet/dvir': 'DVIR',
   '/fleet/alerts': 'Alerts',
-  '/fleet/documents': 'Documents',
   '/fleet/settings': 'Settings',
 }
 
@@ -37,7 +35,7 @@ export default function FleetShell() {
     <div className="app" style={{ position: 'relative', display: 'flex', minHeight: '100vh' }}>
       <Sidebar items={FLEET_NAV_ITEMS} brandSub="Fleet" />
       <div className={'main' + (liveDataFailing ? ' has-live-notice' : '')} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-        <Topbar title={title} onPhoneClick={() => {}} />
+        <Topbar title={title} />
         <LiveDataNotice />
         <div className="content" style={{ padding: '20px 24px 60px', overflowY: 'auto' }}>
           <AnimatePresence mode="wait">

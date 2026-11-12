@@ -3,6 +3,8 @@ import { Phone, Envelope } from '@phosphor-icons/react'
 import { FLEET_STATUS_LABEL } from '../data/fleetData'
 import { getTruck } from '../api/fleet'
 import { useResource } from '../hooks/useResource'
+import { driverChatPath, contactState } from '../utils/driverContact'
+import { CONTACT_INTENT } from '../data/driverContact'
 import AssignDriverPanel from '../components/fleet/AssignDriverPanel'
 import { formatMiles, formatMonthDay, formatWeekday, formatMoney } from '../utils/format'
 import WaveFuelGauge from '../components/fleet/WaveFuelGauge'
@@ -79,6 +81,7 @@ export default function TruckDetail() {
     ? Math.round(truck.metrics.maintenanceCost.value / (maintenancePct / 100))
     : truck.metrics.maintenanceCost.value
 
+  const contact = contactState(truck.driver)
   const fuelTrendData = truck.fuelTrend.map((d) => ({ day: formatMonthDay(d.day), pct: d.fuelPct }))
   const maxDistanceMi = Math.max(0, ...truck.distanceTrend.map((d) => d.distanceMi))
   const distanceTrendData = truck.distanceTrend.map((d) => ({
@@ -109,10 +112,22 @@ export default function TruckDetail() {
           </div>
         </div>
         <div className="truck-detail-actions">
-          <button className="truck-detail-btn" disabled={!truck.driver}>
+          <button
+            type="button"
+            className="truck-detail-btn"
+            disabled={contact.disabled}
+            title={contact.reason}
+            onClick={() => navigate(driverChatPath(truck.driver.id))}
+          >
             <Envelope size={14} aria-hidden="true" /> Message driver
           </button>
-          <button className="truck-detail-btn primary" disabled={!truck.driver}>
+          <button
+            type="button"
+            className="truck-detail-btn primary"
+            disabled={contact.disabled}
+            title={contact.reason}
+            onClick={() => navigate(driverChatPath(truck.driver.id, CONTACT_INTENT.call))}
+          >
             <Phone size={14} aria-hidden="true" /> Call driver
           </button>
         </div>

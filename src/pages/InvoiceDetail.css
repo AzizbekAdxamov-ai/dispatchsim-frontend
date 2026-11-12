@@ -87,9 +87,19 @@
   border-color: var(--red);
 }
 
+.invoice-detail-action-note {
+  font-size: 12.5px;
+  color: var(--green-strong);
+  margin-bottom: 12px;
+}
+
+.invoice-detail-action-note.failed {
+  color: var(--red);
+}
+
 .invoice-stat-mini-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 12px;
   margin-bottom: 16px;
 }

@@ -7,6 +7,8 @@ import UnassignTruckButton from '../components/drivers/UnassignTruckButton'
 import { driverRequests } from '../components/drivers/driverRequests'
 import { useResource } from '../hooks/useResource'
 import { getDriverStatus, driverPlace } from '../utils/driverStatus'
+import { driverChatPath, contactState } from '../utils/driverContact'
+import { CONTACT_INTENT } from '../data/driverContact'
 import { formatCdl, formatPlace, formatUnit, formatMiles, formatMonthYear, formatMoney, formatEta } from '../utils/format'
 import '../components/dashboard/Panel.css'
 import './DriverDetail.css'
@@ -88,6 +90,7 @@ export default function DriverDetail() {
   }
 
   const status = getDriverStatus(driver)
+  const contact = contactState(driver)
   const requests = driverRequests(driver.preferences)
   const history = driver.recentLoads ?? []
   const currentLoad = driver.currentLoad
@@ -116,10 +119,22 @@ export default function DriverDetail() {
           </div>
         </div>
         <div className="driver-detail-actions">
-          <button className="driver-detail-btn">
+          <button
+            type="button"
+            className="driver-detail-btn"
+            disabled={contact.disabled}
+            title={contact.reason}
+            onClick={() => navigate(driverChatPath(driver.id, CONTACT_INTENT.call))}
+          >
             <Phone size={14} aria-hidden="true" /> Call
           </button>
-          <button className="driver-detail-btn primary">
+          <button
+            type="button"
+            className="driver-detail-btn primary"
+            disabled={contact.disabled}
+            title={contact.reason}
+            onClick={() => navigate(driverChatPath(driver.id))}
+          >
             <Envelope size={14} aria-hidden="true" /> Message
           </button>
         </div>

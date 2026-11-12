@@ -6,6 +6,8 @@ import { useAuth } from '../context/AuthContext'
 import { ROLES } from '../data/roleRoutes'
 import UserTable from '../components/admin/UserTable'
 import AccessModal from '../components/admin/AccessModal'
+import TempPasswordModal from '../components/admin/TempPasswordModal'
+import { resetUserPassword } from '../api/auth'
 import '../components/dashboard/Panel.css'
 import './PageHeader.css'
 import './AdminUsers.css'
@@ -17,6 +19,19 @@ const TABS = [
   { key: 'pending', label: 'Awaiting access' },
   { key: 'admins', label: 'Administrators' },
 ]
+
+const RESET_COPY = {
+  button: 'Reset password',
+  confirm: (user) => `Reset the password for ${user.name} (${user.email})? Their current password will stop working.`,
+  failed: 'Password reset failed.',
+  modal: {
+    title: 'Temporary password',
+    note: 'Shown once. Share it with the user directly; they will be asked to set a new one.',
+    copy: 'Copy',
+    copied: 'Copied',
+    close: 'Done',
+  },
+}
 
 function loadErrorMessage(err) {
   if (err instanceof ApiError && err.code === 'NETWORK_ERROR') return 'Cannot reach the server.'
@@ -40,6 +55,8 @@ export default function AdminUsers() {
 
   const [managingUser, setManagingUser] = useState(null)
   const [notice, setNotice] = useState('')
+  // { user, password } while the one-time temporary password is on screen; cleared on close.
+  const [issued, setIssued] = useState(null)
 
   // Bulk-assign selection. Only ever holds ids from the currently visible
   // page — cleared below whenever filter/search/page changes, so an admin
@@ -143,6 +160,18 @@ export default function AdminUsers() {
     } catch (err) {
       const msg = err instanceof ApiError ? err.message : 'Delete failed.'
       setNotice(msg)
+      setTimeout(() => setNotice(''), 6000)
+    }
+  }
+
+  async function handleResetPassword(user) {
+    if (!window.confirm(RESET_COPY.confirm(user))) return
+    try {
+      const { temporaryPassword } = await resetUserPassword(user.id)
+      setIssued({ user, password: temporaryPassword })
+    } catch (err) {
+      // The server's message is plain English (e.g. "Use Settings to change your own password").
+      setNotice(err instanceof ApiError ? err.message : RESET_COPY.failed)
       setTimeout(() => setNotice(''), 6000)
     }
   }
@@ -291,6 +320,9 @@ export default function AdminUsers() {
           users={users}
           onManage={handleManage}
           onDelete={handleDelete}
+          onResetPassword={handleResetPassword}
+          resetLabel={RESET_COPY.button}
+          currentUserId={currentUser?.id}
           selectedIds={selected}
           onToggle={toggleSelected}
           onToggleAll={toggleSelectAll}
@@ -327,6 +359,18 @@ export default function AdminUsers() {
             currentUser={currentUser}
             onClose={() => setManagingUser(null)}
             onSaved={handleSaved}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {issued && (
+          <TempPasswordModal
+            key={issued.user.id}
+            user={issued.user}
+            password={issued.password}
+            copy={RESET_COPY.modal}
+            onClose={() => setIssued(null)}
           />
         )}
       </AnimatePresence>

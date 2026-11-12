@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { MotionConfig } from 'framer-motion'
 import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -36,7 +36,6 @@ import TruckListingDetail from './pages/TruckListingDetail'
 import TruckDetail from './pages/TruckDetail'
 import FleetMaintenance from './pages/FleetMaintenance'
 import FleetAlerts from './pages/FleetAlerts'
-import FleetDocuments from './pages/FleetDocuments'
 import FleetSettings from './pages/FleetSettings'
 import Pending from './pages/Pending'
 import AdminShell from './components/layout/AdminShell'
@@ -111,7 +110,7 @@ export default function App() {
             <Route path="maintenance" element={<FleetMaintenance />} />
             <Route path="dvir" element={<FleetDvir />} />
             <Route path="alerts" element={<FleetAlerts />} />
-            <Route path="documents" element={<FleetDocuments />} />
+            <Route path="documents" element={<Navigate to="/fleet" replace />} />
             <Route path="settings" element={<FleetSettings />} />
           </Route>
           <Route

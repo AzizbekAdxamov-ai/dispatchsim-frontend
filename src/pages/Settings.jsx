@@ -1,10 +1,10 @@
-import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../theme/ThemeProvider'
 import { roleLabel, sortRoles } from '../data/roleRoutes'
-import Toggle from '../components/Toggle'
 import CarrierPanel from '../components/settings/CarrierPanel'
+import ChangePasswordPanel from '../components/settings/ChangePasswordPanel'
+import { PASSWORD_COPY } from '../data/passwordCopy'
 import '../components/dashboard/Panel.css'
 import '../components/dashboard/LoadBoard.css'
 import './PageHeader.css'
@@ -29,13 +29,6 @@ export default function Settings({ emailCopy = SETTINGS_EMAIL_COPY }) {
 
   const name = user?.name ?? ''
   const company = user?.company ?? ''
-
-  const [notif, setNotif] = useState({
-    email: true,
-    sms: false,
-    push: true,
-    brokerMessages: true,
-  })
 
   function handleLogout() {
     logout()
@@ -96,22 +89,7 @@ export default function Settings({ emailCopy = SETTINGS_EMAIL_COPY }) {
 
           <CarrierPanel isAdmin={Boolean(user?.isAdmin)} />
 
-          <div className="panel">
-            <div className="panel-head"><div className="panel-title">Password</div></div>
-            <div className="settings-body">
-              <div className="settings-field">
-                <label htmlFor="settings-current-pw">Current password</label>
-                <input id="settings-current-pw" type="password" placeholder="••••••••" />
-              </div>
-              <div className="settings-field">
-                <label htmlFor="settings-new-pw">New password</label>
-                <input id="settings-new-pw" type="password" placeholder="••••••••" />
-              </div>
-              <div className="settings-save-row">
-                <button type="button" className="settings-save-btn">Update password</button>
-              </div>
-            </div>
-          </div>
+          <ChangePasswordPanel idPrefix="settings" copy={PASSWORD_COPY} />
         </div>
 
         <div>
@@ -127,40 +105,6 @@ export default function Settings({ emailCopy = SETTINGS_EMAIL_COPY }) {
                   <button className={theme === 'dark' ? 'active' : ''} onClick={() => setTheme('dark')}>Dark</button>
                   <button className={theme === 'light' ? 'active' : ''} onClick={() => setTheme('light')}>Light</button>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="panel">
-            <div className="panel-head"><div className="panel-title">Notifications</div></div>
-            <div className="settings-body">
-              <div className="settings-row">
-                <div>
-                  <div className="settings-row-label">Email alerts</div>
-                  <div className="settings-row-desc">Delay, HOS and document alerts by email</div>
-                </div>
-                <Toggle checked={notif.email} onChange={(v) => setNotif((n) => ({ ...n, email: v }))} />
-              </div>
-              <div className="settings-row">
-                <div>
-                  <div className="settings-row-label">SMS alerts</div>
-                  <div className="settings-row-desc">Critical alerts only, sent by text message</div>
-                </div>
-                <Toggle checked={notif.sms} onChange={(v) => setNotif((n) => ({ ...n, sms: v }))} />
-              </div>
-              <div className="settings-row">
-                <div>
-                  <div className="settings-row-label">Push notifications</div>
-                  <div className="settings-row-desc">Real-time alerts inside the app</div>
-                </div>
-                <Toggle checked={notif.push} onChange={(v) => setNotif((n) => ({ ...n, push: v }))} />
-              </div>
-              <div className="settings-row">
-                <div>
-                  <div className="settings-row-label">Broker messages</div>
-                  <div className="settings-row-desc">Notify when a broker sends a new message</div>
-                </div>
-                <Toggle checked={notif.brokerMessages} onChange={(v) => setNotif((n) => ({ ...n, brokerMessages: v }))} />
               </div>
             </div>
           </div>

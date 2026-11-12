@@ -303,6 +303,15 @@
   background: var(--panel-2);
 }
 
+/* Idle trucks are listed, not selectable: no pointer, no hover highlight. */
+.tracking-row.idle {
+  cursor: default;
+}
+
+.tracking-row.idle:hover {
+  background: none;
+}
+
 .tracking-row.selected {
   background: var(--panel-2);
   box-shadow: inset 2px 0 0 var(--blue);
