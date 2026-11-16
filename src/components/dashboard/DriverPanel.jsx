@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import './Panel.css'
 import './DriverPanel.css'
@@ -13,15 +14,16 @@ const row = {
 }
 
 // Expects drivers already enriched with getDriverStatus() (state/status/
-// meta/hos/hosLabel) — see Dashboard.jsx.
-export default function DriverPanel({ drivers }) {
+// meta/hos/hosLabel) — see Dashboard.jsx. `viewAll` ({ to, label }) adds the
+// header link; without it no link is drawn.
+export default function DriverPanel({ drivers, viewAll }) {
   return (
     <div className="panel">
       <div className="panel-head">
         <div className="panel-title">
           Drivers <span className="panel-count">{drivers.length}</span>
         </div>
-        <button className="panel-action">View all</button>
+        {viewAll && <Link className="panel-action" to={viewAll.to}>{viewAll.label}</Link>}
       </div>
       <motion.div variants={container} initial="hidden" animate="show">
         {drivers.map((driver) => (

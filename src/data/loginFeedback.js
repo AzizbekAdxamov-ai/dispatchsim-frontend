@@ -9,6 +9,10 @@ export const LOGIN_FEEDBACK = {
   inviteRequired: 'Registration requires an invite code. Ask your administrator for an invite link.',
   signingIn: 'Signing in…',
   signIn: 'Sign in',
+  forgotLink: 'Forgot password?',
+  forgotTitle: 'Forgot password?',
+  forgotBody: 'Ask your administrator to reset your password.',
+  forgotClose: 'Close',
   cooldown: seconds => `Too many attempts. Try again in ${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}.`,
 }
 

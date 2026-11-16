@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { ChatCircle, PaperPlaneTilt } from '@phosphor-icons/react'
 import { listThreads, openConversation, getThread, sendMessage } from '../api/driverChat'
 import { useResource } from '../hooks/useResource'
@@ -7,6 +7,7 @@ import { visibleMessages, showTyping } from '../utils/chatView'
 import { ApiError } from '../api/client'
 import { chatLimitMessage } from '../utils/chatBudget.js'
 import { describeWait } from '../utils/describeWait.js'
+import { draftForIntent } from '../utils/driverContact'
 import './DriverChat.css'
 
 // Texting your drivers.
@@ -37,6 +38,10 @@ export default function DriverChat() {
   const [draft, setDraft] = useState('')
   const [sending, setSending] = useState(false)
   const [sendError, setSendError] = useState('')
+  const [searchParams, setSearchParams] = useSearchParams()
+  // The Call / Message buttons on the driver and truck pages arrive here with
+  // ?driver=<id>[&intent=call]. Handled once, then the address is cleaned.
+  const handledLink = useRef(false)
 
   const fetchThreads = useCallback((signal) => listThreads(signal), [])
   const { data: listData, error: listError, loading: listLoading, refetch: refetchList } =
@@ -52,6 +57,31 @@ export default function DriverChat() {
     useResource(fetchThread, [conversationId], { pollMs: 5000 })
 
   const threads = listData?.threads ?? []
+
+  const linkedDriverId = searchParams.get('driver')
+  const linkedIntent = searchParams.get('intent')
+  useEffect(() => {
+    if (!linkedDriverId || !listData || handledLink.current) return
+    handledLink.current = true
+    ;(async () => {
+      try {
+        const row = listData.threads.find((t) => t.driverId === linkedDriverId)
+        if (row?.conversationId) {
+          setConversationId(row.conversationId)
+        } else {
+          const opened = await openConversation(linkedDriverId)
+          setConversationId(opened.conversation.id)
+          refetchList()
+        }
+        // A drafted line for the dispatcher to read and send -- never sent for them.
+        setDraft(draftForIntent(linkedIntent))
+      } catch (err) {
+        setSendError(err?.message || 'Could not open that conversation.')
+      } finally {
+        setSearchParams({}, { replace: true })
+      }
+    })()
+  }, [linkedDriverId, linkedIntent, listData, refetchList, setSearchParams])
   const messages = visibleMessages(thread?.messages)
   const standing = thread?.standing ?? null
   const driver = thread?.driver ?? null

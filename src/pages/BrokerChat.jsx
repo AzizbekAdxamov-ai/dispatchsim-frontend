@@ -21,6 +21,7 @@ import { visibleMessages, showTyping } from '../utils/chatView'
 import { formatMoney } from '../utils/format'
 import { talkSummary } from '../components/brokerChat/talkSummary'
 import { PRE_SIGN_COPY, preSignWarnings } from '../components/brokerChat/preSignWarnings.js'
+import { EXPIRY_COPY, EXPIRY_TICK_MS, expiryLabel } from '../components/brokerChat/expiryCountdown.js'
 import { rateConLine } from '../components/brokerChat/rateConLine.js'
 import { canSendBrokerMessage, BOOKED_BAR_COPY } from '../components/brokerChat/sendGate.js'
 import '../components/dashboard/Panel.css'
@@ -174,6 +175,17 @@ export default function BrokerChat({ emailCopy = BROKER_EMAIL_COPY, bookedBarCop
   const currentThread = thread?.conversation?.id === selectedId ? thread : null
   const messages = visibleMessages(currentThread?.messages)
 
+  // The countdown above the messages. A clock state, so the line keeps moving
+  // between the 6 s thread polls.
+  const [clock, setClock] = useState(() => Date.now())
+  useEffect(() => {
+    const id = setInterval(() => setClock(Date.now()), EXPIRY_TICK_MS)
+    return () => clearInterval(id)
+  }, [])
+  const expiry = currentThread?.expiry
+    ? expiryLabel({ expiresAt: currentThread.expiry.expiresAt, warnMinutes: currentThread.expiry.warnMinutes, now: clock, copy: EXPIRY_COPY })
+    : null
+
   // Auto-scroll has to live BELOW `messages`, not above it. `const` is not
   // hoisted the way `function` is -- reading it earlier in the component
   // body throws "Cannot access 'messages' before initialization", which
@@ -315,6 +327,7 @@ export default function BrokerChat({ emailCopy = BROKER_EMAIL_COPY, bookedBarCop
                 {selected.originCity}, {selected.originState} → {selected.destinationCity}, {selected.destinationState}
               </div>
               <div className="bc-thread-broker">{selected.brokerName}</div>
+              {expiry && <div className={`bc-expiry mono${expiry.warn ? ' warn' : ''}`}>{expiry.text}</div>}
             </div>
 
             <div className="bc-thread-body">

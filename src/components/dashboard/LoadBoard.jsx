@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { STATUS_LABEL } from '../../data/mockData'
 import { formatMoney, formatPlace } from '../../utils/format'
@@ -14,14 +15,15 @@ const row = {
   show: { opacity: 1, y: 0, transition: { duration: 0.22, ease: 'easeOut' } },
 }
 
-export default function LoadBoard({ loads }) {
+// `viewAll` ({ to, label }) adds the header link; without it no link is drawn.
+export default function LoadBoard({ loads, viewAll }) {
   return (
     <div className="panel load-board">
       <div className="panel-head">
         <div className="panel-title">
           Active loads <span className="panel-count">{loads.length}</span>
         </div>
-        <button className="panel-action">View all</button>
+        {viewAll && <Link className="panel-action" to={viewAll.to}>{viewAll.label}</Link>}
       </div>
       <table>
         <thead>

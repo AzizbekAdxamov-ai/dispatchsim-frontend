@@ -298,8 +298,8 @@ export default function Tracking() {
             </div>
 
             {/* The yard: trucks with nothing on them. Listed so the fleet
-                count on this page is the whole fleet, and selectable so a
-                click highlights the same dot the map draws. */}
+                count on this page is the whole fleet. Read-only: unlike the
+                load rows above, clicking one does nothing. */}
             {!loading && idleTrucks.length > 0 && (
               <div className="tracking-panel-section">
                 <div className="panel-head">

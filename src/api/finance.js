@@ -27,3 +27,13 @@ export function listSettlements(signal) {
 export function listExpenses(signal) {
   return api.get('/finance/expenses', { auth: true, signal })
 }
+
+// Marks the invoice as sent to the broker. A record only: it does not change when it gets paid.
+export function sendInvoice(id) {
+  return api.post(`/finance/invoices/${encodeURIComponent(id)}/send`, {}, { auth: true })
+}
+
+// Posts a payment follow-up to the broker thread for an overdue invoice.
+export function sendInvoiceReminder(id) {
+  return api.post(`/finance/invoices/${encodeURIComponent(id)}/remind`, {}, { auth: true })
+}

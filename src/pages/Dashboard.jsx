@@ -22,6 +22,9 @@ const DRIVER_PANEL_LIMIT = 6
 // LoadBoard here is a "what's moving right now" preview, not the full
 // board (Loads.jsx is that) — capped for the same reason.
 const LOAD_BOARD_LIMIT = 8
+const VIEW_ALL_LABEL = 'View all'
+const DRIVERS_VIEW_ALL = { to: '/drivers', label: VIEW_ALL_LABEL }
+const LOADS_VIEW_ALL = { to: '/loads', label: VIEW_ALL_LABEL }
 const ON_TIME_CHART_LABELS = {
   title: 'On-time delivery performance',
   subtitle: 'Daily on-time delivery percentage',
@@ -65,8 +68,8 @@ export default function Dashboard() {
     <>
       <StatCards stats={statCards} />
       <div className="grid-2">
-        <LoadBoard loads={activeLoads} />
-        <DriverPanel drivers={enrichedDrivers.slice(0, DRIVER_PANEL_LIMIT)} />
+        <LoadBoard loads={activeLoads} viewAll={LOADS_VIEW_ALL} />
+        <DriverPanel drivers={enrichedDrivers.slice(0, DRIVER_PANEL_LIMIT)} viewAll={DRIVERS_VIEW_ALL} />
       </div>
 
       <div style={{ marginTop: 16 }}>

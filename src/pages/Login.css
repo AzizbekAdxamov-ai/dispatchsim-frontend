@@ -198,3 +198,54 @@
   padding: 9px 12px;
   margin-bottom: 14px;
 }
+
+.login-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--scrim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 100;
+}
+
+.login-dialog {
+  width: 100%;
+  max-width: 340px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 20px 50px var(--shadow);
+}
+
+.login-dialog-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.login-dialog-body {
+  font-size: 13px;
+  color: var(--text-2);
+  margin: 8px 0 18px;
+  line-height: 1.45;
+}
+
+.login-dialog-close {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.login-dialog-close:hover {
+  border-color: var(--text-3);
+  color: var(--text);
+}

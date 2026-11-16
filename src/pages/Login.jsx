@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
-import { roleHomePath } from '../data/roleRoutes'
+import { roleHomePath, settingsPathFor } from '../data/roleRoutes'
 import { ApiError } from '../api/client'
 import { LOGIN_FEEDBACK, cooldownSeconds } from '../data/loginFeedback'
 import truckBg from '../assets/truck-bg.webp'
@@ -17,6 +17,47 @@ function loginErrorMessage(err) {
   return LOGIN_FEEDBACK.unknown
 }
 
+function ForgotDialog({ onClose }) {
+  const closeRef = useRef(null)
+
+  useEffect(() => {
+    closeRef.current?.focus()
+    function onKey(e) {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [onClose])
+
+  return (
+    <motion.div
+      className="login-dialog-backdrop"
+      onMouseDown={(e) => { if (e.target === e.currentTarget) onClose() }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.15, ease: 'easeOut' }}
+    >
+      <motion.div
+        className="login-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="login-dialog-title"
+        initial={{ opacity: 0, y: 12, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 8, scale: 0.98 }}
+        transition={{ duration: 0.18, ease: 'easeOut' }}
+      >
+        <div id="login-dialog-title" className="login-dialog-title">{LOGIN_FEEDBACK.forgotTitle}</div>
+        <p className="login-dialog-body">{LOGIN_FEEDBACK.forgotBody}</p>
+        <button type="button" ref={closeRef} className="login-dialog-close" onClick={onClose}>
+          {LOGIN_FEEDBACK.forgotClose}
+        </button>
+      </motion.div>
+    </motion.div>
+  )
+}
+
 export default function Login() {
   const { login } = useAuth()
   const navigate = useNavigate()
@@ -25,6 +66,7 @@ export default function Login() {
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [remember, setRemember] = useState(true)
+  const [forgotOpen, setForgotOpen] = useState(false)
   const inFlight = useRef(false)
   const cooldownUntil = useRef(0)
   const [remaining, setRemaining] = useState(0)
@@ -47,7 +89,8 @@ export default function Login() {
     setSubmitting(true)
     try {
       const user = await login(email, password, remember)
-      navigate(roleHomePath(user.activeRole))
+      // A temporary password (set by an administrator) must be replaced first.
+      navigate(user.mustChangePassword ? settingsPathFor(user.activeRole) : roleHomePath(user.activeRole))
     } catch (err) {
       if (err instanceof ApiError && err.code === 'RATE_LIMITED') {
         const seconds = cooldownSeconds(err.details)
@@ -121,7 +164,7 @@ export default function Login() {
                 onChange={(e) => setRemember(e.target.checked)}
               /> Remember me
             </label>
-            <button type="button" className="login-forgot">Forgot password?</button>
+            <button type="button" className="login-forgot" onClick={() => setForgotOpen(true)}>{LOGIN_FEEDBACK.forgotLink}</button>
           </div>
 
           <button type="submit" className="login-btn" disabled={submitting || remaining > 0}>
@@ -135,6 +178,10 @@ export default function Login() {
           Don't have an account? <Link to="/register"><b>Sign up</b></Link>
         </div>
       </motion.div>
+
+      <AnimatePresence>
+        {forgotOpen && <ForgotDialog onClose={() => setForgotOpen(false)} />}
+      </AnimatePresence>
     </div>
   )
 }

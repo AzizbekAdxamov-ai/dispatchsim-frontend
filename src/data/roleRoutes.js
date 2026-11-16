@@ -24,6 +24,17 @@ export const ROLE_HOME = {
   hr: '/hr',
 }
 
+// Roles whose settings page lives inside their own section. Anyone else uses
+// the shared page at '/settings'.
+export const ROLE_SETTINGS = {
+  'fleet-manager': '/fleet/settings',
+  finance: '/finance/settings',
+}
+
+export function settingsPathFor(roleKey) {
+  return ROLE_SETTINGS[roleKey] ?? '/settings'
+}
+
 export function roleHomePath(roleKey) {
   if (!roleKey) return '/pending'
   return ROLE_HOME[roleKey] ?? '/'
