@@ -17,7 +17,7 @@ import {
   DISPATCH_SECTIONS, DISPATCH_SETTINGS, RAIL_LABEL_MAX, railLabel,
 } from '../src/components/layout/navSections.js'
 
-const SHELLS = ['FleetShell', 'HrShell', 'FinanceShell', 'AdminShell']
+const SHELLS = ['FleetShell', 'HrShell', 'FinanceShell', 'AdminShell', 'AcademyShell']
 
 function shellItems(name) {
   const src = readFileSync(new URL(`../src/components/layout/${name}.jsx`, import.meta.url), 'utf8')

@@ -1,0 +1,813 @@
+<title>Bitta yuk — bir jamoa</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+[hidden]{display:none!important}
+p.prose{display:block;max-width:68ch}
+/* Layout: one reading column on an "interstate" ground — sections open with green exit-sign headers, the load travels a road through the page. */
+:root{
+  --ground:#EEF1EE; --surface:#FFFFFF; --surface-2:#E3E8E4; --ink:#16201B; --muted:#56635C; --line:#C9D2CC;
+  --sign:#0B5A38; --sign-ink:#FFFFFF; --accent:#0B6B42; --caution:#E0A100; --caution-ink:#2A2000;
+  --good:#1E7A47; --good-bg:#DDF0E4; --bad:#B3261E; --bad-bg:#F8DEDB; --asphalt:#2B302D; --lane:#F2C230;
+  --f-display:"Overpass","Arial Narrow",Arial,sans-serif; --f-body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --fs:16px; --radius:10px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#111613; --surface:#1A201C; --surface-2:#232B26; --ink:#E7ECE8; --muted:#9AA79F; --line:#34403A;
+  --sign:#0E6B43; --sign-ink:#FFFFFF; --accent:#4CC38A; --caution:#F2B705; --caution-ink:#2A2000;
+  --good:#5FD397; --good-bg:#16352A; --bad:#FF8A80; --bad-bg:#3A1E1C; --asphalt:#0B0E0C; --lane:#E9B820; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --ground:#111613; --surface:#1A201C; --surface-2:#232B26; --ink:#E7ECE8; --muted:#9AA79F; --line:#34403A;
+  --sign:#0E6B43; --sign-ink:#FFFFFF; --accent:#4CC38A; --caution:#F2B705; --caution-ink:#2A2000;
+  --good:#5FD397; --good-bg:#16352A; --bad:#FF8A80; --bad-bg:#3A1E1C; --asphalt:#0B0E0C; --lane:#E9B820; color-scheme:dark}
+body{background:var(--ground);color:var(--ink);font-family:var(--f-body);font-size:var(--fs);line-height:1.6}
+body.teach{--fs:19px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--sign)}
+*{box-sizing:border-box}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.15;margin:0}
+p{margin:0}
+.mono{font-family:var(--f-mono);font-size:.92em}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,[tabindex]:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--caution);outline-offset:2px}
+
+/* top bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--sign);color:var(--sign-ink);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:8px}
+.bar-in{max-width:880px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.bar-title{font-family:var(--f-display);font-weight:700;letter-spacing:.02em;font-size:15px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prog{flex:1 1 160px;display:flex;align-items:center;gap:8px;min-width:140px}
+.prog-track{flex:1;height:8px;background:rgba(255,255,255,.22);border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;width:0;background:var(--lane);transition:width .5s ease}
+.prog-num{font-family:var(--f-mono);font-size:12px}
+.mode{display:flex;background:rgba(0,0,0,.22);border-radius:99px;padding:3px}
+.mode button{border:0;background:transparent;color:var(--sign-ink);padding:4px 12px;border-radius:99px;font-size:13px;font-weight:600}
+.mode button[aria-pressed="true"]{background:var(--sign-ink);color:var(--sign)}
+
+/* page */
+.wrap{max-width:880px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px;display:flex;flex-direction:column;gap:56px}
+
+/* hero */
+.hero{display:flex;flex-direction:column;gap:18px}
+.shield-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.exit-tab{background:var(--sign);color:var(--sign-ink);font-family:var(--f-display);font-weight:800;font-size:13px;letter-spacing:.08em;padding:5px 10px 3px;border-radius:6px 6px 0 0;border:2px solid var(--sign-ink);box-shadow:0 0 0 2px var(--sign)}
+.hero h1{font-size:clamp(34px,6vw,56px);font-weight:800;letter-spacing:-.01em}
+.hero .lead{font-size:1.12em;color:var(--muted);max-width:62ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:13px;padding:4px 10px;border:1px solid var(--line);border-radius:99px;background:var(--surface);color:var(--ink)}
+.road{position:relative;height:120px;background:var(--asphalt);border-radius:var(--radius);overflow:hidden}
+.road::after{content:"";position:absolute;left:0;right:0;top:58px;height:4px;background:repeating-linear-gradient(90deg,var(--lane) 0 34px,transparent 34px 64px)}
+.city{position:absolute;bottom:10px;font-family:var(--f-display);font-weight:700;font-size:13px;color:#E7ECE8;letter-spacing:.04em}
+.city.a{left:14px}.city.b{right:14px;text-align:right}
+.city small{display:block;font-family:var(--f-mono);font-weight:500;font-size:11px;color:#9AA79F}
+.truck{position:absolute;top:22px;left:6%;width:120px;height:46px;transition:left 1.1s cubic-bezier(.5,0,.2,1)}
+.hero .truck{animation:drive 9s ease-in-out infinite alternate}
+@keyframes drive{0%{left:4%}100%{left:calc(96% - 120px)}}
+@media (prefers-reduced-motion:reduce){.hero .truck{animation:none}.truck,.prog-fill{transition:none}}
+
+/* sections */
+.sec{display:flex;flex-direction:column;gap:20px;scroll-margin-top:70px}
+.sign{background:var(--sign);color:var(--sign-ink);border-radius:var(--radius);padding:14px 18px 12px;border:3px solid var(--sign-ink);box-shadow:0 0 0 3px var(--sign);display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.sign h2{font-size:clamp(22px,3.4vw,30px);font-weight:800}
+.sign .exitno{font-family:var(--f-display);font-weight:800;font-size:12px;letter-spacing:.12em;opacity:.9}
+.sign .time{font-family:var(--f-mono);font-size:12px;opacity:.85}
+.prose{display:flex;flex-direction:column;gap:12px;max-width:68ch}
+.prose strong{font-weight:600}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+.callout{border-left:4px solid var(--caution);background:var(--surface);padding:12px 16px;border-radius:0 var(--radius) var(--radius) 0}
+.callout .lbl,.task .lbl{font-family:var(--f-display);font-weight:800;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;display:block}
+.teach-only,.teach-inline{display:none}
+body.teach .teach-inline{display:inline}
+body.teach .teach-only{display:block}
+body.teach .self-only{display:none}
+.ask{border:2px dashed var(--accent);border-radius:var(--radius);padding:12px 16px;background:var(--surface)}
+.ask .lbl{color:var(--accent);font-family:var(--f-display);font-weight:800;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+
+/* story */
+.story{display:grid;grid-template-columns:1fr;gap:14px}
+.story-line{display:grid;grid-template-columns:72px 1fr;gap:12px;align-items:start}
+.story-line .t{font-family:var(--f-mono);font-size:12px;color:var(--muted);padding-top:3px}
+.story-cost{display:flex;gap:16px;flex-wrap:wrap;align-items:baseline;border-top:1px solid var(--line);padding-top:12px}
+.story-cost b{font-family:var(--f-display);font-size:30px;color:var(--bad)}
+
+/* roles map */
+.map-box{overflow-x:auto}
+.rolemap{width:100%;min-width:620px;height:auto;display:block}
+.rolemap .node rect{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+.rolemap .node text{fill:var(--ink);font-family:var(--f-display);font-weight:700;font-size:15px}
+.rolemap .node .sub{fill:var(--muted);font-family:var(--f-body);font-weight:400;font-size:11.5px}
+.rolemap .node{cursor:pointer}
+.rolemap .node:hover rect,.rolemap .node:focus rect{stroke:var(--accent)}
+.rolemap .node.on rect{fill:var(--sign);stroke:var(--sign)}
+.rolemap .node.on text{fill:var(--sign-ink)}
+.rolemap .node:focus{outline:none}
+.rolemap .flow{stroke:var(--accent);stroke-width:3;fill:none}
+.rolemap .link{stroke:var(--muted);stroke-width:1.6;stroke-dasharray:5 5;fill:none}
+.rolemap .lab{fill:var(--muted);font-family:var(--f-body);font-size:11.5px}
+.rolemap .team{fill:none;stroke:var(--line);stroke-width:1.5;stroke-dasharray:3 4}
+.rolemap .arrow{fill:var(--accent)}.rolemap .arrow2{fill:var(--muted)}
+.role-detail{display:grid;gap:8px}
+.role-detail h3{font-size:22px}
+.role-detail .not{color:var(--muted)}
+
+/* exercises */
+.ex{display:flex;flex-direction:column;gap:14px}
+.ex-head{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.ex-head h3{font-size:19px}
+.ex-head .tag{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.q{display:flex;flex-direction:column;gap:8px;padding:12px 0;border-top:1px solid var(--line)}
+.q:first-of-type{border-top:0}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opt{border:1.5px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 12px;font-size:14px;text-align:left}
+.opt:hover{border-color:var(--accent)}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--surface-2)}
+.opt.right{border-color:var(--good);background:var(--good-bg);color:var(--ink)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-bg);color:var(--ink)}
+.fb{font-size:14px;padding:8px 12px;border-radius:8px;display:none}
+.fb.show{display:block}
+.fb.ok{background:var(--good-bg)}.fb.no{background:var(--bad-bg)}
+.btn{border:0;background:var(--accent);color:var(--surface);padding:9px 16px;border-radius:8px;font-weight:600;font-size:14px}
+:root .btn{color:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn{color:#0B1410}}
+:root[data-theme="dark"] .btn{color:#0B1410}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.result{font-family:var(--f-display);font-weight:800;font-size:18px}
+
+/* lifecycle stepper */
+.stepper{display:flex;flex-direction:column;gap:14px}
+.steprail{position:relative;height:96px;background:var(--asphalt);border-radius:var(--radius);overflow:hidden}
+.steprail::after{content:"";position:absolute;left:0;right:0;top:46px;height:3px;background:repeating-linear-gradient(90deg,var(--lane) 0 26px,transparent 26px 50px)}
+.steprail .truck{top:16px;width:96px;height:38px}
+.ticks{position:absolute;left:0;right:0;bottom:6px;display:flex;justify-content:space-between;padding:0 10px}
+.ticks span{font-family:var(--f-mono);font-size:11px;color:#9AA79F;width:20px;text-align:center}
+.ticks span.on{color:var(--lane)}
+.step-card{display:grid;gap:8px}
+.step-card .en{font-family:var(--f-mono);font-size:13px;color:var(--accent)}
+.step-card h3{font-size:24px}
+.docs{display:flex;gap:6px;flex-wrap:wrap}
+.doc{font-family:var(--f-mono);font-size:12px;padding:3px 8px;border-radius:5px;background:var(--caution);color:var(--caution-ink)}
+.trap{font-size:14px;color:var(--muted)}
+.trap b{color:var(--ink)}
+
+/* ordering */
+.pool,.built{display:flex;flex-wrap:wrap;gap:6px;min-height:44px}
+.built{border:1.5px dashed var(--line);border-radius:8px;padding:8px}
+.built .opt::before{content:attr(data-n) ". ";font-family:var(--f-mono);color:var(--muted)}
+
+/* chat case */
+.case-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.kv{display:flex;flex-direction:column;gap:2px}
+.kv .k{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-family:var(--f-display);font-weight:700}
+.kv .v{font-family:var(--f-mono);font-size:13px}
+.chat{display:flex;flex-direction:column;gap:12px}
+.msg{max-width:85%;background:var(--surface-2);border-radius:14px 14px 14px 4px;padding:10px 14px;animation:pop .35s ease}
+.msg .who{font-size:12px;color:var(--muted);font-family:var(--f-mono)}
+@keyframes pop{from{transform:translateY(8px);opacity:.3}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.msg{animation:none}}
+.pick{display:flex;flex-direction:column;gap:8px;padding-left:8px;border-left:3px solid var(--line)}
+
+/* tz */
+.tz{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.clock{background:var(--surface-2);border-radius:var(--radius);padding:14px;text-align:center}
+.clock .c{font-family:var(--f-display);font-weight:700;font-size:13px;color:var(--muted);letter-spacing:.05em}
+.clock .h{font-family:var(--f-mono);font-size:34px;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent)}
+
+/* phrases */
+.phr{display:grid;gap:10px}
+.phrase{display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:center;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius)}
+.phrase .en{font-family:var(--f-mono);font-size:14px;min-width:0}
+.phrase .uz{grid-column:1/-1;font-size:13px;color:var(--muted)}
+.phrase .acts{display:flex;gap:6px}
+.icon-btn{border:1.5px solid var(--line);background:var(--surface);border-radius:8px;padding:5px 10px;font-size:12px;font-weight:600}
+
+/* builder */
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label{font-size:12px;color:var(--muted);font-weight:600}
+.field input,.field select{font:inherit;font-size:14px;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);min-width:0}
+.preview{font-family:var(--f-mono);font-size:14px;background:var(--asphalt);color:#E7ECE8;border-radius:var(--radius);padding:16px;white-space:pre-wrap;word-break:break-word;line-height:1.55}
+.warns{display:flex;flex-direction:column;gap:6px}
+.warn{font-size:14px;padding:8px 12px;border-radius:8px;background:var(--bad-bg)}
+.okline{font-size:14px;padding:8px 12px;border-radius:8px;background:var(--good-bg)}
+
+/* glossary */
+.gl{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.flip{perspective:800px;height:120px;border:0;padding:0;background:none;text-align:left}
+.flip .in{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.flip.on .in{transform:rotateY(180deg)}
+.flip .f,.flip .b{position:absolute;inset:0;backface-visibility:hidden;border-radius:var(--radius);padding:12px 14px;display:flex;flex-direction:column;justify-content:center;gap:4px;border:1px solid var(--line)}
+.flip .f{background:var(--surface)}
+.flip .f b{font-family:var(--f-display);font-size:19px}
+.flip .f span{font-size:12px;color:var(--muted)}
+.flip .b{background:var(--sign);color:var(--sign-ink);transform:rotateY(180deg);font-size:13px;line-height:1.45}
+@media (prefers-reduced-motion:reduce){.flip .in{transition:none}}
+
+/* app mission */
+.task{display:grid;gap:10px}
+.task ol{margin:0;padding-left:20px;display:grid;gap:6px}
+.checks{display:grid;gap:8px}
+.checks label{display:flex;gap:10px;align-items:flex-start;font-size:15px}
+.checks input{margin-top:5px;accent-color:var(--accent);width:18px;height:18px;flex:none}
+.foot{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px;display:grid;gap:6px}
+.foot a{color:var(--accent)}
+@media (max-width:520px){.bar-title{display:none}.story-line{grid-template-columns:56px 1fr}.tz{grid-template-columns:1fr}.mode button{padding:4px 9px}}
+
+/* ===== DESIGN v2 (lesson 3): scene hero, route rail, sign icons, dark ELD simulator, lettered options, finish card ===== */
+@property --p{syntax:"<number>";inherits:true;initial-value:0}
+:root{--sb:#2B6CB0;--shadow:0 1px 2px rgba(15,35,25,.06),0 10px 28px rgba(15,35,25,.08);--r2:16px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--sb:#5AA7E8;--shadow:0 10px 28px rgba(0,0,0,.4)}}
+:root[data-theme="dark"]{--sb:#5AA7E8;--shadow:0 10px 28px rgba(0,0,0,.4)}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(11,107,66,.16),transparent 70%);background-repeat:no-repeat}
+.wrap{gap:76px;padding-top:22px}
+.sec{position:relative;scroll-margin-top:118px}
+.sec::before{content:"";position:absolute;left:0;right:0;top:-38px;height:3px;border-radius:2px;background:repeating-linear-gradient(90deg,var(--lane) 0 28px,transparent 28px 56px);opacity:.5}
+.card{border-radius:var(--r2);box-shadow:var(--shadow)}
+
+/* route rail */
+.route{display:flex;gap:6px;overflow-x:auto;max-width:880px;margin:7px auto 0;padding-bottom:1px;scrollbar-width:none}
+.route::-webkit-scrollbar{display:none}
+.route a{flex:none;display:inline-flex;align-items:center;gap:6px;font:700 11px var(--f-display);letter-spacing:.06em;color:#fff;text-decoration:none;padding:3px 9px 3px 4px;border-radius:99px;background:rgba(0,0,0,.2)}
+.route a .n{width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center;font-size:11px}
+.route a .lbl{display:none}
+.route a.cur{background:#fff;color:var(--sign)}
+.route a.cur .lbl{display:inline}
+.route a.done .n{background:var(--lane);color:#2A2000;font-size:0}
+.route a.done .n::before{content:"✓";font-size:11px;font-weight:800}
+@media (min-width:1260px){
+  .route{position:fixed;left:max(16px,calc(50% - 440px - 190px));top:118px;flex-direction:column;gap:0;overflow:visible;margin:0;padding:0;width:164px}
+  .route a{background:none;color:var(--muted);padding:6px 0;border-radius:0;font-size:12px;gap:10px;position:relative}
+  .route a .n{width:24px;height:24px;border:2px solid var(--line);background:var(--surface);color:var(--muted);font-size:12px}
+  .route a .lbl{display:inline}
+  .route a:not(:last-child)::after{content:"";position:absolute;left:11px;top:31px;height:11px;width:2px;background:var(--line)}
+  .route a.done::after{background:var(--good)}
+  .route a.cur{background:none;color:var(--ink)}
+  .route a.cur .n{background:var(--sign);border-color:var(--sign);color:#fff}
+  .route a.done .n{background:var(--good);border-color:var(--good);color:#fff}
+}
+
+/* hero scene */
+.hero{gap:0;border-radius:24px;overflow:hidden;background:linear-gradient(165deg,#06281A 0%,#0B5A38 64%,#157553 100%);color:#fff;box-shadow:var(--shadow)}
+.hero-top{padding:34px 34px 6px;display:flex;flex-direction:column;gap:16px;position:relative;z-index:1}
+.hero h1{color:#fff;font-size:clamp(38px,7.4vw,68px);font-weight:800;letter-spacing:-.015em}
+.hero .lead{color:rgba(255,255,255,.84);max-width:56ch}
+.hero .chip{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.26);color:#fff}
+.scene{display:block;width:100%;height:auto;margin-top:6px}
+.scene .lane{animation:lane 1s linear infinite}
+@keyframes lane{to{stroke-dashoffset:-56}}
+.scene .rig{animation:bob 1.7s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.5px)}}
+.scene .twinkle{animation:tw 3s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.9}50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.scene .lane,.scene .rig,.scene .twinkle{animation:none}}
+@media (max-width:520px){.hero-top{padding:24px 20px 4px}}
+
+/* exit signs */
+.sign{position:relative;align-items:center;flex-wrap:nowrap;gap:14px;padding:16px 20px;background:linear-gradient(180deg,#0E6B43,#0B5A38)}
+.sign .ic{width:48px;height:48px;flex:none;fill:none;stroke:#fff;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;padding:9px;border:2px solid rgba(255,255,255,.85);border-radius:11px}
+.sign .st-txt{flex:1;min-width:0}
+.sign .time{white-space:nowrap;align-self:flex-end}
+.sign .stamp{position:absolute;right:16px;top:-15px;transform:rotate(-6deg) scale(.5);opacity:0;transition:transform .35s cubic-bezier(.3,1.6,.5,1),opacity .2s;font:800 11px var(--f-display);letter-spacing:.12em;background:var(--lane);color:#2A2000;padding:3px 10px 2px;border:2px solid #2A2000;border-radius:5px;pointer-events:none}
+.sec.done .sign .stamp{opacity:1;transform:rotate(-6deg) scale(1)}
+@media (max-width:560px){.sign .ic{display:none}.sign{flex-wrap:wrap}.sign .st-txt{flex-basis:100%}.sign .time{align-self:auto}}
+
+/* story timeline */
+.story2{display:grid;gap:18px}
+.daybar{display:flex;height:30px;border-radius:9px;overflow:hidden;background:var(--surface-2)}
+.daybar i{display:block;height:100%;border-right:1px solid var(--surface)}
+.daybar .D{background:var(--accent)}.daybar .ON{background:var(--caution)}.daybar .OFF{background:var(--muted)}
+.daybar .V{background:repeating-linear-gradient(45deg,#E5392F 0 6px,#B3261E 6px 12px);animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.55}}
+.dayscale{display:flex;justify-content:space-between;font:11px var(--f-mono);color:var(--muted);margin-top:-8px}
+.daylegend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted)}
+.daylegend i,.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.tl{list-style:none;margin:0;padding:0}
+.tl li{display:grid;grid-template-columns:54px 26px 1fr;position:relative;padding-bottom:18px}
+.tl li:last-child{padding-bottom:0}
+.tl li::before{content:"";grid-column:2;grid-row:1;justify-self:center;width:12px;height:12px;border-radius:50%;background:var(--accent);margin-top:7px;position:relative;z-index:1;box-shadow:0 0 0 4px var(--surface)}
+.tl li:not(:last-child)::after{content:"";position:absolute;left:66px;top:18px;bottom:-4px;width:2px;background:var(--line)}
+.tl time{grid-column:1;grid-row:1;font:12px var(--f-mono);color:var(--muted);padding-top:4px}
+.tl .c{grid-column:3;grid-row:1;min-width:0}
+.tl li.bad::before{background:#E5392F}
+.bubble{background:var(--surface-2);border-radius:16px 16px 16px 4px;padding:10px 14px;border-left:4px solid var(--bad);display:grid;gap:2px}
+.bubble .who{font:12px var(--f-mono);color:var(--muted)}
+.oos{background:#B3261E;color:#fff;border-radius:12px;padding:12px 16px;display:grid;gap:2px}
+.oos b{font:800 13px var(--f-display);letter-spacing:.14em}
+.story-cost{border:2px dashed var(--bad);border-radius:12px;padding:12px 16px;align-items:center}
+
+/* rule signs */
+.rules{gap:16px}
+.rule{background:#fff;color:#111;border:4px solid #111;border-radius:12px;padding:8px 14px 14px;text-align:center;display:grid;gap:2px;box-shadow:0 0 0 2px #fff,var(--shadow);outline:0}
+.rule::before{content:attr(data-label);font:800 11px var(--f-display);letter-spacing:.16em}
+.rule b{font-size:58px;line-height:1;color:#111;font-weight:800}
+.rule span{font-size:13px;color:#333;line-height:1.4}
+
+/* ELD block */
+.eld-grid{display:grid;grid-template-columns:minmax(210px,290px) 1fr;gap:22px;align-items:center}
+.eld-grid .status4{grid-template-columns:1fr 1fr}
+.eld-dev{width:100%;height:auto;display:block}
+.status4{gap:12px}
+.st{border-radius:14px;border:1px solid var(--line);border-top:5px solid var(--c,var(--line));box-shadow:var(--shadow)}
+.st.OFF{--c:var(--muted)}.st.SB{--c:var(--sb)}.st.D{--c:var(--accent)}.st.ON{--c:var(--caution)}
+.st .k.SB{background:var(--sb);color:#fff}
+@media (max-width:760px){.eld-grid{grid-template-columns:1fr}.eld-dev{max-width:300px;margin:0 auto}}
+@media (max-width:420px){.eld-grid .status4{grid-template-columns:1fr}}
+
+/* spot illustrations */
+.spot{display:block;width:100%;height:auto;border-radius:16px;box-shadow:var(--shadow)}
+
+/* HOS simulator: ELD-style dark panel */
+.card.hos{background:#141A16;border-color:#27312B;color:#E7ECE8;gap:16px;display:grid}
+.card.hos .ex-head h3{color:#fff}
+.card.hos .ex-head h3::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;background:#4CC38A;margin-right:9px;box-shadow:0 0 10px #4CC38A;animation:pulse 1.6s ease-in-out infinite}
+.card.hos .tag,.card.hos .tscale,.card.hos .now{color:#9AA79F}
+.card.hos .clocks{grid-template-columns:repeat(3,1fr);gap:8px}
+.hclock{background:rgba(255,255,255,.04);border:1px solid #27312B;text-align:center;justify-items:center;padding:14px 6px 10px;gap:8px;--rc:#4CC38A}
+.hclock .c{order:2;font:700 11px/1.25 var(--f-display);letter-spacing:.05em;color:#9AA79F}
+.hclock .ring{order:1;width:96px;height:96px;border-radius:50%;position:relative;display:grid;place-items:center;background:conic-gradient(var(--rc) calc(var(--p)*1%),rgba(255,255,255,.1) 0);transition:--p .45s ease}
+.hclock .ring::before{content:"";position:absolute;inset:9px;border-radius:50%;background:#141A16}
+.hclock .ring .h{position:relative;z-index:1;font:600 22px var(--f-mono);color:#E7ECE8;font-variant-numeric:tabular-nums}
+.hclock.low{--rc:#F2B705}.hclock.low .ring .h{color:#F2B705}
+.hclock.out{--rc:#FF6B5F}.hclock.out .ring .h{color:#FF8A80}
+@media (max-width:520px){.hclock .ring{width:76px;height:76px}.hclock .ring::before{inset:8px}.hclock .ring .h{font-size:17px}}
+.card.hos .tline{height:54px;background:#202823;border-radius:11px;position:relative}
+.card.hos .tline::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(90deg,transparent 0 calc(100%/24 - 1px),rgba(255,255,255,.09) 0 calc(100%/24))}
+.card.hos .tline span{border-right:1px solid #141A16}
+.card.hos .tline .D{background:#4CC38A}.card.hos .tline .ON{background:#F2B705}.card.hos .tline .OFF{background:#6B7770}.card.hos .tline .SB{background:var(--sb)}
+.card.hos .tline .V{background:repeating-linear-gradient(45deg,#E5392F 0 6px,#B3261E 6px 12px)}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:#9AA79F}
+.hbtns .btn{border-radius:99px;padding:9px 14px;transition:transform .08s,filter .15s}
+.hbtns .btn:hover{filter:brightness(1.1)}.hbtns .btn:active{transform:scale(.96)}
+.hbtns .btn.D{background:#4CC38A;color:#04210F}.hbtns .btn.ON{background:#F2B705;color:#2A2000}.hbtns .btn.OFF{background:#6B7770;color:#fff}.hbtns .btn.SB{background:var(--sb);color:#fff}
+.card.hos .btn.ghost{color:#E7ECE8;border-color:#3A4640}
+.card.hos .vlog .warn{background:rgba(255,107,95,.14);color:#FFB4AD;border-left:3px solid #FF6B5F}
+.card.hos .vlog .okline{background:rgba(95,211,151,.13);color:#9BE5BE;border-left:3px solid #4CC38A}
+
+/* exercises: lettered options */
+.opt{border-radius:12px;padding:9px 14px;display:flex;gap:10px;align-items:center;transition:transform .08s,border-color .15s,background .15s}
+.opt:active{transform:scale(.985)}
+:is(#quiz,#plans) .opts{flex-direction:column;align-items:stretch;counter-reset:o}
+:is(#quiz,#plans) .opt::before{counter-increment:o;content:counter(o,upper-alpha);flex:none;width:26px;height:26px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font:700 12px var(--f-mono)}
+:is(#quiz,#plans) .opt[aria-pressed="true"]::before{background:var(--accent);color:#fff}
+:is(#quiz,#plans) .opt.right::before{content:"✓";background:var(--good);color:#fff}
+:is(#quiz,#plans) .opt.wrong::before{content:"✗";background:var(--bad);color:#fff}
+#msgOpts .opt::before{content:"";flex:none;width:22px;height:22px;border:2px solid var(--line);border-radius:7px;display:grid;place-items:center;font-size:13px;color:#fff;font-weight:800}
+#msgOpts .opt[aria-pressed="true"]::before{content:"✓";background:var(--accent);border-color:var(--accent)}
+#msgOpts .opt.right::before{content:"✓";background:var(--good);border-color:var(--good)}
+#msgOpts .opt.wrong::before{content:"✗";background:var(--bad);border-color:var(--bad)}
+#statusQ .opt{min-width:64px;justify-content:center;font:700 13px var(--f-mono)}
+.fb{border-radius:10px;border-left:4px solid transparent}
+.fb.ok{border-left-color:var(--good)}.fb.no{border-left-color:var(--bad)}
+.fb.show{animation:pop2 .3s ease}
+@keyframes pop2{from{transform:translateY(-4px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.fb.show{animation:none}}
+.btn{border-radius:99px;padding:10px 20px;transition:transform .08s,filter .15s;box-shadow:0 2px 0 rgba(0,0,0,.18)}
+.btn:hover{filter:brightness(1.08)}.btn:active{transform:translateY(1px);box-shadow:none}
+.btn.ghost{box-shadow:none}
+.result:not(:empty){background:var(--surface-2);padding:3px 14px;border-radius:99px}
+.lcard{border-radius:16px;box-shadow:var(--shadow);border-left:6px solid var(--line);transition:border-color .2s}
+.lcard.done-ok{border-left-color:var(--good)}.lcard.done-no{border-left-color:var(--bad)}
+.lcard .lane{font-size:20px}
+.lrow .chip{background:var(--surface-2);border:0;border-radius:8px}
+.phrase{border-radius:16px 16px 16px 4px;border-left:4px solid var(--accent);box-shadow:var(--shadow)}
+.basic{border-left:4px solid var(--sign);border-radius:10px}
+.flip{height:130px}
+
+/* finish + mentor */
+.finish{border-radius:24px;padding:30px 24px;text-align:center;display:grid;gap:12px;justify-items:center;background:var(--surface);border:2px dashed var(--line)}
+.finish h2{font-size:clamp(24px,4vw,34px)}
+.finish p{color:var(--muted);max-width:52ch}
+.miles{display:flex;gap:7px;flex-wrap:wrap;justify-content:center}
+.miles i{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font:700 12px var(--f-mono);color:var(--muted);font-style:normal}
+.miles i.on{background:var(--lane);border-color:var(--lane);color:#2A2000}
+.finish.won{background:linear-gradient(165deg,#06281A,#0B5A38 70%,#157553);color:#fff;border:0;box-shadow:var(--shadow)}
+.finish.won p{color:rgba(255,255,255,.85)}
+.finish .badge{font:800 12px var(--f-display);letter-spacing:.14em;background:var(--lane);color:#2A2000;padding:4px 12px 3px;border-radius:5px;border:2px solid #2A2000;display:none}
+.finish.won .badge{display:inline-block;transform:rotate(-3deg)}
+.mentor{display:grid;gap:14px;border-radius:18px;padding:20px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow)}
+.mentor-head{display:flex;gap:14px;align-items:center}
+.mentor-av{width:46px;height:46px;border-radius:50%;background:var(--sign);color:#fff;display:grid;place-items:center;font:800 20px var(--f-display);flex:none}
+.mentor h3{font-size:20px}
+.mentor .sub{color:var(--muted);font-size:14px}
+.mq{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:var(--surface-2);border-radius:14px 14px 14px 4px;padding:10px 12px;font-size:14px}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,30px);opacity:0;pointer-events:none;background:var(--asphalt);color:#fff;font-weight:700;padding:10px 18px;border-radius:99px;border:2px solid var(--lane);z-index:30;transition:transform .3s cubic-bezier(.3,1.5,.5,1),opacity .2s;display:flex;gap:8px;align-items:center}
+.toast.on{transform:translate(-50%,0);opacity:1}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+.st{align-content:start}
+.st .k{align-self:start}
+.story-cost b{flex:none}
+.story-cost span{flex:1 1 260px}
+</style>
+
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="truck" viewBox="0 0 120 46">
+      <rect x="2" y="4" width="78" height="30" rx="2" fill="#F4F6F4" stroke="#9AA79F"/>
+      <text x="41" y="24" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#2B302D">DS-1001</text>
+      <path d="M82 12h18l12 11v11H82z" fill="#0E6B43"/>
+      <path d="M100 15h-12v8h21z" fill="#BFE3CF"/>
+      <rect x="80" y="30" width="34" height="5" fill="#1B201D"/>
+      <circle cx="18" cy="38" r="6" fill="#111"/><circle cx="18" cy="38" r="2.4" fill="#9AA79F"/>
+      <circle cx="34" cy="38" r="6" fill="#111"/><circle cx="34" cy="38" r="2.4" fill="#9AA79F"/>
+      <circle cx="92" cy="38" r="6" fill="#111"/><circle cx="92" cy="38" r="2.4" fill="#9AA79F"/>
+      <circle cx="106" cy="38" r="6" fill="#111"/><circle cx="106" cy="38" r="2.4" fill="#9AA79F"/>
+    </symbol>
+  
+    <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3 2.5 20h19L12 3z"/><path d="M12 10v5M12 17.5v.5"/></symbol>
+    <symbol id="i-people" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6M15 14.5c3 0 6 1.5 6 5"/></symbol>
+    <symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="18" r="2.3"/><circle cx="18" cy="6" r="2.3"/><path d="M8.3 17.6C15 18 8 7 15.8 6.4"/></symbol>
+    <symbol id="i-box" viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4V7z"/><path d="M3 7l9 4 9-4M12 11v10"/></symbol>
+    <symbol id="i-trailer" viewBox="0 0 24 24"><rect x="2" y="6" width="14" height="9" rx="1"/><path d="M16 9h4l2 3v3h-6"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="19" cy="17.5" r="1.8"/></symbol>
+    <symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 4v16M6 20h12M4 8h16"/><path d="M4 8l-2.5 6a3 3 0 0 0 5 0L4 8zM20 8l-2.5 6a3 3 0 0 0 5 0L20 8z"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4V5z"/><path d="M8 9.5h8M8 12.5h5"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 12.5l2 2 4-4.5"/></symbol>
+    <symbol id="i-task" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></symbol>
+  </defs>
+</svg>
+
+<header class="bar" role="banner">
+  <div class="bar-in">
+    <div class="bar-title">1-hafta · 1-dars · Bitta yuk — bir jamoa</div>
+    <div class="prog" aria-label="Dars bo‘yicha jarayon">
+      <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+      <span class="prog-num" id="progNum">0/7</span>
+    </div>
+    <div class="mode" role="group" aria-label="Rejim">
+      <button type="button" id="modeSelf" aria-pressed="true">Mustaqil</button>
+      <button type="button" id="modeTeach" aria-pressed="false">Darsda</button>
+    </div>
+    <nav class="route" aria-label="Dars yo‘li">
+      <a href="#s-story" data-go="story"><span class="n">1</span><span class="lbl">Hikoya</span></a>
+      <a href="#s-roles" data-go="roles"><span class="n">2</span><span class="lbl">Rollar</span></a>
+      <a href="#s-life" data-go="life"><span class="n">3</span><span class="lbl">Yuk yo‘li</span></a>
+      <a href="#s-case" data-go="case"><span class="n">4</span><span class="lbl">DS-1001</span></a>
+      <a href="#s-talk" data-go="talk"><span class="n">5</span><span class="lbl">Inglizcha</span></a>
+      <a href="#s-quiz" data-go="quiz"><span class="n">6</span><span class="lbl">Test</span></a>
+      <a href="#s-app" data-go="app"><span class="n">7</span><span class="lbl">Topshiriq</span></a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero" aria-labelledby="h1">
+    <div class="hero-top">
+      <div class="shield-row">
+        <span class="exit-tab">1-HAFTA · 1-DARS</span>
+        <span class="chip">110 daqiqa</span>
+        <span class="chip">Ingliz tili B1+</span>
+        <span class="chip">Oldingi bilim shart emas</span>
+      </div>
+      <h1 id="h1">Bitta yuk — bir jamoa</h1>
+      <p class="lead">AQSh logistikasida yukni kim jo‘natadi, kim tashkil qiladi, kim tashiydi va kim kuzatadi. Bugun bitta yukni Dallasdan Atlantaga birga olib borasiz va har bosqichda kim nima qilishini ko‘rasiz.</p>
+    </div>
+    <svg class="scene" viewBox="0 0 880 200" aria-hidden="true">
+      <defs><linearGradient id="beam" x1="0" x2="1"><stop offset="0" stop-color="#F6E7A6" stop-opacity=".55"/><stop offset="1" stop-color="#F6E7A6" stop-opacity="0"/></linearGradient></defs>
+      <g fill="#fff"><circle class="twinkle" cx="560" cy="22" r="1.6"/><circle class="twinkle" cx="640" cy="46" r="1.2" style="animation-delay:.8s"/><circle class="twinkle" cx="710" cy="18" r="1.5" style="animation-delay:1.4s"/><circle class="twinkle" cx="470" cy="40" r="1.1" style="animation-delay:2s"/><circle class="twinkle" cx="840" cy="30" r="1.3" style="animation-delay:.4s"/></g>
+      <circle cx="778" cy="48" r="20" fill="#F6E7A6" opacity=".92"/><circle cx="786" cy="42" r="18" fill="#0F3E2A" opacity=".55"/>
+      <path d="M0 138C90 108 170 118 260 132S430 94 540 120S740 98 880 124V200H0z" fill="rgba(0,0,0,.20)"/>
+      <path d="M0 160C120 138 230 150 330 156S560 132 680 150S820 140 880 148V200H0z" fill="rgba(0,0,0,.28)"/>
+      <path d="M20 152l9-30 9 30zM52 152l9-30 9 30zM330 152l9-30 9 30zM372 152l9-30 9 30zM780 152l9-30 9 30zM818 152l9-30 9 30z" fill="rgba(0,0,0,.34)"/>
+      <rect y="148" width="880" height="52" fill="#18201B"/><rect y="148" width="880" height="3" fill="rgba(255,255,255,.18)"/>
+      <path class="lane" d="M0 178H880" stroke="#F2C230" stroke-width="3" stroke-dasharray="30 26" fill="none"/>
+      <g transform="translate(470,68)"><rect x="-1.5" y="58" width="3" height="26" fill="#9AA79F"/><rect x="-24" y="0" width="48" height="60" rx="6" fill="#fff" stroke="#111" stroke-width="3"/><text x="0" y="15" text-anchor="middle" font-size="8" font-weight="800" fill="#111" font-family="Overpass,Arial,sans-serif" letter-spacing="1">ROL</text><text x="0" y="46" text-anchor="middle" font-size="30" font-weight="800" fill="#111" font-family="Overpass,Arial,sans-serif">7</text></g><g transform="translate(580,68)"><rect x="-1.5" y="58" width="3" height="26" fill="#9AA79F"/><rect x="-24" y="0" width="48" height="60" rx="6" fill="#fff" stroke="#111" stroke-width="3"/><text x="0" y="15" text-anchor="middle" font-size="8" font-weight="800" fill="#111" font-family="Overpass,Arial,sans-serif" letter-spacing="1">FAKT</text><text x="0" y="46" text-anchor="middle" font-size="30" font-weight="800" fill="#111" font-family="Overpass,Arial,sans-serif">✓</text></g><g transform="translate(690,68)"><rect x="-1.5" y="58" width="3" height="26" fill="#9AA79F"/><rect x="-24" y="0" width="48" height="60" rx="6" fill="#fff" stroke="#111" stroke-width="3"/><text x="0" y="15" text-anchor="middle" font-size="8" font-weight="800" fill="#111" font-family="Overpass,Arial,sans-serif" letter-spacing="1">TAXMIN</text><text x="0" y="46" text-anchor="middle" font-size="30" font-weight="800" fill="#111" font-family="Overpass,Arial,sans-serif">?</text></g>
+      <g class="rig"><path d="M204 152L340 138V170L204 160z" fill="url(#beam)"/><use href="#truck" x="76" y="110" width="132" height="51"/></g>
+    </svg>
+  </section>
+
+  <section class="sec" id="s-story" data-sec="story">
+    <div class="sign"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-warn"/></svg><div class="st-txt"><div class="exitno">EXIT 1</div><h2>Bir xabar 3 soat va bir mijozni yo‘qotdi</h2></div><div class="time">10 daqiqa</div><span class="stamp" aria-hidden="true">O‘TILDI ✓</span></div>
+    <div class="card story2">
+      <ol class="tl">
+        <li><time>10:10</time><div class="c"><p>Driver yozadi: <span class="mono">“Loading done. Waiting on paperwork.”</span></p></div></li>
+        <li class="bad"><time>10:12</time><div class="c"><p>Yangi updater shoshib brokerga yozadi: <span class="mono">“Truck is loaded and in transit, on time for delivery.”</span></p></div></li>
+        <li><time>10:15</time><div class="c"><p>Broker bu xabarni receiverga uzatadi va unloading uchun ertalabki slotni band qiladi.</p></div></li>
+        <li class="bad"><time>13:05</time><div class="c"><p>Shipper BOL’ni faqat 3 soatdan keyin beradi. Truck kech chiqadi, ertalabki slot boy beriladi.</p></div></li>
+      </ol>
+      
+      <div class="story-cost"><b>$150</b><span>receiverning kechikish jarimasi, yana broker ishonchi va keyingi yuklar</span></div>
+    </div>
+    <div class="prose">
+      <p>Xato bilimsizlikdan emas edi. Updater <strong>tasdiqlangan fakt</strong> (loading tugadi) bilan <strong>taxmin</strong>ni (yo‘lga chiqdi, vaqtida yetadi) aralashtirib yubordi. Bu dars aynan shu farqni o‘rgatadi.</p>
+    </div>
+    <div class="callout"><span class="lbl">Dars oxirida siz</span>
+      <ul style="margin:0;padding-left:20px;display:grid;gap:4px">
+        <li>yetti asosiy rolni bir-biridan ajratasiz;</li>
+        <li>yukning qidiruvdan POD’gacha bo‘lgan yo‘lini aytib berasiz;</li>
+        <li>tasdiqlangan ma’lumotni taxmindan ajratasiz;</li>
+        <li>load ID, holat, vaqt va keyingi qadam bilan update yozasiz.</li>
+      </ul>
+    </div>
+    <div class="ask teach-only"><span class="lbl">Guruhga savol</span><p>Updater 10:12 da nima deb yozishi kerak edi? Ikki-uch javobni eshiting, to‘g‘risini dars oxirida qaytib ko‘ramiz.</p></div>
+  </section>
+
+  <section class="sec" id="s-roles" data-sec="roles">
+    <div class="sign"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-people"/></svg><div class="st-txt"><div class="exitno">EXIT 2</div><h2>Kim nima qiladi</h2></div><div class="time">20 daqiqa</div><span class="stamp" aria-hidden="true">O‘TILDI ✓</span></div>
+    <div class="prose"><p>Yuqoridagi yashil chiziq yukning <strong>jismoniy</strong> harakati. Uzuq chiziqlar ishni tashkil qilish va <strong>axborot</strong> almashinuvi. Rolni bosing.</p></div>
+    <div class="card map-box">
+      <svg class="rolemap" viewBox="0 0 720 360" role="group" aria-label="Rollar xaritasi">
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" class="arrow"/></marker>
+          <marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" class="arrow2"/></marker>
+        </defs>
+        <path class="flow" d="M168 70H272" marker-end="url(#ah)"/>
+        <path class="flow" d="M448 70H552" marker-end="url(#ah)"/>
+        <text class="lab" x="220" y="58" text-anchor="middle">yuk</text>
+        <text class="lab" x="500" y="58" text-anchor="middle">yuk</text>
+        <path class="link" d="M90 100V180H262" marker-end="url(#ah2)"/>
+        <path class="link" d="M316 150V108" marker-end="url(#ah2)"/>
+        <text class="lab" x="120" y="172">buyurtma</text>
+        <text class="lab" x="324" y="132">kelishuv</text>
+        <rect class="team" x="196" y="236" width="508" height="110" rx="12"/>
+        <text class="lab" x="212" y="256">Carrier jamoasi</text>
+        <path class="link" d="M420 100V230" marker-end="url(#ah2)"/>
+        <g class="node" data-role="shipper" tabindex="0" role="button" aria-label="Shipper"><rect x="12" y="40" width="156" height="60" rx="10"/><text x="90" y="66" text-anchor="middle">SHIPPER</text><text class="sub" x="90" y="86" text-anchor="middle">jo‘natadi</text></g>
+        <g class="node" data-role="carrier" tabindex="0" role="button" aria-label="Carrier"><rect x="272" y="40" width="176" height="60" rx="10"/><text x="360" y="66" text-anchor="middle">CARRIER</text><text class="sub" x="360" y="86" text-anchor="middle">tashiydi</text></g>
+        <g class="node" data-role="receiver" tabindex="0" role="button" aria-label="Receiver"><rect x="552" y="40" width="156" height="60" rx="10"/><text x="630" y="66" text-anchor="middle">RECEIVER</text><text class="sub" x="630" y="86" text-anchor="middle">qabul qiladi</text></g>
+        <g class="node" data-role="broker" tabindex="0" role="button" aria-label="Broker"><rect x="262" y="150" width="108" height="60" rx="10"/><text x="316" y="176" text-anchor="middle">BROKER</text><text class="sub" x="316" y="196" text-anchor="middle">tashkil qiladi</text></g>
+        <g class="node" data-role="dispatcher" tabindex="0" role="button" aria-label="Dispatcher"><rect x="212" y="268" width="150" height="62" rx="10"/><text x="287" y="294" text-anchor="middle">DISPATCHER</text><text class="sub" x="287" y="314" text-anchor="middle">muvofiqlashtiradi</text></g>
+        <g class="node" data-role="updater" tabindex="0" role="button" aria-label="Updater"><rect x="376" y="268" width="150" height="62" rx="10"/><text x="451" y="294" text-anchor="middle">UPDATER</text><text class="sub" x="451" y="314" text-anchor="middle">kuzatadi, xabar beradi</text></g>
+        <g class="node" data-role="driver" tabindex="0" role="button" aria-label="Driver"><rect x="540" y="268" width="150" height="62" rx="10"/><text x="615" y="294" text-anchor="middle">DRIVER</text><text class="sub" x="615" y="314" text-anchor="middle">haydaydi</text></g>
+      </svg>
+    </div>
+    <div class="card role-detail" id="roleDetail" aria-live="polite"></div>
+    <div class="callout"><span class="lbl">Esda tuting</span><p>Shipper jo‘natadi → carrier tashiydi → receiver qabul qiladi. Broker tashishni tashkil qiladi, yukni o‘zi haydamaydi. Kichik kompaniyada updater ishini ko‘pincha dispatcher bajaradi; DispatchSim’da ham check-call’lar dispatcherda.</p></div>
+
+    <div class="card ex" id="exRoles">
+      <div class="ex-head"><h3>Mashq A. Bu kim?</h3><span class="tag">7 savol · 4 daqiqa</span></div>
+      <div id="rolesQ"></div>
+      <div class="btn-row"><button type="button" class="btn" id="rolesCheck">Tekshirish</button><span class="result" id="rolesRes"></span></div>
+    </div>
+  </section>
+
+  <section class="sec" id="s-life" data-sec="life">
+    <div class="sign"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-route"/></svg><div class="st-txt"><div class="exitno">EXIT 3</div><h2>Yukning to‘liq yo‘li</h2></div><div class="time">20 daqiqa</div><span class="stamp" aria-hidden="true">O‘TILDI ✓</span></div>
+    <div class="prose"><p>To‘qqiz bosqich. Har birida kim harakat qiladi, qaysi hujjat paydo bo‘ladi va yangi xodim qayerda adashadi.</p></div>
+    <div class="stepper">
+      <div class="steprail" aria-hidden="true">
+        <svg class="truck" id="stepTruck"><use href="#truck"/></svg>
+        <div class="ticks" id="ticks"></div>
+      </div>
+      <div class="card step-card" id="stepCard" aria-live="polite"></div>
+      <div class="btn-row"><button type="button" class="btn ghost" id="stepPrev">← Oldingi</button><button type="button" class="btn" id="stepNext">Keyingi bosqich →</button><span class="mono" id="stepNo"></span></div>
+    </div>
+
+    <div class="card ex" id="exOrder">
+      <div class="ex-head"><h3>Mashq B. Tartibga soling</h3><span class="tag">Bosqichlarni bosib, to‘g‘ri ketma-ketlikni yig‘ing</span></div>
+      <div class="pool" id="orderPool"></div>
+      <div class="built" id="orderBuilt" aria-label="Siz yig‘gan tartib"></div>
+      <div class="btn-row"><button type="button" class="btn" id="orderCheck">Tekshirish</button><button type="button" class="btn ghost" id="orderReset">Qaytadan</button><span class="result" id="orderRes"></span></div>
+    </div>
+  </section>
+
+  <section class="sec" id="s-case" data-sec="case">
+    <div class="sign"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-box"/></svg><div class="st-txt"><div class="exitno">EXIT 4</div><h2>Birga kuzatamiz: DS-1001</h2></div><div class="time">20 daqiqa</div><span class="stamp" aria-hidden="true">O‘TILDI ✓</span></div>
+    <div class="prose"><p>Siz updatersiz. Driver xabar yuboradi, siz holatni tanlaysiz. Faqat tasdiqlangan narsani yozing.</p><p style="font-size:13px;color:var(--muted)">Kompaniyalar, ismlar va yuk ma’lumotlari dars uchun o‘ylab topilgan.</p></div>
+    <div class="card case-meta">
+      <div class="kv"><span class="k">Load ID</span><span class="v">DS-1001</span></div>
+      <div class="kv"><span class="k">Pickup</span><span class="v">Oct 14 · 09:00 CDT · Dallas, TX</span></div>
+      <div class="kv"><span class="k">Delivery</span><span class="v">Oct 15 · 13:00 EDT · Atlanta, GA</span></div>
+      <div class="kv"><span class="k">Equipment</span><span class="v">Dry Van 53′ · 12 pallets</span></div>
+      <div class="kv"><span class="k">Shipper</span><span class="v">Cedar Box Supply</span></div>
+      <div class="kv"><span class="k">Receiver</span><span class="v">Eastgate Warehouse</span></div>
+      <div class="kv"><span class="k">PU ref</span><span class="v">PU-4512</span></div>
+      <div class="kv"><span class="k">Driver</span><span class="v">Alex</span></div>
+    </div>
+    <div class="card chat" id="chat" aria-live="polite"></div>
+    <div class="btn-row"><button type="button" class="btn" id="chatNext">Keyingi xabar</button><button type="button" class="btn ghost" id="chatReset">Boshidan</button></div>
+
+    <div class="card ex">
+      <div class="ex-head"><h3>Vaqt zonasi</h3><span class="tag">Atlanta Dallasdan 1 soat oldinda (oktabr)</span></div>
+      <div class="tz">
+        <div class="clock"><div class="c">DALLAS · CDT (UTC−5)</div><div class="h" id="tzA">08:45</div></div>
+        <div class="clock"><div class="c">ATLANTA · EDT (UTC−4)</div><div class="h" id="tzB">09:45</div></div>
+      </div>
+      <label for="tzRange" style="font-size:13px;color:var(--muted)">Dallas vaqtini suring</label>
+      <input type="range" id="tzRange" min="0" max="95" value="35">
+      <p style="font-size:13px;color:var(--muted)">CT va ET umumiy zona nomi. CDT/EDT yozgi vaqt; 1-noyabrdan keyin CST/EST bo‘ladi, shuning uchun xabarda sana ham kerak.</p>
+    </div>
+  </section>
+
+  <section class="sec" id="s-talk" data-sec="talk">
+    <div class="sign"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chat"/></svg><div class="st-txt"><div class="exitno">EXIT 5</div><h2>Ishdagi inglizcha</h2></div><div class="time">15 daqiqa</div><span class="stamp" aria-hidden="true">O‘TILDI ✓</span></div>
+    <div class="prose"><p>Har iborani tinglang va ovoz chiqarib takrorlang. <span class="teach-inline">Juft bo‘lib: biri updater, biri driver.</span></p></div>
+    <div class="phr" id="phrases"></div>
+
+    <div class="card ex" id="exBuild">
+      <div class="ex-head"><h3>Mashq C. Brokerga update yozing</h3><span class="tag">Vaziyat: Oct 14, 10:10 CDT</span></div>
+      <p>Driver: <span class="mono">“Loading is complete. I’m waiting for the BOL. I have not left yet.”</span> Boshqa yangilik yo‘q.</p>
+      <div class="form">
+        <div class="field"><label for="bLoad">Load ID</label><input id="bLoad" value="DS-1001"></div>
+        <div class="field"><label for="bStatus">Tasdiqlangan holat</label>
+          <select id="bStatus">
+            <option value="loaded">Loading was completed</option>
+            <option value="transit">The truck is in transit</option>
+            <option value="departed">The driver departed the shipper</option>
+            <option value="checked">The driver checked in</option>
+          </select></div>
+        <div class="field"><label for="bTime">Vaqt</label><input id="bTime" value="10:10" class="mono"></div>
+        <div class="field"><label for="bZone">Zona</label><select id="bZone"><option>CDT</option><option>EDT</option><option value="">— yozilmagan —</option></select></div>
+        <div class="field"><label for="bDate">Sana</label><input id="bDate" value="October 14"></div>
+        <div class="field"><label for="bSrc">Manba</label><select id="bSrc"><option value="per the driver">per the driver</option><option value="">— yozilmagan —</option></select></div>
+        <div class="field"><label for="bPending">Kutilmoqda</label><select id="bPending"><option value="He is waiting for the BOL and has not departed.">BOL kutilmoqda, chiqmagan</option><option value="Delivery is on time.">Delivery on time</option><option value="">— yo‘q —</option></select></div>
+        <div class="field"><label for="bNext">Keyingi qadam</label><select id="bNext"><option value="We will update you once he departs.">Chiqqanda update beramiz</option><option value="ETA to the receiver is 08:00 tomorrow.">ETA ertaga 08:00</option><option value="">— yo‘q —</option></select></div>
+      </div>
+      <div class="preview" id="bPreview"></div>
+      <div class="warns" id="bWarn"></div>
+    </div>
+  </section>
+
+  <section class="sec" id="s-quiz" data-sec="quiz">
+    <div class="sign"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-check"/></svg><div class="st-txt"><div class="exitno">EXIT 6</div><h2>O‘zingizni tekshiring</h2></div><div class="time">10 daqiqa</div><span class="stamp" aria-hidden="true">O‘TILDI ✓</span></div>
+    <div class="card ex">
+      <div id="quiz"></div>
+      <div class="btn-row"><button type="button" class="btn" id="quizCheck">Natijani ko‘rish</button><span class="result" id="quizRes"></span></div>
+    </div>
+  </section>
+
+  <section class="sec" id="s-app" data-sec="app">
+    <div class="sign"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-task"/></svg><div class="st-txt"><div class="exitno">EXIT 7</div><h2>Ilovada topshiriq</h2></div><div class="time">Uyda · 20 daqiqa</div><span class="stamp" aria-hidden="true">O‘TILDI ✓</span></div>
+    <div class="card task">
+      <span class="lbl">DispatchSim’da bajaring</span>
+      <ol>
+        <li><b>Load Board</b>’da istalgan bitta e’lonni oching.</li>
+        <li>Undan topib yozing: shipper, receiver, broker, equipment, pickup va delivery vaqti, vaqt zonasi.</li>
+        <li>Shu yuk uchun broker bilan chatni oching va <span class="mono">“Is this load still available?”</span> deb so‘rang.</li>
+        <li><b>Documents</b> sahifasini oching: BOL va POD qachon paydo bo‘lishini toping.</li>
+      </ol>
+      <div class="checks" id="appChecks">
+        <label><input type="checkbox" id="ac1"> E’londagi barcha maydonlarni topdim</label>
+        <label><input type="checkbox" id="ac2"> Broker bilan birinchi xabarni yozdim</label>
+        <label><input type="checkbox" id="ac3"> BOL va POD qayerda ekanini bilaman</label>
+      </div>
+    </div>
+
+    <div class="ex-head"><h3>Lug‘at: kartochkani bosing</h3><span class="tag">14 atama</span></div>
+    <div class="gl" id="gloss"></div>
+  </section>
+
+  <section class="finish" id="finish" aria-live="polite">
+    <span class="badge">DARS O‘TILDI</span>
+    <h2 id="finTitle"></h2>
+    <p id="finText"></p>
+    <div class="miles" id="miles"></div>
+  </section>
+
+  <section class="mentor" aria-labelledby="mentorH">
+    <div class="mentor-head"><div class="mentor-av" aria-hidden="true">M</div><div><h3 id="mentorH">Mentorga savol</h3><div class="sub">Javobni so‘ramang: o‘z fikringizni yozib, mentor bilan solishtiring. Mana boshlash uchun uchta savol.</div></div></div>
+    <div id="mqs" style="display:grid;gap:8px"></div>
+  </section>
+
+  <footer class="foot">
+    <p><b>Keyingi dars:</b> truck va trailer turlari, load e’lonini to‘liq o‘qish, manzil vaqti.</p>
+    <p>Broker va carrier vazifalari farqi: <a href="https://www.fmcsa.dot.gov/faq/what-are-definitions-motor-carrier-broker-and-freight-forwarder-authorities" target="_blank" rel="noopener">FMCSA ta’riflari</a>. Ish oqimi tushuntirish uchun soddalashtirilgan; aniq vakolatlar kompaniyaga bog‘liq.</p>
+  </footer>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(function(){
+  "use strict";
+  var store={get:function(k,d){try{var v=localStorage.getItem("ds-l1-"+k);return v===null?d:JSON.parse(v)}catch(e){return d}},set:function(k,v){try{localStorage.setItem("ds-l1-"+k,JSON.stringify(v))}catch(e){}}};
+  function $(s,r){return (r||document).querySelector(s)}
+  function el(t,a,c){var e=document.createElement(t);if(a)for(var k in a){if(k==="text")e.textContent=a[k];else if(k==="html")e.innerHTML=a[k];else e.setAttribute(k,a[k])}(c||[]).forEach(function(x){e.appendChild(typeof x==="string"?document.createTextNode(x):x)});return e}
+  function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+
+  /* progress */
+  var SECS=["story","roles","life","case","talk","quiz","app"];
+  var done=store.get("done",{});
+  function mark(s){if(done[s])return;done[s]=true;store.set("done",done);renderProg();toast("EXIT "+(SECS.indexOf(s)+1)+" o‘tildi")}
+  function renderProg(){var n=SECS.filter(function(s){return done[s]}).length;$("#progFill").style.width=(n/SECS.length*100)+"%";$("#progNum").textContent=n+"/"+SECS.length;SECS.forEach(function(x){var s=document.querySelector('[data-sec="'+x+'"]');if(s)s.classList.toggle("done",!!done[x]);var a=document.querySelector('.route a[data-go="'+x+'"]');if(a)a.classList.toggle("done",!!done[x])});renderFinish()}
+  renderProg();
+  if("IntersectionObserver" in window){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting&&true)mark("story")})},{threshold:.6});io.observe($("#s-story .callout"))}
+
+  /* mode */
+  if("IntersectionObserver" in window){var curIO=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){document.querySelectorAll(".route a").forEach(function(a){a.classList.toggle("cur",a.dataset.go===e.target.dataset.sec)})}})},{rootMargin:"-35% 0px -55% 0px"});document.querySelectorAll(".sec").forEach(function(s){curIO.observe(s)})}
+  var tt;function toast(m){var t=$("#toast");if(!t)return;t.textContent="✓ "+m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(function(){t.classList.remove("on")},2200)}
+  function renderFinish(){var f=$("#finish");if(!f)return;var n=SECS.filter(function(x){return done[x]}).length,all=n===SECS.length;f.classList.toggle("won",all);var m=$("#miles");m.innerHTML="";SECS.forEach(function(x,i){m.appendChild(el("i",{class:done[x]?"on":"",text:done[x]?"✓":String(i+1)}))});$("#finTitle").textContent=all?"Yo‘l tugadi: 1-dars bajarildi":"Yo‘l davom etyapti";var qs=store.get("qz",null);$("#finText").textContent=all?("Hamma 7 ta EXIT’dan o‘tdingiz."+(qs!==null?" Yakuniy test: "+qs+"/8.":"")+" Endi ilovadagi topshiriqni bajaring va mentorga savollaringizni bering. Keyingi dars: truck va trailer turlari."):("Yana "+(SECS.length-n)+" ta EXIT qoldi. Har bir bo‘limdagi mashqni bajarsangiz belgi yonadi.")}
+  function setMode(m){document.body.classList.toggle("teach",m==="teach");$("#modeTeach").setAttribute("aria-pressed",m==="teach");$("#modeSelf").setAttribute("aria-pressed",m!=="teach");store.set("mode",m)}
+  $("#modeTeach").onclick=function(){setMode("teach")};$("#modeSelf").onclick=function(){setMode("self")};
+  setMode(store.get("mode","self"));
+
+  /* roles */
+  var ROLES={
+    shipper:{n:"Shipper",w:"Yukni jo‘natuvchi tomon",d:"Yukni tayyorlaydi va topshiradi. Pickup manzili zavod, ombor yoki taqsimot markazi bo‘lishi mumkin. Shipper har doim mahsulotni ishlab chiqargan zavodning o‘zi bo‘lmaydi.",ex:"Driver yuk olish uchun Cedar Box Supply darvozasiga keladi. Bu shipperdagi pickup.",not:"Truck tanlamaydi va narxni carrier bilan bevosita kelishmaydi, agar u broker orqali ishlasa."},
+    broker:{n:"Broker",w:"Tashishni tashkil qiluvchi vositachi",d:"Shipperdan buyurtma oladi va bajaradigan carrierni topadi. Narx, manzil va vaqtni carrier bilan kelishadi, rate confirmation yuboradi, jarayon haqida update kutadi.",ex:"Broker dispatcherga pickup va delivery ma’lumotini yuborib, truck bormi deb so‘raydi.",not:"Yukni o‘zi haydamaydi. Broker va carrier FMCSA’da alohida ruxsatnoma turlari."},
+    carrier:{n:"Carrier",w:"Tashuvchi kompaniya",d:"Yukni tashishni zimmasiga oladi: truck va driver ajratadi. MC va USDOT raqamlari shu kompaniyaga tegishli.",ex:"Maple Road Carrier DS-1001 uchun Alex va dry van ajratadi.",not:"Yuk egasi emas; yukning sifati va qadoqlanishi uchun shipper javob beradi."},
+    dispatcher:{n:"Dispatcher",w:"Yuk va transportni muvofiqlashtiruvchi",d:"Truck qayerda va qachon bo‘shashini aniqlaydi, mos load izlaydi, broker bilan shartlarni kelishadi, rate con’ni tekshiradi va driverga aniq topshiriq yuboradi.",ex:"Rate con’dagi pickup vaqti kelishilganidan farq qilsa, imzolashdan oldin brokerga yozadi.",not:"Tasdiqlanmagan narxni “kelishildi” deb yozmaydi; equipment mosligini tekshirmasdan yuk olmaydi."},
+    updater:{n:"Updater",w:"Holatni kuzatuvchi va xabar beruvchi",d:"Driverdan yoki GPS/ELD’dan holatni oladi, brokerga tasdiqlangan update yuboradi, hujjatlarni so‘raydi. Sohada “track and trace”, “check calls” deb ham ataladi.",ex:"“Load DS-1001: checked in at 08:45 CDT, per the driver. Waiting for a dock.”",not:"Yangi narx yoki appointment’ni o‘zi tasdiqlamaydi; muammoni dispatcherga olib chiqadi."},
+    driver:{n:"Driver",w:"Haydovchi",d:"Truckni boshqaradi, joyda check-in qiladi, holat va hujjat haqida xabar beradi. HOS qoidalari uning haydash vaqtini cheklaydi.",ex:"“Checked in at the shipper. Waiting for a dock.”",not:"Haydash paytida javob kutmang: xavfsiz to‘xtaganda yozadi."},
+    receiver:{n:"Receiver",w:"Yukni qabul qiluvchi tomon",d:"Delivery nuqtasida yukni qabul qiladi, tushirishni boshqaradi va BOL yoki delivery receipt’ni imzolaydi. Bu imzo POD bo‘ladi.",ex:"Eastgate Warehouse 13:40 EDT da BOL’ni imzolaydi.",not:"Erta kelgan truckni darhol tushirishga majbur emas: appointment muhim."}
+  };
+  function showRole(k){var r=ROLES[k];document.querySelectorAll(".rolemap .node").forEach(function(n){n.classList.toggle("on",n.dataset.role===k)});var d=$("#roleDetail");d.innerHTML="";d.appendChild(el("h3",{text:r.n}));d.appendChild(el("p",{text:r.w,style:"font-weight:600"}));d.appendChild(el("p",{text:r.d}));d.appendChild(el("p",{html:"<span class=\"mono\">Misol:</span> "+r.ex.replace(/</g,"&lt;")}));d.appendChild(el("p",{class:"not",text:"Chegarasi: "+r.not}))}
+  document.querySelectorAll(".rolemap .node").forEach(function(n){n.addEventListener("click",function(){showRole(n.dataset.role)});n.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();showRole(n.dataset.role)}})});
+  showRole("broker");
+
+  var RQ=[["Yukni jo‘natishga topshiradi.","shipper"],["Tashishni tashkil qilib, carrier bilan narx kelishadi.","broker"],["Transportni boshqaradi.","driver"],["Brokerga tasdiqlangan holatni yuboradi.","updater"],["Yukni qabul qiladi va hujjatni imzolaydi.","receiver"],["Truck uchun mos load tanlaydi.","dispatcher"],["Tashishni zimmasiga olgan kompaniya.","carrier"]];
+  var RKEYS=["shipper","broker","carrier","dispatcher","updater","driver","receiver"];
+  var rAns={};
+  RQ.forEach(function(q,i){var box=el("div",{class:"q"});box.appendChild(el("p",{text:(i+1)+". "+q[0]}));var o=el("div",{class:"opts"});RKEYS.forEach(function(k){var b=el("button",{type:"button",class:"opt","aria-pressed":"false",text:ROLES[k].n});b.onclick=function(){rAns[i]=k;o.querySelectorAll(".opt").forEach(function(x){x.setAttribute("aria-pressed",x===b);x.classList.remove("right","wrong")})};o.appendChild(b)});box.appendChild(o);$("#rolesQ").appendChild(box)});
+  $("#rolesCheck").onclick=function(){var ok=0;document.querySelectorAll("#rolesQ .q").forEach(function(box,i){box.querySelectorAll(".opt").forEach(function(b){var k=RKEYS.filter(function(x){return ROLES[x].n===b.textContent})[0];b.classList.remove("right","wrong");if(k===RQ[i][1]&&(rAns[i]===k||document.body.classList.contains("teach")))b.classList.add("right");else if(rAns[i]===k)b.classList.add("wrong")});if(rAns[i]===RQ[i][1])ok++});$("#rolesRes").textContent=ok+"/7";if(ok>=5)mark("roles")};
+
+  /* lifecycle */
+  var STEPS=[
+    {en:"Load search",t:"Mos yukni izlash",who:"Dispatcher",d:"Truck qayerda bo‘shashi, equipment va vaqtga mos e’lonlarni ko‘radi. E’lonni ko‘rish yukni band qilish degani emas.",docs:[],trap:"Flatbed yuk dry van truckka mos kelmaydi. Equipment birinchi tekshiriladi."},
+    {en:"Booking",t:"Shartlarni kelishish",who:"Dispatcher ↔ Broker",d:"Mavjudlik, manzillar, appointment, equipment va narx aniqlashtiriladi. Broker carrierning MC raqamini tekshiradi.",docs:["MC"],trap:"“Kelishdik” deyish uchun narx ham, sharoit ham aniq bo‘lishi kerak."},
+    {en:"Rate confirmation",t:"Yozma shartni tekshirish",who:"Dispatcher",d:"Rate con’da load ID, carrier, manzillar, sana-vaqt, narx va shartlar bor. Og‘zaki kelishuv bilan solishtiriladi, keyin imzolanadi.",docs:["Rate con"],trap:"Hujjatdagi narx kelishilganidan past bo‘lishi mumkin. Imzolashdan oldin har doim solishtiring."},
+    {en:"Dispatch",t:"Driverga aniq topshiriq",who:"Dispatcher → Driver",d:"Pickup va delivery manzili, vaqti, reference raqam va kontaktlar yuboriladi. Driver ma’lumotni olganini tasdiqlaydi.",docs:["Dispatch details"],trap:"Booking broker bilan kelishuv; dispatch driverning ishini boshlash. Bular alohida qadamlar."},
+    {en:"Empty to pickup",t:"Pickupga bo‘sh borish",who:"Driver",d:"Truck hali yuksiz shipper tomon ketmoqda. Bu masofa deadhead deb ataladi va pul keltirmaydi.",docs:[],trap:"“Heading to pickup” hali “loaded” emas."},
+    {en:"Arrival and check-in",t:"Kelish va qayd",who:"Driver",d:"Driver darvozaga yetadi va korxona tartibi bo‘yicha ro‘yxatdan o‘tadi.",docs:["PU ref"],trap:"Arrived — yetib keldi. Checked in — qayd qilindi. Bu yuk ortish boshlandi degani emas."},
+    {en:"Loading and BOL",t:"Yuk ortish va BOL",who:"Shipper, Driver",d:"Yuk ortiladi va BOL (Bill of Lading) beriladi: yuk va tashish haqidagi asosiy hujjat. Driver BOL’dagi ma’lumot topshiriqqa mosligini tekshiradi.",docs:["BOL"],trap:"Loading tugashi, BOL olinishi va departure uch xil vaqtda bo‘lishi mumkin."},
+    {en:"In transit",t:"Yuk yo‘lda",who:"Driver, Updater",d:"Truck delivery tomon ketmoqda. Updater kelishilgan tartibda holatni tekshiradi. ETA manba va yangilangan vaqt bilan beriladi.",docs:["ETA"],trap:"Ma’lumot yetarli bo‘lmasa ETA to‘qimang: “ETA not confirmed yet” deb yozing."},
+    {en:"Delivery and POD",t:"Topshirish va POD",who:"Receiver, Driver",d:"Receiverda check-in, tushirish va imzo. Imzolangan BOL yoki delivery receipt POD (Proof of Delivery) bo‘ladi.",docs:["POD"],trap:"Receiverga yetib kelish hali POD bor degani emas."}
+  ];
+  var si=0;
+  var ticks=$("#ticks");STEPS.forEach(function(s,i){ticks.appendChild(el("span",{text:String(i+1)}))});
+  function renderStep(){var s=STEPS[si];var c=$("#stepCard");c.innerHTML="";c.appendChild(el("span",{class:"en",text:String(si+1).padStart(2,"0")+" · "+s.en.toUpperCase()}));c.appendChild(el("h3",{text:s.t}));c.appendChild(el("p",{html:"<b>Kim:</b> "+s.who}));c.appendChild(el("p",{text:s.d}));if(s.docs.length){var dd=el("div",{class:"docs"});s.docs.forEach(function(x){dd.appendChild(el("span",{class:"doc",text:x}))});c.appendChild(dd)}c.appendChild(el("p",{class:"trap",html:"<b>Yangi xodim xatosi:</b> "+s.trap}));
+    var rail=$(".steprail");var w=rail.clientWidth-96;$("#stepTruck").style.left=(8+(w-8)*si/(STEPS.length-1))+"px";
+    ticks.querySelectorAll("span").forEach(function(t,i){t.classList.toggle("on",i<=si)});
+    $("#stepNo").textContent=(si+1)+"/"+STEPS.length;$("#stepPrev").disabled=si===0;$("#stepNext").textContent=si===STEPS.length-1?"Boshiga qaytish ↺":"Keyingi bosqich →"}
+  $("#stepNext").onclick=function(){si=si===STEPS.length-1?0:si+1;renderStep()};
+  $("#stepPrev").onclick=function(){if(si>0){si--;renderStep()}};
+  window.addEventListener("resize",renderStep);
+  renderStep();
+
+  var order=[];
+  function renderOrder(){var pool=$("#orderPool"),built=$("#orderBuilt");pool.innerHTML="";built.innerHTML="";
+    shuffledIdx.forEach(function(i){if(order.indexOf(i)>-1)return;var b=el("button",{type:"button",class:"opt",text:STEPS[i].en});b.onclick=function(){order.push(i);renderOrder()};pool.appendChild(b)});
+    order.forEach(function(i,n){var b=el("button",{type:"button",class:"opt","data-n":String(n+1),text:STEPS[i].en,title:"Olib tashlash"});b.onclick=function(){order.splice(n,1);renderOrder()};built.appendChild(b)})}
+  var shuffledIdx=shuffle(STEPS.map(function(_,i){return i}));
+  renderOrder();
+  $("#orderReset").onclick=function(){order=[];shuffledIdx=shuffle(shuffledIdx);$("#orderRes").textContent="";renderOrder()};
+  $("#orderCheck").onclick=function(){if(order.length<STEPS.length){$("#orderRes").textContent="Hammasini joylang";return}var ok=0;$("#orderBuilt").querySelectorAll(".opt").forEach(function(b,n){var r=order[n]===n;b.classList.add(r?"right":"wrong");if(r)ok++});$("#orderRes").textContent=ok+"/"+STEPS.length+(ok===STEPS.length?" — to‘g‘ri":"");if(ok>=7)mark("life")};
+
+  /* chat case */
+  var CHAT=[
+    {t:"Oct 14 · 08:45 CDT",m:"I’m checked in at the shipper. Waiting for a dock.",a:["Checked in, waiting for a dock","Loading","Loaded"],c:0,why:"Tasdiqlangan: check-in va dock kutish. Loading haqida hali dalil yo‘q."},
+    {t:"Oct 14 · 10:10 CDT",m:"Loading is complete. Waiting on the BOL.",a:["In transit","Loaded, awaiting paperwork","Departed"],c:1,why:"Yuk ortildi, lekin BOL va chiqish tasdiqlanmagan. “In transit” deb yozish — hikoyadagi xato."},
+    {t:"Oct 14 · 10:30 CDT",m:"Got the BOL. Leaving the shipper now.",a:["Departed, delivery ETA not confirmed","On time for delivery","Delivered"],c:0,why:"Departure tasdiqlandi. ETA hali olinmagan, “on time” va’da qilinmaydi."},
+    {t:"Oct 15 · 11:40 EDT",m:"Checked in at the receiver. Appointment is at 13:00.",a:["Unloading","Checked in at the receiver","Delivered"],c:1,why:"Erta kelish tushirish boshlandi degani emas."},
+    {t:"Oct 15 · 13:40 EDT",m:"Unloaded. Receiver signed the BOL, sending a photo.",a:["Delivered, POD pending photo","Delivered, POD received","Checked in"],c:0,why:"Imzolangan BOL — POD. Lekin nusxa hali sizda yo‘q: rasmni so‘rang va o‘qilishini tekshiring."}
+  ];
+  var ci=0,chatOk=0;
+  function chatPush(){if(ci>=CHAT.length)return;var s=CHAT[ci],idx=ci;var chat=$("#chat");
+    var m=el("div",{class:"msg"});m.appendChild(el("div",{class:"who",text:"Alex · "+s.t}));m.appendChild(el("div",{text:s.m}));chat.appendChild(m);
+    var p=el("div",{class:"pick"});p.appendChild(el("span",{text:"Brokerga qaysi holatni yozasiz?",style:"font-size:13px;color:var(--muted)"}));var o=el("div",{class:"opts"});var fb=el("div",{class:"fb"});
+    s.a.forEach(function(a,j){var b=el("button",{type:"button",class:"opt",text:a});b.onclick=function(){if(p.dataset.done)return;p.dataset.done="1";o.querySelectorAll(".opt").forEach(function(x,k){if(k===s.c)x.classList.add("right")});if(j!==s.c)b.classList.add("wrong");else chatOk++;fb.className="fb show "+(j===s.c?"ok":"no");fb.textContent=s.why;if(idx===CHAT.length-1)mark("case")};o.appendChild(b)});
+    p.appendChild(o);p.appendChild(fb);chat.appendChild(p);ci++;$("#chatNext").disabled=ci>=CHAT.length;$("#chatNext").textContent=ci>=CHAT.length?"Hammasi o‘qildi":"Keyingi xabar"}
+  $("#chatNext").onclick=chatPush;
+  $("#chatReset").onclick=function(){$("#chat").innerHTML="";ci=0;chatOk=0;chatPush()};
+  chatPush();
+
+  function tz(){var v=+$("#tzRange").value;var mins=v*15;function f(m){m=((m%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")}$("#tzA").textContent=f(mins);$("#tzB").textContent=f(mins+60)}
+  $("#tzRange").oninput=tz;tz();
+
+  /* phrases */
+  var PH=[["Hi Alex, please confirm your current status for load DS-1001 when it is safe to reply.","Driverdan xavfsiz paytda holatni so‘rash"],["Are you checked in at the shipper?","Shipperda check-in qildingizmi?"],["Load DS-1001: The driver confirmed check-in at the Dallas shipper at 08:45 CDT on October 14.","Brokerga: check-in tasdiqlandi"],["Loading was completed at 10:10 CDT, per the driver. He is awaiting the BOL and has not departed.","Yuk ortildi, BOL kutilmoqda"],["The delivery ETA has not been confirmed. We are requesting an updated ETA from the driver.","ETA hali tasdiqlanmagan"],["The pickup time on the rate confirmation differs from the dispatch details. Please confirm the correct appointment.","Hujjatlar mos kelmasa — aniqlashtirish"]];
+  var canSpeak="speechSynthesis" in window;
+  PH.forEach(function(p){var row=el("div",{class:"phrase"});row.appendChild(el("div",{class:"en",text:p[0]}));var acts=el("div",{class:"acts"});
+    if(canSpeak){var s=el("button",{type:"button",class:"icon-btn",text:"Tinglash"});s.onclick=function(){try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(p[0]);u.lang="en-US";u.rate=.92;speechSynthesis.speak(u);mark("talk")}catch(e){}};acts.appendChild(s)}
+    var c=el("button",{type:"button",class:"icon-btn",text:"Nusxa"});c.onclick=function(){var done=function(){c.textContent="Olindi";setTimeout(function(){c.textContent="Nusxa"},1200)};try{navigator.clipboard.writeText(p[0]).then(done,function(){selectText(row.firstChild)})}catch(e){selectText(row.firstChild)}};acts.appendChild(c);
+    row.appendChild(acts);row.appendChild(el("div",{class:"uz",text:p[1]}));$("#phrases").appendChild(row)});
+  function selectText(n){try{var r=document.createRange();r.selectNodeContents(n);var s=getSelection();s.removeAllRanges();s.addRange(r)}catch(e){}}
+
+  /* update builder */
+  var STATUS={loaded:"Loading was completed",transit:"The truck is in transit",departed:"The driver departed the shipper",checked:"The driver checked in"};
+  function build(){var g=function(id){return $("#"+id).value.trim()};
+    var line1="Load "+(g("bLoad")||"[ID]")+": "+STATUS[g("bStatus")]+" at "+(g("bTime")||"[time]")+(g("bZone")?" "+g("bZone"):"")+" on "+(g("bDate")||"[date]")+(g("bSrc")?", "+g("bSrc"):"")+".";
+    var out=[line1,g("bPending"),g("bNext")].filter(Boolean).join(" ");$("#bPreview").textContent=out;
+    var w=[];if(g("bStatus")==="transit")w.push("“In transit” tasdiqlanmagan: driver hali chiqmagan.");if(g("bStatus")==="departed")w.push("Departure tasdiqlanmagan: driver “I have not left yet” dedi.");if(g("bStatus")==="checked")w.push("Check-in eski yangilik. Hozirgi holat — loading tugagan.");if(!g("bZone"))w.push("Vaqt zonasi yo‘q: Dallas yoki Atlanta vaqtimi, broker bilmaydi.");if(!g("bSrc"))w.push("Manba yo‘q: kim tasdiqlaganini yozing (per the driver).");if(g("bPending")==="Delivery is on time.")w.push("“On time” va’da qilinmoqda, lekin ETA olinmagan.");if(g("bNext").indexOf("ETA")>-1)w.push("ETA to‘qilgan: driver ETA bermadi.");if(!g("bNext"))w.push("Keyingi qadam yo‘q: broker qachon yana xabar olishini bilmaydi.");
+    var box=$("#bWarn");box.innerHTML="";if(w.length)w.forEach(function(x){box.appendChild(el("div",{class:"warn",text:x}))});else{box.appendChild(el("div",{class:"okline",text:"Yaxshi update: load ID, tasdiqlangan holat, vaqt va zona, manba, kutilayotgan narsa va keyingi qadam bor."}));mark("talk")}}
+  ["bLoad","bStatus","bTime","bZone","bDate","bSrc","bPending","bNext"].forEach(function(id){$("#"+id).addEventListener("input",build);$("#"+id).addEventListener("change",build)});
+  $("#bStatus").value="transit";build();
+
+  /* quiz */
+  var QZ=[
+    ["Broker bilan carrierning asosiy farqi nima?",["Broker tashishni tashkil qiladi, carrier tashiydi","Broker truck egasi, carrier vositachi","Ular bir xil ish qiladi"],0,"Broker tashkil qiladi; carrier yukni haqiqatda tashiydi."],
+    ["Booking bilan dispatch’ning farqi?",["Booking — broker bilan kelishuv, dispatch — driverga topshiriq","Ikkalasi bir xil","Dispatch broker bilan kelishuv"],0,"Booking broker bilan, dispatch driver bilan."],
+    ["Driver: “I’m at the gate, haven’t checked in yet.” To‘g‘ri update?",["The driver is loaded","The driver arrived at the gate and has not checked in yet","The driver is unloading"],1,"Faqat tasdiqlangan narsa: darvozada, check-in qilinmagan."],
+    ["Loading tugadi, BOL va departure yo‘q. “In transit” yozish mumkinmi?",["Ha","Yo‘q"],1,"Departure tasdiqlanmaguncha “in transit” yozilmaydi."],
+    ["Rate con nima uchun tekshiriladi?",["Og‘zaki kelishuv yozma shartlarga mosligini ko‘rish uchun","Bu shunchaki rasmiyatchilik","Driver uchun"],0,"Narx, sana, manzil — hammasi kelishilganiga mos bo‘lishi kerak."],
+    ["ETA tasdiqlanmagan bo‘lsa, “on time” yozish mumkinmi?",["Ha, appointment ma’lum bo‘lsa","Yo‘q, ETA hali tasdiqlanmagan deb ochiq yoziladi"],1,"Appointment — reja; ETA — driverdan olingan fakt."],
+    ["Dallasda 10:30 CDT. Atlantada (EDT) soat nechi?",["09:30","11:30","10:30"],1,"Oktabrda Atlanta Dallasdan 1 soat oldinda."],
+    ["Receiverga yetib kelish POD borligini anglatadimi?",["Ha","Yo‘q"],1,"Tushirish, imzo va hujjat nusxasi alohida tasdiqlanadi."]
+  ];
+  var qa={};
+  QZ.forEach(function(q,i){var box=el("div",{class:"q"});box.appendChild(el("p",{text:(i+1)+". "+q[0],style:"font-weight:600"}));var o=el("div",{class:"opts"});q[1].forEach(function(a,j){var b=el("button",{type:"button",class:"opt","aria-pressed":"false",text:a});b.onclick=function(){qa[i]=j;o.querySelectorAll(".opt").forEach(function(x){x.setAttribute("aria-pressed",x===b);x.classList.remove("right","wrong")});box.querySelector(".fb").className="fb"};o.appendChild(b)});box.appendChild(o);box.appendChild(el("div",{class:"fb"}));$("#quiz").appendChild(box)});
+  $("#quizCheck").onclick=function(){var ok=0;document.querySelectorAll("#quiz .q").forEach(function(box,i){var q=QZ[i];box.querySelectorAll(".opt").forEach(function(b,j){b.classList.remove("right","wrong");if(j===q[2])b.classList.add("right");else if(qa[i]===j)b.classList.add("wrong")});var fb=box.querySelector(".fb");var r=qa[i]===q[2];if(r)ok++;fb.className="fb show "+(r?"ok":"no");fb.textContent=q[3]});store.set("qz",ok);$("#quizRes").textContent=ok+"/"+QZ.length+(ok>=7?" — a’lo":ok>=5?" — yaxshi":" — yana bir bor ko‘rib chiqing");if(ok>=6)mark("quiz");renderFinish()};
+
+  /* app checks + glossary */
+  ["ac1","ac2","ac3"].forEach(function(id){var c=$("#"+id);c.checked=!!store.get(id,false);c.onchange=function(){store.set(id,c.checked);if($("#ac1").checked&&$("#ac2").checked&&$("#ac3").checked)mark("app")}});
+  var GL=[["Load","yuk buyurtmasi","Tashish uchun bitta buyurtma: qayerdan, qayerga, qachon, qanday transport."],["Shipper","jo‘natuvchi","Yukni topshiradigan tomon; pickup manzili."],["Receiver","qabul qiluvchi","Yukni qabul qilib, hujjatni imzolaydigan tomon."],["Broker","vositachi","Shipper va carrier o‘rtasida tashishni tashkil qiladi."],["Carrier","tashuvchi","Yukni tashishni zimmasiga olgan kompaniya; MC/USDOT egasi."],["Pickup","yuk olish","Shipperdagi yuk olish nuqtasi va vaqti."],["Delivery","yetkazish","Receiverga topshirish nuqtasi va vaqti."],["Appointment","belgilangan vaqt","Manzilda kutilayotgan vaqt; haqiqiy kelish vaqti emas."],["Deadhead","bo‘sh masofa","Yuk olishga yuksiz borilgan milya; pul keltirmaydi."],["Rate con","yozma kelishuv","Rate confirmation: narx va shartlar yozilgan, imzolanadigan hujjat."],["BOL","yuk hujjati","Bill of Lading: yuk va tashish ma’lumotlari; pickupda beriladi."],["POD","topshirish dalili","Proof of Delivery: ko‘pincha receiver imzolagan BOL."],["ETA","kutilgan kelish","Estimated Time of Arrival: manba va vaqt bilan beriladi, kafolat emas."],["Check-in","qayd","Manzilda ro‘yxatdan o‘tish; yuk ortish boshlandi degani emas."]];
+  GL.forEach(function(g){var b=el("button",{type:"button",class:"flip","aria-label":g[0]+": bosib izohni ko‘ring"});b.innerHTML='<div class="in"><div class="f"><b></b><span></span></div><div class="b"></div></div>';b.querySelector(".f b").textContent=g[0];b.querySelector(".f span").textContent=g[1];b.querySelector(".b").textContent=g[2];b.onclick=function(){b.classList.toggle("on")};$("#gloss").appendChild(b)});
+  var MQ=["Fakt bilan taxminni qanday ajrataman? Bugungi update’larimdan misol keltiring.", "Yetti rolning qaysi biri menga eng tushunarsiz va nega?", "Yuk yo‘lida eng ko‘p xato qayerda bo‘lishi mumkin deb o‘ylayman?"];
+  function copyText(btn,t){var ok=function(){btn.textContent="Olindi";setTimeout(function(){btn.textContent="Nusxa"},1200)};try{navigator.clipboard.writeText(t).then(ok,function(){})}catch(e){}}
+  MQ.forEach(function(q){var r=el("div",{class:"mq"});r.appendChild(el("span",{text:q}));var bt=el("button",{type:"button",class:"icon-btn",text:"Nusxa"});bt.onclick=function(){copyText(bt,q)};r.appendChild(bt);$("#mqs").appendChild(r)});
+})();
+</script>

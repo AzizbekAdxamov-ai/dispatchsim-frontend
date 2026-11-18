@@ -4,6 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "sync:course": "node scripts/sync-course.mjs",
+    "predev": "npm run sync:course",
+    "prebuild": "npm run sync:course",
     "dev": "vite",
     "build": "vite build",
     "build:map": "node scripts/build-us-map.mjs",

@@ -105,7 +105,8 @@ function NavEntry({ to, end, icon: Icon, label, shortLabel, badge, active, colla
 //   items    -- a flat list (Fleet, Finance, HR, Admin), unchanged.
 // Either way the logo collapses the sidebar to an icon rail and back,
 // and so does Ctrl/Cmd+B.
-export default function Sidebar({ items = DEFAULT_NAV_ITEMS, sections, settings, brandSub = 'Dispatch operations' }) {
+// `extraBottom`: more entries for the bottom group (the dispatch shell adds Academy).
+export default function Sidebar({ items = DEFAULT_NAV_ITEMS, sections, settings, brandSub = 'Dispatch operations', extraBottom = [] }) {
   const { user } = useAuth()
   const { pathname } = useLocation()
   const [collapsed, setCollapsed] = useState(readCollapsed)
@@ -158,6 +159,9 @@ export default function Sidebar({ items = DEFAULT_NAV_ITEMS, sections, settings,
   }
   if (sections && user?.isAdmin) {
     bottom.push({ key: 'admin', ...adminEntry, active: pathname.startsWith('/admin') })
+  }
+  for (const extra of extraBottom) {
+    bottom.push({ key: extra.to, ...extra, active: pathname.startsWith(extra.to) })
   }
 
   return (

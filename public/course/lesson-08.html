@@ -1,0 +1,952 @@
+<title>Muzokara va broker</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+[hidden]{display:none!important}
+p.prose{display:block;max-width:68ch}
+/* Layout: one reading column on an "interstate" ground — sections open with green exit-sign headers, the load travels a road through the page. */
+:root{
+  --ground:#EEF1EE; --surface:#FFFFFF; --surface-2:#E3E8E4; --ink:#16201B; --muted:#56635C; --line:#C9D2CC;
+  --sign:#0B5A38; --sign-ink:#FFFFFF; --accent:#0B6B42; --caution:#E0A100; --caution-ink:#2A2000;
+  --good:#1E7A47; --good-bg:#DDF0E4; --bad:#B3261E; --bad-bg:#F8DEDB; --asphalt:#2B302D; --lane:#F2C230;
+  --f-display:"Overpass","Arial Narrow",Arial,sans-serif; --f-body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --fs:16px; --radius:10px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#111613; --surface:#1A201C; --surface-2:#232B26; --ink:#E7ECE8; --muted:#9AA79F; --line:#34403A;
+  --sign:#0E6B43; --sign-ink:#FFFFFF; --accent:#4CC38A; --caution:#F2B705; --caution-ink:#2A2000;
+  --good:#5FD397; --good-bg:#16352A; --bad:#FF8A80; --bad-bg:#3A1E1C; --asphalt:#0B0E0C; --lane:#E9B820; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --ground:#111613; --surface:#1A201C; --surface-2:#232B26; --ink:#E7ECE8; --muted:#9AA79F; --line:#34403A;
+  --sign:#0E6B43; --sign-ink:#FFFFFF; --accent:#4CC38A; --caution:#F2B705; --caution-ink:#2A2000;
+  --good:#5FD397; --good-bg:#16352A; --bad:#FF8A80; --bad-bg:#3A1E1C; --asphalt:#0B0E0C; --lane:#E9B820; color-scheme:dark}
+body{background:var(--ground);color:var(--ink);font-family:var(--f-body);font-size:var(--fs);line-height:1.6}
+body.teach{--fs:19px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--sign)}
+*{box-sizing:border-box}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.15;margin:0}
+p{margin:0}
+.mono{font-family:var(--f-mono);font-size:.92em}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,[tabindex]:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--caution);outline-offset:2px}
+
+/* top bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--sign);color:var(--sign-ink);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:8px}
+.bar-in{max-width:880px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.bar-title{font-family:var(--f-display);font-weight:700;letter-spacing:.02em;font-size:15px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prog{flex:1 1 160px;display:flex;align-items:center;gap:8px;min-width:140px}
+.prog-track{flex:1;height:8px;background:rgba(255,255,255,.22);border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;width:0;background:var(--lane);transition:width .5s ease}
+.prog-num{font-family:var(--f-mono);font-size:12px}
+.mode{display:flex;background:rgba(0,0,0,.22);border-radius:99px;padding:3px}
+.mode button{border:0;background:transparent;color:var(--sign-ink);padding:4px 12px;border-radius:99px;font-size:13px;font-weight:600}
+.mode button[aria-pressed="true"]{background:var(--sign-ink);color:var(--sign)}
+
+/* page */
+.wrap{max-width:880px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px;display:flex;flex-direction:column;gap:56px}
+
+/* hero */
+.hero{display:flex;flex-direction:column;gap:18px}
+.shield-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.exit-tab{background:var(--sign);color:var(--sign-ink);font-family:var(--f-display);font-weight:800;font-size:13px;letter-spacing:.08em;padding:5px 10px 3px;border-radius:6px 6px 0 0;border:2px solid var(--sign-ink);box-shadow:0 0 0 2px var(--sign)}
+.hero h1{font-size:clamp(34px,6vw,56px);font-weight:800;letter-spacing:-.01em}
+.hero .lead{font-size:1.12em;color:var(--muted);max-width:62ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:13px;padding:4px 10px;border:1px solid var(--line);border-radius:99px;background:var(--surface);color:var(--ink)}
+.road{position:relative;height:120px;background:var(--asphalt);border-radius:var(--radius);overflow:hidden}
+.road::after{content:"";position:absolute;left:0;right:0;top:58px;height:4px;background:repeating-linear-gradient(90deg,var(--lane) 0 34px,transparent 34px 64px)}
+.city{position:absolute;bottom:10px;font-family:var(--f-display);font-weight:700;font-size:13px;color:#E7ECE8;letter-spacing:.04em}
+.city.a{left:14px}.city.b{right:14px;text-align:right}
+.city small{display:block;font-family:var(--f-mono);font-weight:500;font-size:11px;color:#9AA79F}
+.truck{position:absolute;top:22px;left:6%;width:120px;height:46px;transition:left 1.1s cubic-bezier(.5,0,.2,1)}
+.hero .truck{animation:drive 9s ease-in-out infinite alternate}
+@keyframes drive{0%{left:4%}100%{left:calc(96% - 120px)}}
+@media (prefers-reduced-motion:reduce){.hero .truck{animation:none}.truck,.prog-fill{transition:none}}
+
+/* sections */
+.sec{display:flex;flex-direction:column;gap:20px;scroll-margin-top:70px}
+.sign{background:var(--sign);color:var(--sign-ink);border-radius:var(--radius);padding:14px 18px 12px;border:3px solid var(--sign-ink);box-shadow:0 0 0 3px var(--sign);display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.sign h2{font-size:clamp(22px,3.4vw,30px);font-weight:800}
+.sign .exitno{font-family:var(--f-display);font-weight:800;font-size:12px;letter-spacing:.12em;opacity:.9}
+.sign .time{font-family:var(--f-mono);font-size:12px;opacity:.85}
+.prose{display:flex;flex-direction:column;gap:12px;max-width:68ch}
+.prose strong{font-weight:600}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+.callout{border-left:4px solid var(--caution);background:var(--surface);padding:12px 16px;border-radius:0 var(--radius) var(--radius) 0}
+.callout .lbl,.task .lbl{font-family:var(--f-display);font-weight:800;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;display:block}
+.teach-only,.teach-inline{display:none}
+body.teach .teach-inline{display:inline}
+body.teach .teach-only{display:block}
+body.teach .self-only{display:none}
+.ask{border:2px dashed var(--accent);border-radius:var(--radius);padding:12px 16px;background:var(--surface)}
+.ask .lbl{color:var(--accent);font-family:var(--f-display);font-weight:800;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+
+/* story */
+.story{display:grid;grid-template-columns:1fr;gap:14px}
+.story-line{display:grid;grid-template-columns:72px 1fr;gap:12px;align-items:start}
+.story-line .t{font-family:var(--f-mono);font-size:12px;color:var(--muted);padding-top:3px}
+.story-cost{display:flex;gap:16px;flex-wrap:wrap;align-items:baseline;border-top:1px solid var(--line);padding-top:12px}
+.story-cost b{font-family:var(--f-display);font-size:30px;color:var(--bad)}
+
+/* roles map */
+.map-box{overflow-x:auto}
+.rolemap{width:100%;min-width:620px;height:auto;display:block}
+.rolemap .node rect{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+.rolemap .node text{fill:var(--ink);font-family:var(--f-display);font-weight:700;font-size:15px}
+.rolemap .node .sub{fill:var(--muted);font-family:var(--f-body);font-weight:400;font-size:11.5px}
+.rolemap .node{cursor:pointer}
+.rolemap .node:hover rect,.rolemap .node:focus rect{stroke:var(--accent)}
+.rolemap .node.on rect{fill:var(--sign);stroke:var(--sign)}
+.rolemap .node.on text{fill:var(--sign-ink)}
+.rolemap .node:focus{outline:none}
+.rolemap .flow{stroke:var(--accent);stroke-width:3;fill:none}
+.rolemap .link{stroke:var(--muted);stroke-width:1.6;stroke-dasharray:5 5;fill:none}
+.rolemap .lab{fill:var(--muted);font-family:var(--f-body);font-size:11.5px}
+.rolemap .team{fill:none;stroke:var(--line);stroke-width:1.5;stroke-dasharray:3 4}
+.rolemap .arrow{fill:var(--accent)}.rolemap .arrow2{fill:var(--muted)}
+.role-detail{display:grid;gap:8px}
+.role-detail h3{font-size:22px}
+.role-detail .not{color:var(--muted)}
+
+/* exercises */
+.ex{display:flex;flex-direction:column;gap:14px}
+.ex-head{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.ex-head h3{font-size:19px}
+.ex-head .tag{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.q{display:flex;flex-direction:column;gap:8px;padding:12px 0;border-top:1px solid var(--line)}
+.q:first-of-type{border-top:0}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opt{border:1.5px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 12px;font-size:14px;text-align:left}
+.opt:hover{border-color:var(--accent)}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--surface-2)}
+.opt.right{border-color:var(--good);background:var(--good-bg);color:var(--ink)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-bg);color:var(--ink)}
+.fb{font-size:14px;padding:8px 12px;border-radius:8px;display:none}
+.fb.show{display:block}
+.fb.ok{background:var(--good-bg)}.fb.no{background:var(--bad-bg)}
+.btn{border:0;background:var(--accent);color:var(--surface);padding:9px 16px;border-radius:8px;font-weight:600;font-size:14px}
+:root .btn{color:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn{color:#0B1410}}
+:root[data-theme="dark"] .btn{color:#0B1410}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.result{font-family:var(--f-display);font-weight:800;font-size:18px}
+
+/* lifecycle stepper */
+.stepper{display:flex;flex-direction:column;gap:14px}
+.steprail{position:relative;height:96px;background:var(--asphalt);border-radius:var(--radius);overflow:hidden}
+.steprail::after{content:"";position:absolute;left:0;right:0;top:46px;height:3px;background:repeating-linear-gradient(90deg,var(--lane) 0 26px,transparent 26px 50px)}
+.steprail .truck{top:16px;width:96px;height:38px}
+.ticks{position:absolute;left:0;right:0;bottom:6px;display:flex;justify-content:space-between;padding:0 10px}
+.ticks span{font-family:var(--f-mono);font-size:11px;color:#9AA79F;width:20px;text-align:center}
+.ticks span.on{color:var(--lane)}
+.step-card{display:grid;gap:8px}
+.step-card .en{font-family:var(--f-mono);font-size:13px;color:var(--accent)}
+.step-card h3{font-size:24px}
+.docs{display:flex;gap:6px;flex-wrap:wrap}
+.doc{font-family:var(--f-mono);font-size:12px;padding:3px 8px;border-radius:5px;background:var(--caution);color:var(--caution-ink)}
+.trap{font-size:14px;color:var(--muted)}
+.trap b{color:var(--ink)}
+
+/* ordering */
+.pool,.built{display:flex;flex-wrap:wrap;gap:6px;min-height:44px}
+.built{border:1.5px dashed var(--line);border-radius:8px;padding:8px}
+.built .opt::before{content:attr(data-n) ". ";font-family:var(--f-mono);color:var(--muted)}
+
+/* chat case */
+.case-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.kv{display:flex;flex-direction:column;gap:2px}
+.kv .k{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-family:var(--f-display);font-weight:700}
+.kv .v{font-family:var(--f-mono);font-size:13px}
+.chat{display:flex;flex-direction:column;gap:12px}
+.msg{max-width:85%;background:var(--surface-2);border-radius:14px 14px 14px 4px;padding:10px 14px;animation:pop .35s ease}
+.msg .who{font-size:12px;color:var(--muted);font-family:var(--f-mono)}
+@keyframes pop{from{transform:translateY(8px);opacity:.3}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.msg{animation:none}}
+.pick{display:flex;flex-direction:column;gap:8px;padding-left:8px;border-left:3px solid var(--line)}
+
+/* tz */
+.tz{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.clock{background:var(--surface-2);border-radius:var(--radius);padding:14px;text-align:center}
+.clock .c{font-family:var(--f-display);font-weight:700;font-size:13px;color:var(--muted);letter-spacing:.05em}
+.clock .h{font-family:var(--f-mono);font-size:34px;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent)}
+
+/* phrases */
+.phr{display:grid;gap:10px}
+.phrase{display:grid;grid-template-columns:1fr auto;gap:8px 12px;align-items:center;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius)}
+.phrase .en{font-family:var(--f-mono);font-size:14px;min-width:0}
+.phrase .uz{grid-column:1/-1;font-size:13px;color:var(--muted)}
+.phrase .acts{display:flex;gap:6px}
+.icon-btn{border:1.5px solid var(--line);background:var(--surface);border-radius:8px;padding:5px 10px;font-size:12px;font-weight:600}
+
+/* builder */
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label{font-size:12px;color:var(--muted);font-weight:600}
+.field input,.field select{font:inherit;font-size:14px;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);min-width:0}
+.preview{font-family:var(--f-mono);font-size:14px;background:var(--asphalt);color:#E7ECE8;border-radius:var(--radius);padding:16px;white-space:pre-wrap;word-break:break-word;line-height:1.55}
+.warns{display:flex;flex-direction:column;gap:6px}
+.warn{font-size:14px;padding:8px 12px;border-radius:8px;background:var(--bad-bg)}
+.okline{font-size:14px;padding:8px 12px;border-radius:8px;background:var(--good-bg)}
+
+/* glossary */
+.gl{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.flip{perspective:800px;height:120px;border:0;padding:0;background:none;text-align:left}
+.flip .in{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.flip.on .in{transform:rotateY(180deg)}
+.flip .f,.flip .b{position:absolute;inset:0;backface-visibility:hidden;border-radius:var(--radius);padding:12px 14px;display:flex;flex-direction:column;justify-content:center;gap:4px;border:1px solid var(--line)}
+.flip .f{background:var(--surface)}
+.flip .f b{font-family:var(--f-display);font-size:19px}
+.flip .f span{font-size:12px;color:var(--muted)}
+.flip .b{background:var(--sign);color:var(--sign-ink);transform:rotateY(180deg);font-size:13px;line-height:1.45}
+@media (prefers-reduced-motion:reduce){.flip .in{transition:none}}
+
+/* app mission */
+.task{display:grid;gap:10px}
+.task ol{margin:0;padding-left:20px;display:grid;gap:6px}
+.checks{display:grid;gap:8px}
+.checks label{display:flex;gap:10px;align-items:flex-start;font-size:15px}
+.checks input{margin-top:5px;accent-color:var(--accent);width:18px;height:18px;flex:none}
+.foot{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px;display:grid;gap:6px}
+.foot a{color:var(--accent)}
+@media (max-width:520px){.bar-title{display:none}.story-line{grid-template-columns:56px 1fr}.tz{grid-template-columns:1fr}.mode button{padding:4px 9px}}
+
+/* lesson 2: trailer types */
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tab{border:1.5px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 12px;font-weight:600;font-size:14px;display:inline-flex;gap:8px;align-items:center}
+.tab .code{font-family:var(--f-mono);font-size:12px;background:var(--surface-2);border-radius:4px;padding:1px 6px}
+.tab[aria-selected="true"]{background:var(--sign);border-color:var(--sign);color:var(--sign-ink)}
+.tab[aria-selected="true"] .code{background:rgba(255,255,255,.18)}
+.rig-box{background:var(--asphalt);border-radius:var(--radius);padding:10px 12px 0;overflow:hidden}
+.rig{width:100%;height:auto;display:block;max-height:150px}
+.rig .ground{fill:var(--lane)}
+.rig .body{fill:#F4F6F4;stroke:#9AA79F;stroke-width:1.5}
+.rig .deck{fill:#C9D2CC}
+.rig .cargo{fill:var(--caution)}
+.rig .cab{fill:var(--sign)}
+.rig .glass{fill:#BFE3CF}
+.rig .unit{fill:#5B6A62}
+.rig .tire{fill:#111}
+.rig .hub{fill:#9AA79F}
+.rig .ghost{fill:none;stroke:#9AA79F;stroke-width:1.5;stroke-dasharray:6 5}
+.rig .lbl{fill:#E7ECE8;font-family:var(--f-mono);font-size:12px}
+.type-card{display:grid;gap:12px}
+.type-card h3{font-size:24px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.fact{background:var(--surface-2);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.fact .k{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-family:var(--f-display);font-weight:700}
+.fact .v{font-family:var(--f-mono);font-size:14px}
+.approx{font-size:12px;color:var(--muted)}
+
+/* match exercise */
+.match{display:grid;gap:0}
+.match .q p{font-weight:600}
+
+/* weight calculator */
+.calc{display:grid;gap:16px}
+.calc-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.calc label{font-size:13px;color:var(--muted);font-weight:600;display:flex;justify-content:space-between;gap:8px}
+.calc label output{font-family:var(--f-mono);color:var(--ink);font-variant-numeric:tabular-nums}
+.calc select{font:inherit;font-size:14px;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);width:100%}
+.wbar{position:relative;height:40px;border-radius:8px;background:var(--surface-2);overflow:visible}
+.wseg{position:absolute;top:0;bottom:0;transition:left .25s ease,width .25s ease}
+.wseg.tare{background:var(--muted);border-radius:8px 0 0 8px;left:0}
+.wseg.fuel{background:var(--caution)}
+.wseg.cargo{background:var(--accent)}
+.wseg.over{background:var(--bad)}
+.wline{position:absolute;top:-8px;bottom:-8px;width:3px;background:var(--ink);border-radius:2px}
+.wline span{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-family:var(--f-mono);font-size:11px;white-space:nowrap;color:var(--ink)}
+.wlegend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted)}
+.wlegend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.verdict{font-family:var(--f-display);font-weight:800;font-size:22px;font-variant-numeric:tabular-nums}
+.verdict.ok{color:var(--good)}.verdict.no{color:var(--bad)}
+.axles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.axle{background:var(--surface-2);border-radius:8px;padding:10px;text-align:center}
+.axle b{display:block;font-family:var(--f-mono);font-size:16px}
+.axle span{font-size:12px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.wseg{transition:none}}
+
+/* haul check */
+.truck-id{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.loads{display:grid;gap:12px}
+.lcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;display:grid;gap:10px}
+.lcard .lane{font-family:var(--f-display);font-weight:800;font-size:18px}
+.lrow{display:flex;flex-wrap:wrap;gap:6px}
+.lrow .chip{font-family:var(--f-mono);font-size:12px}
+.lcard .why{font-size:13px;color:var(--muted)}
+.lcard.done-ok{border-color:var(--good)}
+.lcard.done-no{border-color:var(--bad)}
+.sub-q{font-size:13px;color:var(--muted)}
+@media (max-width:520px){.axles{grid-template-columns:1fr}}
+
+/* lesson 3: HOS builder */
+.hos{display:grid;gap:14px}
+.clocks{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.hclock{background:var(--surface-2);border-radius:var(--radius);padding:12px 14px;display:grid;gap:6px}
+.hclock .c{font-family:var(--f-display);font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.hclock .h{font-family:var(--f-mono);font-size:28px;font-variant-numeric:tabular-nums}
+.hclock .meter{height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.hclock .meter i{display:block;height:100%;background:var(--accent);transition:width .3s ease}
+.hclock.low .h{color:var(--caution)}.hclock.low .meter i{background:var(--caution)}
+.hclock.out .h{color:var(--bad)}.hclock.out .meter i{background:var(--bad)}
+.tline{position:relative;height:44px;border-radius:8px;background:var(--surface-2);overflow:hidden;display:flex}
+.tline span{height:100%;display:block;border-right:1px solid var(--surface)}
+.tline .D{background:var(--accent)}.tline .ON{background:var(--caution)}.tline .OFF{background:var(--muted)}.tline .SB{background:var(--sign)}
+.tline .V{background:var(--bad)}
+.tscale{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.hbtns{display:flex;flex-wrap:wrap;gap:6px}
+.hbtns .btn{font-size:13px;padding:8px 12px}
+.hbtns .btn.D{background:var(--accent)}
+.hbtns .btn.ON{background:var(--caution);color:var(--caution-ink)}
+.hbtns .btn.OFF{background:var(--muted)}
+.hbtns .btn.SB{background:var(--sign);color:var(--sign-ink)}
+.vlog{display:grid;gap:6px}
+.now{font-family:var(--f-mono);font-size:14px;color:var(--muted)}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.rule{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;display:grid;gap:4px}
+.rule b{font-family:var(--f-display);font-size:26px;font-weight:800;color:var(--accent)}
+.rule span{font-size:14px}
+.status4{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.st{border-radius:var(--radius);padding:12px 14px;border:1px solid var(--line);background:var(--surface);display:grid;gap:4px}
+.st .k{font-family:var(--f-mono);font-size:12px;padding:2px 8px;border-radius:4px;justify-self:start}
+.st .k.D{background:var(--accent);color:var(--surface)}
+.st .k.ON{background:var(--caution);color:var(--caution-ink)}
+.st .k.OFF{background:var(--muted);color:var(--surface)}
+.st .k.SB{background:var(--sign);color:var(--sign-ink)}
+.basics{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.basic{background:var(--surface-2);border-radius:8px;padding:10px 12px;font-size:14px}
+.basic b{display:block;font-family:var(--f-display)}
+.msgpick{display:grid;gap:8px}
+.msgpick .opt{font-family:var(--f-mono);font-size:13px}
+
+/* ===== DESIGN v2 (lesson 3): scene hero, route rail, sign icons, dark ELD simulator, lettered options, finish card ===== */
+@property --p{syntax:"<number>";inherits:true;initial-value:0}
+:root{--sb:#2B6CB0;--shadow:0 1px 2px rgba(15,35,25,.06),0 10px 28px rgba(15,35,25,.08);--r2:16px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--sb:#5AA7E8;--shadow:0 10px 28px rgba(0,0,0,.4)}}
+:root[data-theme="dark"]{--sb:#5AA7E8;--shadow:0 10px 28px rgba(0,0,0,.4)}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(11,107,66,.16),transparent 70%);background-repeat:no-repeat}
+.wrap{gap:76px;padding-top:22px}
+.sec{position:relative;scroll-margin-top:118px}
+.sec::before{content:"";position:absolute;left:0;right:0;top:-38px;height:3px;border-radius:2px;background:repeating-linear-gradient(90deg,var(--lane) 0 28px,transparent 28px 56px);opacity:.5}
+.card{border-radius:var(--r2);box-shadow:var(--shadow)}
+
+/* route rail */
+.route{display:flex;gap:6px;overflow-x:auto;max-width:880px;margin:7px auto 0;padding-bottom:1px;scrollbar-width:none}
+.route::-webkit-scrollbar{display:none}
+.route a{flex:none;display:inline-flex;align-items:center;gap:6px;font:700 11px var(--f-display);letter-spacing:.06em;color:#fff;text-decoration:none;padding:3px 9px 3px 4px;border-radius:99px;background:rgba(0,0,0,.2)}
+.route a .n{width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center;font-size:11px}
+.route a .lbl{display:none}
+.route a.cur{background:#fff;color:var(--sign)}
+.route a.cur .lbl{display:inline}
+.route a.done .n{background:var(--lane);color:#2A2000;font-size:0}
+.route a.done .n::before{content:"✓";font-size:11px;font-weight:800}
+@media (min-width:1260px){
+  .route{position:fixed;left:max(16px,calc(50% - 440px - 190px));top:118px;flex-direction:column;gap:0;overflow:visible;margin:0;padding:0;width:164px}
+  .route a{background:none;color:var(--muted);padding:6px 0;border-radius:0;font-size:12px;gap:10px;position:relative}
+  .route a .n{width:24px;height:24px;border:2px solid var(--line);background:var(--surface);color:var(--muted);font-size:12px}
+  .route a .lbl{display:inline}
+  .route a:not(:last-child)::after{content:"";position:absolute;left:11px;top:31px;height:11px;width:2px;background:var(--line)}
+  .route a.done::after{background:var(--good)}
+  .route a.cur{background:none;color:var(--ink)}
+  .route a.cur .n{background:var(--sign);border-color:var(--sign);color:#fff}
+  .route a.done .n{background:var(--good);border-color:var(--good);color:#fff}
+}
+
+/* hero scene */
+.hero{gap:0;border-radius:24px;overflow:hidden;background:linear-gradient(165deg,#06281A 0%,#0B5A38 64%,#157553 100%);color:#fff;box-shadow:var(--shadow)}
+.hero-top{padding:34px 34px 6px;display:flex;flex-direction:column;gap:16px;position:relative;z-index:1}
+.hero h1{color:#fff;font-size:clamp(38px,7.4vw,68px);font-weight:800;letter-spacing:-.015em}
+.hero .lead{color:rgba(255,255,255,.84);max-width:56ch}
+.hero .chip{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.26);color:#fff}
+.scene{display:block;width:100%;height:auto;margin-top:6px}
+.scene .lane{animation:lane 1s linear infinite}
+@keyframes lane{to{stroke-dashoffset:-56}}
+.scene .rig{animation:bob 1.7s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.5px)}}
+.scene .twinkle{animation:tw 3s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.9}50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.scene .lane,.scene .rig,.scene .twinkle{animation:none}}
+@media (max-width:520px){.hero-top{padding:24px 20px 4px}}
+
+/* exit signs */
+.sign{position:relative;align-items:center;flex-wrap:nowrap;gap:14px;padding:16px 20px;background:linear-gradient(180deg,#0E6B43,#0B5A38)}
+.sign .ic{width:48px;height:48px;flex:none;fill:none;stroke:#fff;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;padding:9px;border:2px solid rgba(255,255,255,.85);border-radius:11px}
+.sign .st-txt{flex:1;min-width:0}
+.sign .time{white-space:nowrap;align-self:flex-end}
+.sign .stamp{position:absolute;right:16px;top:-15px;transform:rotate(-6deg) scale(.5);opacity:0;transition:transform .35s cubic-bezier(.3,1.6,.5,1),opacity .2s;font:800 11px var(--f-display);letter-spacing:.12em;background:var(--lane);color:#2A2000;padding:3px 10px 2px;border:2px solid #2A2000;border-radius:5px;pointer-events:none}
+.sec.done .sign .stamp{opacity:1;transform:rotate(-6deg) scale(1)}
+@media (max-width:560px){.sign .ic{display:none}.sign{flex-wrap:wrap}.sign .st-txt{flex-basis:100%}.sign .time{align-self:auto}}
+
+/* story timeline */
+.story2{display:grid;gap:18px}
+.daybar{display:flex;height:30px;border-radius:9px;overflow:hidden;background:var(--surface-2)}
+.daybar i{display:block;height:100%;border-right:1px solid var(--surface)}
+.daybar .D{background:var(--accent)}.daybar .ON{background:var(--caution)}.daybar .OFF{background:var(--muted)}
+.daybar .V{background:repeating-linear-gradient(45deg,#E5392F 0 6px,#B3261E 6px 12px);animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.55}}
+.dayscale{display:flex;justify-content:space-between;font:11px var(--f-mono);color:var(--muted);margin-top:-8px}
+.daylegend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted)}
+.daylegend i,.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.tl{list-style:none;margin:0;padding:0}
+.tl li{display:grid;grid-template-columns:54px 26px 1fr;position:relative;padding-bottom:18px}
+.tl li:last-child{padding-bottom:0}
+.tl li::before{content:"";grid-column:2;grid-row:1;justify-self:center;width:12px;height:12px;border-radius:50%;background:var(--accent);margin-top:7px;position:relative;z-index:1;box-shadow:0 0 0 4px var(--surface)}
+.tl li:not(:last-child)::after{content:"";position:absolute;left:66px;top:18px;bottom:-4px;width:2px;background:var(--line)}
+.tl time{grid-column:1;grid-row:1;font:12px var(--f-mono);color:var(--muted);padding-top:4px}
+.tl .c{grid-column:3;grid-row:1;min-width:0}
+.tl li.bad::before{background:#E5392F}
+.bubble{background:var(--surface-2);border-radius:16px 16px 16px 4px;padding:10px 14px;border-left:4px solid var(--bad);display:grid;gap:2px}
+.bubble .who{font:12px var(--f-mono);color:var(--muted)}
+.oos{background:#B3261E;color:#fff;border-radius:12px;padding:12px 16px;display:grid;gap:2px}
+.oos b{font:800 13px var(--f-display);letter-spacing:.14em}
+.story-cost{border:2px dashed var(--bad);border-radius:12px;padding:12px 16px;align-items:center}
+
+/* rule signs */
+.rules{gap:16px}
+.rule{background:#fff;color:#111;border:4px solid #111;border-radius:12px;padding:8px 14px 14px;text-align:center;display:grid;gap:2px;box-shadow:0 0 0 2px #fff,var(--shadow);outline:0}
+.rule::before{content:attr(data-label);font:800 11px var(--f-display);letter-spacing:.16em}
+.rule b{font-size:58px;line-height:1;color:#111;font-weight:800}
+.rule span{font-size:13px;color:#333;line-height:1.4}
+
+/* ELD block */
+.eld-grid{display:grid;grid-template-columns:minmax(210px,290px) 1fr;gap:22px;align-items:center}
+.eld-grid .status4{grid-template-columns:1fr 1fr}
+.eld-dev{width:100%;height:auto;display:block}
+.status4{gap:12px}
+.st{border-radius:14px;border:1px solid var(--line);border-top:5px solid var(--c,var(--line));box-shadow:var(--shadow)}
+.st.OFF{--c:var(--muted)}.st.SB{--c:var(--sb)}.st.D{--c:var(--accent)}.st.ON{--c:var(--caution)}
+.st .k.SB{background:var(--sb);color:#fff}
+@media (max-width:760px){.eld-grid{grid-template-columns:1fr}.eld-dev{max-width:300px;margin:0 auto}}
+@media (max-width:420px){.eld-grid .status4{grid-template-columns:1fr}}
+
+/* spot illustrations */
+.spot{display:block;width:100%;height:auto;border-radius:16px;box-shadow:var(--shadow)}
+
+/* HOS simulator: ELD-style dark panel */
+.card.hos{background:#141A16;border-color:#27312B;color:#E7ECE8;gap:16px;display:grid}
+.card.hos .ex-head h3{color:#fff}
+.card.hos .ex-head h3::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;background:#4CC38A;margin-right:9px;box-shadow:0 0 10px #4CC38A;animation:pulse 1.6s ease-in-out infinite}
+.card.hos .tag,.card.hos .tscale,.card.hos .now{color:#9AA79F}
+.card.hos .clocks{grid-template-columns:repeat(3,1fr);gap:8px}
+.hclock{background:rgba(255,255,255,.04);border:1px solid #27312B;text-align:center;justify-items:center;padding:14px 6px 10px;gap:8px;--rc:#4CC38A}
+.hclock .c{order:2;font:700 11px/1.25 var(--f-display);letter-spacing:.05em;color:#9AA79F}
+.hclock .ring{order:1;width:96px;height:96px;border-radius:50%;position:relative;display:grid;place-items:center;background:conic-gradient(var(--rc) calc(var(--p)*1%),rgba(255,255,255,.1) 0);transition:--p .45s ease}
+.hclock .ring::before{content:"";position:absolute;inset:9px;border-radius:50%;background:#141A16}
+.hclock .ring .h{position:relative;z-index:1;font:600 22px var(--f-mono);color:#E7ECE8;font-variant-numeric:tabular-nums}
+.hclock.low{--rc:#F2B705}.hclock.low .ring .h{color:#F2B705}
+.hclock.out{--rc:#FF6B5F}.hclock.out .ring .h{color:#FF8A80}
+@media (max-width:520px){.hclock .ring{width:76px;height:76px}.hclock .ring::before{inset:8px}.hclock .ring .h{font-size:17px}}
+.card.hos .tline{height:54px;background:#202823;border-radius:11px;position:relative}
+.card.hos .tline::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(90deg,transparent 0 calc(100%/24 - 1px),rgba(255,255,255,.09) 0 calc(100%/24))}
+.card.hos .tline span{border-right:1px solid #141A16}
+.card.hos .tline .D{background:#4CC38A}.card.hos .tline .ON{background:#F2B705}.card.hos .tline .OFF{background:#6B7770}.card.hos .tline .SB{background:var(--sb)}
+.card.hos .tline .V{background:repeating-linear-gradient(45deg,#E5392F 0 6px,#B3261E 6px 12px)}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:#9AA79F}
+.hbtns .btn{border-radius:99px;padding:9px 14px;transition:transform .08s,filter .15s}
+.hbtns .btn:hover{filter:brightness(1.1)}.hbtns .btn:active{transform:scale(.96)}
+.hbtns .btn.D{background:#4CC38A;color:#04210F}.hbtns .btn.ON{background:#F2B705;color:#2A2000}.hbtns .btn.OFF{background:#6B7770;color:#fff}.hbtns .btn.SB{background:var(--sb);color:#fff}
+.card.hos .btn.ghost{color:#E7ECE8;border-color:#3A4640}
+.card.hos .vlog .warn{background:rgba(255,107,95,.14);color:#FFB4AD;border-left:3px solid #FF6B5F}
+.card.hos .vlog .okline{background:rgba(95,211,151,.13);color:#9BE5BE;border-left:3px solid #4CC38A}
+
+/* exercises: lettered options */
+.opt{border-radius:12px;padding:9px 14px;display:flex;gap:10px;align-items:center;transition:transform .08s,border-color .15s,background .15s}
+.opt:active{transform:scale(.985)}
+:is(#quiz,#plans) .opts{flex-direction:column;align-items:stretch;counter-reset:o}
+:is(#quiz,#plans) .opt::before{counter-increment:o;content:counter(o,upper-alpha);flex:none;width:26px;height:26px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font:700 12px var(--f-mono)}
+:is(#quiz,#plans) .opt[aria-pressed="true"]::before{background:var(--accent);color:#fff}
+:is(#quiz,#plans) .opt.right::before{content:"✓";background:var(--good);color:#fff}
+:is(#quiz,#plans) .opt.wrong::before{content:"✗";background:var(--bad);color:#fff}
+#msgOpts .opt::before{content:"";flex:none;width:22px;height:22px;border:2px solid var(--line);border-radius:7px;display:grid;place-items:center;font-size:13px;color:#fff;font-weight:800}
+#msgOpts .opt[aria-pressed="true"]::before{content:"✓";background:var(--accent);border-color:var(--accent)}
+#msgOpts .opt.right::before{content:"✓";background:var(--good);border-color:var(--good)}
+#msgOpts .opt.wrong::before{content:"✗";background:var(--bad);border-color:var(--bad)}
+#statusQ .opt{min-width:64px;justify-content:center;font:700 13px var(--f-mono)}
+.fb{border-radius:10px;border-left:4px solid transparent}
+.fb.ok{border-left-color:var(--good)}.fb.no{border-left-color:var(--bad)}
+.fb.show{animation:pop2 .3s ease}
+@keyframes pop2{from{transform:translateY(-4px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.fb.show{animation:none}}
+.btn{border-radius:99px;padding:10px 20px;transition:transform .08s,filter .15s;box-shadow:0 2px 0 rgba(0,0,0,.18)}
+.btn:hover{filter:brightness(1.08)}.btn:active{transform:translateY(1px);box-shadow:none}
+.btn.ghost{box-shadow:none}
+.result:not(:empty){background:var(--surface-2);padding:3px 14px;border-radius:99px}
+.lcard{border-radius:16px;box-shadow:var(--shadow);border-left:6px solid var(--line);transition:border-color .2s}
+.lcard.done-ok{border-left-color:var(--good)}.lcard.done-no{border-left-color:var(--bad)}
+.lcard .lane{font-size:20px}
+.lrow .chip{background:var(--surface-2);border:0;border-radius:8px}
+.phrase{border-radius:16px 16px 16px 4px;border-left:4px solid var(--accent);box-shadow:var(--shadow)}
+.basic{border-left:4px solid var(--sign);border-radius:10px}
+.flip{height:130px}
+
+/* finish + mentor */
+.finish{border-radius:24px;padding:30px 24px;text-align:center;display:grid;gap:12px;justify-items:center;background:var(--surface);border:2px dashed var(--line)}
+.finish h2{font-size:clamp(24px,4vw,34px)}
+.finish p{color:var(--muted);max-width:52ch}
+.miles{display:flex;gap:7px;flex-wrap:wrap;justify-content:center}
+.miles i{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font:700 12px var(--f-mono);color:var(--muted);font-style:normal}
+.miles i.on{background:var(--lane);border-color:var(--lane);color:#2A2000}
+.finish.won{background:linear-gradient(165deg,#06281A,#0B5A38 70%,#157553);color:#fff;border:0;box-shadow:var(--shadow)}
+.finish.won p{color:rgba(255,255,255,.85)}
+.finish .badge{font:800 12px var(--f-display);letter-spacing:.14em;background:var(--lane);color:#2A2000;padding:4px 12px 3px;border-radius:5px;border:2px solid #2A2000;display:none}
+.finish.won .badge{display:inline-block;transform:rotate(-3deg)}
+.mentor{display:grid;gap:14px;border-radius:18px;padding:20px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow)}
+.mentor-head{display:flex;gap:14px;align-items:center}
+.mentor-av{width:46px;height:46px;border-radius:50%;background:var(--sign);color:#fff;display:grid;place-items:center;font:800 20px var(--f-display);flex:none}
+.mentor h3{font-size:20px}
+.mentor .sub{color:var(--muted);font-size:14px}
+.mq{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:var(--surface-2);border-radius:14px 14px 14px 4px;padding:10px 12px;font-size:14px}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,30px);opacity:0;pointer-events:none;background:var(--asphalt);color:#fff;font-weight:700;padding:10px 18px;border-radius:99px;border:2px solid var(--lane);z-index:30;transition:transform .3s cubic-bezier(.3,1.5,.5,1),opacity .2s;display:flex;gap:8px;align-items:center}
+.toast.on{transform:translate(-50%,0);opacity:1}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+.st{align-content:start}
+.st .k{align-self:start}
+.story-cost b{flex:none}
+.story-cost span{flex:1 1 260px}
+
+/* lesson 4: fleet & maintenance tools */
+.pm{display:grid;gap:16px}
+.pm-ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.pm-items{display:grid;gap:10px}
+.pm-item{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-left:6px solid var(--good);border-radius:14px;background:var(--surface)}
+.pm-item.soon{border-left-color:var(--caution)}.pm-item.over{border-left-color:var(--bad)}
+.pm-item .nm{font-weight:700}
+.pm-item .sub{font-size:12px;color:var(--muted);font-family:var(--f-mono)}
+.pm-state{font:800 12px var(--f-display);letter-spacing:.1em;text-transform:uppercase;color:var(--good)}
+.pm-item.soon .pm-state{color:#9A6B00}.pm-item.over .pm-state{color:var(--bad)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pm-item.soon .pm-state{color:var(--caution)}}
+:root[data-theme="dark"] .pm-item.soon .pm-state{color:var(--caution)}
+.pm-bar{grid-column:1/-1;height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.pm-bar i{display:block;height:100%;background:var(--good);transition:width .25s ease}
+.pm-item.soon .pm-bar i{background:var(--caution)}.pm-item.over .pm-bar i{background:var(--bad)}
+.pm-verdict{font-family:var(--f-display);font-weight:800;font-size:18px;padding:12px 16px;border-radius:12px;background:var(--good-bg)}
+.pm-verdict.soon{background:#FBEFC8;color:#3A2A00}.pm-verdict.over{background:var(--bad-bg)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .pm-verdict.soon{background:#3A3010;color:#F2D272}}
+:root[data-theme="dark"] .pm-verdict.soon{background:#3A3010;color:#F2D272}
+.stack{display:flex;height:38px;border-radius:10px;overflow:hidden;background:var(--surface-2)}
+.stack i{display:block;height:100%;border-right:2px solid var(--surface);transition:flex-basis .25s ease}
+.stack .a{background:#E5392F}.stack .b{background:var(--caution)}.stack .c{background:#7A5AF0}.stack .p{background:var(--good)}
+.stack-legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted)}
+.stack-legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.bignums{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.big{background:var(--surface-2);border-radius:12px;padding:12px 14px;display:grid;gap:2px}
+.big b{font:800 28px var(--f-display);font-variant-numeric:tabular-nums}
+.big span{font-size:12px;color:var(--muted)}
+.big.hot b{color:var(--bad)}.big.cool b{color:var(--good)}
+.tri{display:grid;gap:8px;padding:12px 0;border-top:1px solid var(--line)}
+.tri:first-of-type{border-top:0}
+.tri p{font-weight:600}
+.tri .opts{flex-wrap:wrap;flex-direction:row}
+.ord{display:grid;gap:12px}
+.ord .built{min-height:56px;flex-direction:column}
+.ord .built .opt{width:100%}
+.ord .pool{flex-direction:column}
+.ord .pool .opt{width:100%}
+.hl{font-weight:700}
+
+/* lesson 5: market & pricing tools */
+.chart{position:relative;height:210px;padding-bottom:26px;margin-top:6px}
+.plot{position:absolute;inset:18px 0 26px 0;display:flex;align-items:flex-end;gap:8px;border-bottom:2px solid var(--line)}
+.cw{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;min-width:0}
+.col{width:100%;border-radius:8px 8px 0 0;background:var(--accent);position:relative;transition:height .3s ease}
+.col.hi{background:#E5392F}
+.col span{position:absolute;top:-17px;left:0;right:0;text-align:center;font:600 11px var(--f-mono);color:var(--ink)}
+.cline{position:absolute;left:0;right:0;border-top:2px dashed var(--caution);z-index:2;pointer-events:none}
+.cline em{position:absolute;right:0;top:4px;font:700 11px var(--f-mono);font-style:normal;background:var(--caution);color:var(--caution-ink);padding:1px 8px;border-radius:5px}
+.days{position:absolute;left:0;right:0;bottom:0;height:22px;display:flex;gap:8px}
+.days span{flex:1;text-align:center;font:11px var(--f-mono);color:var(--muted)}
+.lanes{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.lanebtn{border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 14px;text-align:left;display:grid;gap:2px}
+.lanebtn b{font-family:var(--f-display);font-size:17px}
+.lanebtn span{font:12px var(--f-mono);color:var(--muted)}
+.lanebtn[aria-pressed="true"]{border-color:var(--accent);background:var(--surface-2)}
+.lanebtn.seen::after{content:"✓";position:absolute}
+.big.best{outline:3px solid var(--good)}
+.chain{display:block;width:100%;height:auto;border-radius:16px;box-shadow:var(--shadow)}
+.tri .opts.three .opt{flex:1 1 150px}
+.note{font-size:13px;color:var(--muted)}
+.price-grid{display:grid;gap:18px}
+@media (prefers-reduced-motion:reduce){.col{transition:none}}
+
+/* lesson 6: load board tools */
+.lcard{border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:14px;display:grid;gap:12px}
+.lcard-h{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 12px;font:12px var(--f-mono);color:var(--muted)}
+.hot-row{display:flex;flex-wrap:wrap;gap:8px}
+.hot{border:1.5px solid var(--line);background:var(--surface-2);border-radius:10px;padding:8px 12px;font:600 14px var(--f-mono);color:var(--ink);text-align:left;display:grid;gap:2px;cursor:pointer}
+.hot small{font:500 11px var(--f-body);color:var(--muted)}
+.hot[aria-pressed="true"]{border-color:var(--accent);background:var(--surface);box-shadow:0 0 0 2px var(--accent)}
+.hot.seen small::after{content:" ✓";color:var(--good);font-weight:700}
+.hot-info{padding:12px 14px;border-left:5px solid var(--accent);background:var(--surface-2);border-radius:0 10px 10px 0;min-height:64px}
+.hot-info b{display:block;margin-bottom:2px}
+.lb{display:grid;gap:8px}
+.lb-r{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:10px 12px;border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:12px;background:var(--surface);transition:opacity .2s}
+.lb-r.out{opacity:.3;border-left-color:var(--line)}
+.lb-r .a{font-weight:700}
+.lb-r .b,.lb-r .d{font:12px var(--f-mono);color:var(--muted)}
+.lb-r .c{font:800 18px var(--f-display);text-align:right;font-variant-numeric:tabular-nums}
+.lb-r .d{text-align:right}
+.calc select{width:100%;padding:9px 10px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit}
+.chk-list{display:grid;gap:6px;margin-top:6px}
+@media (prefers-reduced-motion:reduce){.lb-r{transition:none}}
+
+/* lesson 8: negotiation simulator */
+.sim-load{display:flex;flex-wrap:wrap;gap:6px 18px;font:13px var(--f-mono);color:var(--muted);padding:10px 12px;border:1px dashed var(--line);border-radius:10px}
+.sim-load b{color:var(--ink)}
+.chat-log{display:grid;gap:8px;padding:12px;background:var(--surface-2);border-radius:14px;max-height:460px;overflow:auto}
+.smsg{max-width:86%;padding:9px 12px;border-radius:14px;line-height:1.4;font-size:15px}
+.smsg small{display:block;font:600 11px var(--f-mono);margin-bottom:2px;opacity:.75}
+.smsg.b{justify-self:start;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-bottom-left-radius:4px}
+.smsg.me{justify-self:end;background:var(--sign);color:var(--sign-ink);border-bottom-right-radius:4px}
+.opts.sim-opts{display:grid;gap:8px}
+.opts.sim-opts .opt{text-align:left;width:100%}
+.sim-end{padding:14px 16px;border-radius:12px;border:2px solid var(--line);background:var(--surface);display:grid;gap:6px}
+.sim-end.good{border-color:var(--good);background:var(--good-bg)}
+.sim-end.bad{border-color:var(--bad);background:var(--bad-bg)}
+.sim-end.mid{border-color:var(--caution)}
+.sim-end .t{font:800 20px var(--f-display)}
+.sim-stats{display:flex;flex-wrap:wrap;gap:6px 18px;font:13px var(--f-mono)}
+.ladder{margin-top:6px}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="truck" viewBox="0 0 120 46">
+      <rect x="2" y="4" width="78" height="30" rx="2" fill="#F4F6F4" stroke="#9AA79F"/>
+      <text x="41" y="24" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#2B302D">FLOOR · 214</text>
+      <path d="M82 12h18l12 11v11H82z" fill="#0E6B43"/>
+      <path d="M100 15h-12v8h21z" fill="#BFE3CF"/>
+      <rect x="80" y="30" width="34" height="5" fill="#1B201D"/>
+      <circle cx="18" cy="38" r="6" fill="#111"/><circle cx="18" cy="38" r="2.4" fill="#9AA79F"/>
+      <circle cx="34" cy="38" r="6" fill="#111"/><circle cx="34" cy="38" r="2.4" fill="#9AA79F"/>
+      <circle cx="92" cy="38" r="6" fill="#111"/><circle cx="92" cy="38" r="2.4" fill="#9AA79F"/>
+      <circle cx="106" cy="38" r="6" fill="#111"/><circle cx="106" cy="38" r="2.4" fill="#9AA79F"/>
+    </symbol>
+    <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3 2.5 20h19L12 3z"/><path d="M12 10v5M12 17.5v.5"/></symbol>
+    <symbol id="i-board" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 9v11M13 13h5M13 16.5h3"/></symbol>
+    <symbol id="i-money" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6.5 9v.01M17.5 15v.01"/></symbol>
+    <symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="18" r="2.3"/><circle cx="18" cy="6" r="2.3"/><path d="M8.3 17.6C15 18 8 7 15.8 6.4"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.2 7.8-8 9-4.8-1.2-8-4.5-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></symbol>
+    <symbol id="i-quote" viewBox="0 0 24 24"><path d="M5 18v-5a5 5 0 0 1 5-5M13 18v-5a5 5 0 0 1 5-5"/><path d="M5 18h5v-5H5zM13 18h5v-5h-5z"/></symbol>
+    <symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 4v16M6 20h12M4 8h16"/><path d="M4 8l-2 6a3 3 0 0 0 6 0L6 8M18 8l-2 6a3 3 0 0 0 6 0l-2-6" transform="translate(-1 0)"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4V5z"/><path d="M8 9.5h8M8 12.5h5"/></symbol>
+    <symbol id="i-task" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></symbol>
+  </defs>
+</svg>
+
+<header class="bar" role="banner">
+  <div class="bar-in">
+    <div class="bar-title">4-hafta · 8-dars · Muzokara va broker</div>
+    <div class="prog" aria-label="Dars bo‘yicha jarayon">
+      <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+      <span class="prog-num" id="progNum">0/7</span>
+    </div>
+    <div class="mode" role="group" aria-label="Rejim">
+      <button type="button" id="modeSelf" aria-pressed="true">Mustaqil</button>
+      <button type="button" id="modeTeach" aria-pressed="false">Darsda</button>
+    </div>
+    <nav class="route" aria-label="Dars yo‘li">
+      <a href="#s-story" data-go="story"><span class="n">1</span><span class="lbl">Hikoya</span></a>
+      <a href="#s-nums" data-go="nums"><span class="n">2</span><span class="lbl">Uch raqam</span></a>
+      <a href="#s-lang" data-go="lang"><span class="n">3</span><span class="lbl">Til va savollar</span></a>
+      <a href="#s-sim" data-go="sim"><span class="n">4</span><span class="lbl">Simulyator</span></a>
+      <a href="#s-pos" data-go="pos"><span class="n">5</span><span class="lbl">Pozitsiya</span></a>
+      <a href="#s-talk" data-go="talk"><span class="n">6</span><span class="lbl">Inglizcha</span></a>
+      <a href="#s-app" data-go="app"><span class="n">7</span><span class="lbl">Topshiriq</span></a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero" aria-labelledby="h1">
+    <div class="hero-top">
+      <div class="shield-row">
+        <span class="exit-tab">4-HAFTA · 8-DARS</span>
+        <span class="chip">125 daqiqa</span>
+        <span class="chip">Ingliz tili B1+</span>
+        <span class="chip">1–7-darslar o‘tilgan</span>
+      </div>
+      <h1 id="h1">Muzokara va broker psixologiyasi</h1>
+      <p class="lead">Birinchi taklifga rozi bo‘lish eng qimmat xato bo‘lishi mumkin. Bugun o‘z minimal narxingizni bilgan holda muzokaraga kirishni, qisqa va hurmatli jumlalar bilan narx so‘rashni va brokerning ham o‘z bosimi borligini hisobga olishni o‘rganasiz.</p>
+    </div>
+    <svg class="scene" viewBox="0 0 880 200" aria-hidden="true">
+      <defs><linearGradient id="beam" x1="0" x2="1"><stop offset="0" stop-color="#F6E7A6" stop-opacity=".55"/><stop offset="1" stop-color="#F6E7A6" stop-opacity="0"/></linearGradient></defs>
+      <g fill="#fff"><circle class="twinkle" cx="560" cy="22" r="1.6"/><circle class="twinkle" cx="640" cy="46" r="1.2" style="animation-delay:.8s"/><circle class="twinkle" cx="710" cy="18" r="1.5" style="animation-delay:1.4s"/><circle class="twinkle" cx="470" cy="40" r="1.1" style="animation-delay:2s"/><circle class="twinkle" cx="840" cy="30" r="1.3" style="animation-delay:.4s"/></g>
+      <circle cx="778" cy="48" r="20" fill="#F6E7A6" opacity=".92"/><circle cx="786" cy="42" r="18" fill="#0F3E2A" opacity=".55"/>
+      <path d="M0 138C90 108 170 118 260 132S430 94 540 120S740 98 880 124V200H0z" fill="rgba(0,0,0,.20)"/>
+      <path d="M0 160C120 138 230 150 330 156S560 132 680 150S820 140 880 148V200H0z" fill="rgba(0,0,0,.28)"/>
+      <path d="M20 152l9-30 9 30zM52 152l9-30 9 30zM330 152l9-30 9 30zM372 152l9-30 9 30zM780 152l9-30 9 30zM818 152l9-30 9 30z" fill="rgba(0,0,0,.34)"/>
+      <rect y="148" width="880" height="52" fill="#18201B"/><rect y="148" width="880" height="3" fill="rgba(255,255,255,.18)"/>
+      <path class="lane" d="M0 178H880" stroke="#F2C230" stroke-width="3" stroke-dasharray="30 26" fill="none"/>
+      <g transform="translate(470,68)"><rect x="-1.5" y="58" width="3" height="26" fill="#9AA79F"/><rect x="-24" y="0" width="48" height="60" rx="6" fill="#fff" stroke="#111" stroke-width="3"/><text x="0" y="15" text-anchor="middle" font-size="8" font-weight="800" fill="#111" font-family="Overpass,Arial,sans-serif" letter-spacing="1">OCHISH</text><text x="0" y="46" text-anchor="middle" font-size="24" font-weight="800" fill="#111" font-family="Overpass,Arial,sans-serif">115%</text></g>
+      <g transform="translate(580,68)"><rect x="-1.5" y="58" width="3" height="26" fill="#9AA79F"/><rect x="-24" y="0" width="48" height="60" rx="6" fill="#fff" stroke="#111" stroke-width="3"/><text x="0" y="15" text-anchor="middle" font-size="8" font-weight="800" fill="#111" font-family="Overpass,Arial,sans-serif" letter-spacing="1">MAQSAD</text><text x="0" y="46" text-anchor="middle" font-size="20" font-weight="800" fill="#111" font-family="Overpass,Arial,sans-serif">$1.9K</text></g>
+      <g transform="translate(690,68)"><rect x="-1.5" y="58" width="3" height="26" fill="#9AA79F"/><rect x="-24" y="0" width="48" height="60" rx="6" fill="#fff" stroke="#111" stroke-width="3"/><text x="0" y="15" text-anchor="middle" font-size="8" font-weight="800" fill="#111" font-family="Overpass,Arial,sans-serif" letter-spacing="1">FLOOR</text><text x="0" y="46" text-anchor="middle" font-size="20" font-weight="800" fill="#111" font-family="Overpass,Arial,sans-serif">$1.8K</text></g>
+      <g class="rig"><path d="M204 152L340 138V170L204 160z" fill="url(#beam)"/><use href="#truck" x="76" y="110" width="132" height="51"/></g>
+    </svg>
+  </section>
+
+  <section class="sec" id="s-story" data-sec="story">
+    <div class="sign"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-warn"/></svg><div class="st-txt"><div class="exitno">EXIT 1</div><h2>Bir xil yuk, ikki xil dispatcher</h2></div><div class="time">10 daqiqa</div><span class="stamp" aria-hidden="true">O‘TILDI ✓</span></div>
+    <div class="card story2">
+      <ol class="tl">
+        <li><time>Du 09:00</time><div class="c"><p>Dispatcher Ali Atlanta → Chicago yukini topadi: ≈ 700 mil yukli + 100 mil bo‘sh. Truck’ning minimal narxi (7-dars usuli bilan) <b>$1 800</b>. Ali buni hisoblamagan.</p></div></li>
+        <li class="bad"><time>09:03</time><div class="c"><p>Broker: “$1 600 all-in.” Ali: “<span class="mono">What's your best rate?</span>”</p></div></li>
+        <li class="bad"><time>09:04</time><div class="c"><p>Broker: “$1 600 is my best.” Ali: “OK, I'll take it.” Yuk <b>$1 600</b> ga band bo‘ladi.</p></div></li>
+        <li><time>Se 09:00</time><div class="c"><p>Dispatcher Dina shu yo‘nalishdagi o‘xshash yuk bilan ishlaydi. U oldindan biladi: break-even $1 280, minimal narx <b>$1 800</b>, maqsad $1 900, ochilish narxi <b>$2 050</b>.</p></div></li>
+        <li><time>09:15</time><div class="c"><p>Dina avval o‘z narxini aytadi, savol bilan siljitadi, oxirida shartli taklif beradi. Yuk <b>$1 850</b> ga yopiladi.</p></div></li>
+      </ol>
+      <div class="story-cost"><b>$250</b><span>Ali va Dina yopgan narx orasidagi farq. Ali minimal narxdan past ishladi, Dina esa undan yuqori. O‘quv misoli: real broker har doim ham siljimaydi.</span></div>
+    </div>
+    <div class="callout"><span class="lbl">Qoida</span>Muzokara ovoz balandligi emas, tayyorgarlik. Narx aytishdan oldin uch raqamni biling: eng past (floor), maqsad (target) va ochilish (anchor).</div>
+    <div class="ask teach-only"><span class="lbl">Guruhga savol</span><p>Ali qaysi jumlada imkonni boy berdi? Dina ayni qaysi uch qadam bilan narxni oshirdi?</p></div>
+  </section>
+
+  <section class="sec" id="s-nums" data-sec="nums">
+    <div class="sign"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-target"/></svg><div class="st-txt"><div class="exitno">EXIT 2</div><h2>Uch raqam: floor, target, anchor</h2></div><div class="time">20 daqiqa</div><span class="stamp" aria-hidden="true">O‘TILDI ✓</span></div>
+    <div class="rules">
+      <div class="rule" data-label="FLOOR"><b>Eng past</b><span>Shundan past narxga ishlamaysiz. 7-darsdagi minimal narx shu raqamni beradi.</span></div>
+      <div class="rule" data-label="TARGET"><b>Maqsad</b><span>Muzokara oxirida yopilishini umid qilgan narx.</span></div>
+      <div class="rule" data-label="ANCHOR"><b>Ochilish</b><span>Brokerga birinchi aytadigan narx: maqsaddan yuqori, siljish uchun joy bilan.</span></div>
+    </div>
+    <p class="prose">FreightWaves maqolasidagi misolda maqsad $2 000, ochilish esa $2 300 (≈ 115%). Ochilish narxini $2 075 kabi “yumaloq bo‘lmagan” raqam qilish hisoblangan, o‘ylab aytilgan taassurot beradi, deb tavsiya qilinadi. Bu mutaxassis tavsiyasi, qat’iy qoida emas.</p>
+    <div class="card pm">
+      <div class="ex-head"><h3>Uch raqam kalkulyatori</h3><span class="tag">sliderlarni suring</span></div>
+      <div class="pm-ctl calc">
+        <div><label for="nFloor">Floor (minimal narx) <output id="nFloorO"></output></label><input type="range" id="nFloor" min="1000" max="2500" step="50" value="1800"></div>
+        <div><label for="nTarget">Target (floor’dan yuqori) <output id="nTargetO"></output></label><input type="range" id="nTarget" min="0" max="400" step="25" value="100"></div>
+        <div><label for="nAnchor">Anchor (target’dan necha foiz yuqori) <output id="nAnchorO"></output></label><input type="range" id="nAnchor" min="100" max="130" step="1" value="108"></div>
+      </div>
+      <div class="chart ladder" role="img" aria-label="Floor, target va anchor narxlari ustunlar ko‘rinishida">
+        <div class="plot" id="nPlot"></div>
+        <div class="days"><span>Floor</span><span>Target</span><span>Anchor</span></div>
+      </div>
+      <div class="pm-verdict" id="nVerdict" aria-live="polite"></div>
+      <div class="result" id="nRes"></div>
+    </div>
+    <div class="card ex" id="exNums">
+      <div class="ex-head"><h3>Mashq: bu qaysi raqam?</h3><span class="tag">4 holat</span></div>
+      <div id="numList"></div>
+      <div class="btn-row"><button type="button" class="btn" id="numCheck">Tekshirish</button><span class="result" id="numRes"></span></div>
+    </div>
+  </section>
+
+  <section class="sec" id="s-lang" data-sec="lang">
+    <div class="sign"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-quote"/></svg><div class="st-txt"><div class="exitno">EXIT 3</div><h2>Nima deyish kerak, nima yo‘q</h2></div><div class="time">15 daqiqa</div><span class="stamp" aria-hidden="true">O‘TILDI ✓</span></div>
+    <p class="prose">Tajribali dispatcherlar va mutaxassislar quyidagilarni tavsiya qiladi: to‘g‘ridan-to‘g‘ri va xushmuomala gapirish, o‘z narxingizni birinchi bo‘lib aytish, foydali ma’lumot berish (masalan, pickup’ga yaqinligingiz), “nima o‘zgarsa kelishamiz?” deb so‘rash. Aksincha, “eng yaxshi narx”, “arzon” kabi so‘zlar, boshqa broker narxini ro‘kach qilish va “nega?” deb so‘rash munosabatni buzishi mumkin.</p>
+    <div class="card ex" id="exLang">
+      <div class="ex-head"><h3>Mashq: jumla qanday?</h3><span class="tag">7 jumla</span></div>
+      <div id="langList"></div>
+      <div class="btn-row"><button type="button" class="btn" id="langCheck">Tekshirish</button><span class="result" id="langRes"></span></div>
+    </div>
+    <div class="callout"><span class="lbl">Halollik</span>Yolg‘on raqam aytmang (“boshqa broker $2 100 beryapti” deb o‘ylab topmang). Brokerlar bir-birini taniydi, ishonch yo‘qolsa, keyingi yuklar ham yo‘qoladi.</div>
+  </section>
+
+  <section class="sec" id="s-sim" data-sec="sim">
+    <div class="sign"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chat"/></svg><div class="st-txt"><div class="exitno">EXIT 4</div><h2>Muzokara simulyatori</h2></div><div class="time">30 daqiqa</div><span class="stamp" aria-hidden="true">O‘TILDI ✓</span></div>
+    <p class="prose">Brokerga yozing. Har bosqichda javob tanlaysiz, broker esa shunga qarab javob beradi. Maqsad: floor’dan past narxga rozi bo‘lmasdan, yuqori narxda yopish. Turli yo‘llarni sinab ko‘ring.</p>
+    <div class="card chatsim">
+      <div class="sim-load"><span><b>Atlanta, GA → Chicago, IL</b></span><span>Dry van</span><span>700 mil yukli + 100 mil deadhead</span><span>CPM $1.60 · break-even $1 280</span><span><b>Floor $1 800</b> · target $1 900 · anchor $2 050</span></div>
+      <div class="chat-log" id="chatLog" aria-live="polite"></div>
+      <div class="opts sim-opts" id="simOpts"></div>
+      <div id="simEnd"></div>
+      <div class="btn-row"><button type="button" class="btn ghost" id="simReset">Boshidan boshlash</button><span class="result" id="simRes"></span></div>
+      <p class="note">Simulyatordagi broker — o‘quv modeli: real broker boshqacha javob beradi va har doim ham narxni oshirmaydi.</p>
+    </div>
+    <div class="ask teach-only"><span class="lbl">Darsda</span><p>Talabalarga javobni bosishdan oldin ovoz chiqarib tanlatib, nega shuni tanlaganini so‘rang. Keyin eng yomon va eng yaxshi yo‘lni ketma-ket ko‘rsating.</p></div>
+  </section>
+
+  <section class="sec" id="s-pos" data-sec="pos">
+    <div class="sign"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-scale"/></svg><div class="st-txt"><div class="exitno">EXIT 5</div><h2>Brokerning bosimi va sizning pozitsiyangiz</h2></div><div class="time">15 daqiqa</div><span class="stamp" aria-hidden="true">O‘TILDI ✓</span></div>
+    <p class="prose">Broker ham vaqt va narx bosimi ostida: u yukni ishonchli carrier bilan yopishi kerak. Siz kuchli yoki kuchsiz ekaningizni bir nechta narsa belgilaydi: yo‘nalishdagi talab (5-dars: load-to-truck ratio), truck’ning pickup’ga yaqinligi, o‘z raqamlaringizni bilishingiz, broker bilan oldingi ishingiz. Bozor ma’lumotini ishlatish ham tavsiya etiladi, chunki yuk ko‘p yurgan bozor odatda truck yetishmayotganini bildiradi.</p>
+    <div class="card ex" id="exPos">
+      <div class="ex-head"><h3>Mashq: pozitsiyangiz qanday?</h3><span class="tag">6 holat</span></div>
+      <div id="posList"></div>
+      <div class="btn-row"><button type="button" class="btn" id="posCheck">Tekshirish</button><span class="result" id="posRes"></span></div>
+    </div>
+    <div class="card pm">
+      <div class="ex-head"><h3>Kichik farq, katta natija</h3><span class="tag">mil boshiga sent</span></div>
+      <div class="pm-ctl calc">
+        <div><label for="kCent">Qo‘shimcha narx, mil boshiga <output id="kCentO"></output></label><input type="range" id="kCent" min="1" max="30" step="1" value="10"></div>
+        <div><label for="kMi">Yillik jami mil <output id="kMiO"></output></label><input type="range" id="kMi" min="50000" max="150000" step="5000" value="100000"></div>
+      </div>
+      <div class="bignums"><div class="big hot"><b id="kYear">$0</b><span>yiliga qo‘shimcha daromad</span></div><div class="big"><b id="kLoad">$0</b><span>700 millik bitta yukda</span></div></div>
+      <div class="result" id="kRes"></div>
+    </div>
+  </section>
+
+  <section class="sec" id="s-talk" data-sec="talk">
+    <div class="sign"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-chat"/></svg><div class="st-txt"><div class="exitno">EXIT 6</div><h2>Ishdagi inglizcha</h2></div><div class="time">10 daqiqa</div><span class="stamp" aria-hidden="true">O‘TILDI ✓</span></div>
+    <div class="phr" id="phrases"></div>
+    <div class="ex-head" style="margin-top:12px"><h3>O‘zingizni tekshiring</h3><span class="tag">8 savol</span></div>
+    <div class="card ex">
+      <div id="quiz"></div>
+      <div class="btn-row"><button type="button" class="btn" id="quizCheck">Natijani ko‘rish</button><span class="result" id="quizRes"></span></div>
+    </div>
+  </section>
+
+  <section class="sec" id="s-app" data-sec="app">
+    <div class="sign"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-task"/></svg><div class="st-txt"><div class="exitno">EXIT 7</div><h2>Ilovada topshiriq</h2></div><div class="time">Uyda · 25 daqiqa</div><span class="stamp" aria-hidden="true">O‘TILDI ✓</span></div>
+    <div class="card task">
+      <span class="lbl">DispatchSim’da bajaring</span>
+      <ol>
+        <li><b>Load Board</b>’dan bitta yuk tanlang. 7-dars usuli bilan <b>break-even</b>, <b>floor</b>, <b>target</b> va <b>anchor</b> narxlarini hisoblab yozing.</li>
+        <li>Broker chatida avval o‘z narxingizni ayting: <span class="mono">“My rate on this one is $2,075 all-in.”</span> (raqamni o‘zingiznikiga almashtiring).</li>
+        <li>Broker pastroq narx aytsa, so‘rang: <span class="mono">“What would it take to get to $1,950?”</span></li>
+        <li>Shartli taklif bering: <span class="mono">“I can do $1,875 if we book it right now.”</span></li>
+        <li>Yopilgan narxni yozing: u floor’dan yuqorimi? Boshlang‘ich taklifdan necha dollar ortiq? Nima ishladi, nima ishlamadi? 3 jumla yozing.</li>
+      </ol>
+      <div class="checks" id="appChecks">
+        <label><input type="checkbox" id="ac1"> To‘rt raqamni hisobladim</label>
+        <label><input type="checkbox" id="ac2"> Brokerga avval o‘z narximni aytdim va savol berdim</label>
+        <label><input type="checkbox" id="ac3"> Yopilgan narxni floor bilan solishtirdim</label>
+      </div>
+    </div>
+    <div class="ex-head"><h3>Lug‘at: kartochkani bosing</h3><span class="tag">14 atama</span></div>
+    <div class="gl" id="gloss"></div>
+  </section>
+
+  <section class="finish" id="finish" aria-live="polite">
+    <span class="badge">DARS O‘TILDI</span>
+    <h2 id="finTitle"></h2>
+    <p id="finText"></p>
+    <div class="miles" id="miles"></div>
+  </section>
+
+  <section class="mentor" aria-labelledby="mentorH">
+    <div class="mentor-head"><div class="mentor-av" aria-hidden="true">M</div><div><h3 id="mentorH">Mentorga savol</h3><div class="sub">Javobni so‘ramang: o‘z fikringizni yozib, mentor bilan solishtiring. Mana boshlash uchun uchta savol.</div></div></div>
+    <div id="mqs" style="display:grid;gap:8px"></div>
+  </section>
+
+  <footer class="foot">
+    <p><b>Keyingi dars:</b> dispatch operatsiyalari: yukni band qilishdan yetkazib berishgacha bo‘lgan kundalik ish tartibi.</p>
+    <p>Manbalar (mutaxassislar tavsiyalari, qat’iy qoida emas): <a href="https://www.fleetowner.com/operations/article/21263348/tips-for-truck-carriers-to-negotiate-spot-rates" target="_blank" rel="noopener">FleetOwner — Tips to help carriers negotiate better spot rates</a> (xushmuomala va aniq gapirish, foydali ma’lumot berish, 10 sent/mil ≈ $10 000/yil); <a href="https://www.overdriveonline.com/business/article/15292461/how-to-speak-your-freight-brokers-language-with-confidence" target="_blank" rel="noopener">Overdrive — Speak your broker's language</a> (o‘z raqamlaringizni bilish, narxni birinchi aytish, shartlarni rate confirmation’ga yozdirish); <a href="https://www.freightwaves.com/?p=565727" target="_blank" rel="noopener">FreightWaves — Load Board Negotiation Secrets</a> (anchor, savollar, shartli taklif). Darsdagi yo‘nalish, narxlar va broker javoblari o‘quv misollari: real bozorda boshqacha bo‘ladi.</p>
+  </footer>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(function(){
+  "use strict";
+  var store={get:function(k,d){try{var v=localStorage.getItem("ds-l8-"+k);return v===null?d:JSON.parse(v)}catch(e){return d}},set:function(k,v){try{localStorage.setItem("ds-l8-"+k,JSON.stringify(v))}catch(e){}}};
+  function $(s,r){return (r||document).querySelector(s)}
+  function el(t,a,c){var e=document.createElement(t);if(a)for(var k in a){if(k==="text")e.textContent=a[k];else if(k==="html")e.innerHTML=a[k];else e.setAttribute(k,a[k])}(c||[]).forEach(function(x){e.appendChild(typeof x==="string"?document.createTextNode(x):x)});return e}
+  function usd(n){return (n<0?"−":"")+"$"+Math.round(Math.abs(n)).toLocaleString("en-US")}
+  function rpm(n){return "$"+n.toFixed(2)}
+
+  var SECS=["story","nums","lang","sim","pos","talk","app"];
+  var done=store.get("done",{});
+  function mark(x){if(done[x])return;done[x]=true;store.set("done",done);renderProg();toast("EXIT "+(SECS.indexOf(x)+1)+" o‘tildi")}
+  function renderProg(){var n=SECS.filter(function(x){return done[x]}).length;$("#progFill").style.width=(n/SECS.length*100)+"%";$("#progNum").textContent=n+"/"+SECS.length;SECS.forEach(function(x){var s=document.querySelector('[data-sec="'+x+'"]');if(s)s.classList.toggle("done",!!done[x]);var a=document.querySelector('.route a[data-go="'+x+'"]');if(a)a.classList.toggle("done",!!done[x])});renderFinish()}
+  renderProg();
+  if("IntersectionObserver" in window){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)mark("story")})},{threshold:.6});io.observe($("#s-story .callout"))}
+  if("IntersectionObserver" in window){var curIO=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){document.querySelectorAll(".route a").forEach(function(a){a.classList.toggle("cur",a.dataset.go===e.target.dataset.sec)})}})},{rootMargin:"-35% 0px -55% 0px"});document.querySelectorAll(".sec").forEach(function(s){curIO.observe(s)})}
+  var tt;function toast(m){var t=$("#toast");if(!t)return;t.textContent="✓ "+m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(function(){t.classList.remove("on")},2200)}
+  function renderFinish(){var f=$("#finish");if(!f)return;var n=SECS.filter(function(x){return done[x]}).length,all=n===SECS.length;f.classList.toggle("won",all);var m=$("#miles");m.innerHTML="";SECS.forEach(function(x,i){m.appendChild(el("i",{class:done[x]?"on":"",text:done[x]?"✓":String(i+1)}))});$("#finTitle").textContent=all?"Yo‘l tugadi: 8-dars bajarildi":"Yo‘l davom etyapti";var qs=store.get("qz",null);$("#finText").textContent=all?("Hamma 7 ta EXIT’dan o‘tdingiz."+(qs!==null?" Yakuniy test: "+qs+"/8.":"")+" Endi ilovadagi topshiriqni bajaring va mentorga savollaringizni bering. Keyingi dars: dispatch operatsiyalari."):("Yana "+(SECS.length-n)+" ta EXIT qoldi. Har bir bo‘limdagi mashqni bajarsangiz belgi yonadi.")}
+  function setMode(m){document.body.classList.toggle("teach",m==="teach");$("#modeTeach").setAttribute("aria-pressed",m==="teach");$("#modeSelf").setAttribute("aria-pressed",m!=="teach");store.set("mode",m)}
+  $("#modeTeach").onclick=function(){setMode("teach")};$("#modeSelf").onclick=function(){setMode("self")};
+  setMode(store.get("mode","self"));
+
+  function quizBlock(listSel,items,labels,btnSel,resSel,need,onPass,cls){
+    var ans={},list=$(listSel);
+    items.forEach(function(t,i){var r=el("div",{class:"tri"});r.appendChild(el("p",{text:(i+1)+". "+t[0]}));var o=el("div",{class:"opts"+(cls?" "+cls:"")});labels.forEach(function(a,j){var b=el("button",{type:"button",class:"opt","aria-pressed":"false",text:a});b.onclick=function(){ans[i]=j;o.querySelectorAll(".opt").forEach(function(x){x.setAttribute("aria-pressed",x===b);x.classList.remove("right","wrong")});r.querySelector(".fb").className="fb"};o.appendChild(b)});r.appendChild(o);r.appendChild(el("div",{class:"fb"}));list.appendChild(r)});
+    $(btnSel).onclick=function(){var ok=0;list.querySelectorAll(".tri").forEach(function(r,i){var t=items[i];r.querySelectorAll(".opt").forEach(function(b,j){b.classList.remove("right","wrong");if(j===t[1])b.classList.add("right");else if(ans[i]===j)b.classList.add("wrong")});var good=ans[i]===t[1];if(good)ok++;var fb=r.querySelector(".fb");fb.className="fb show "+(good?"ok":"no");fb.textContent=t[2]});$(resSel).textContent=ok+"/"+items.length;if(ok>=need)onPass()}}
+  /* single-choice with immediate feedback */
+  function pickBlock(optsSel,fbSel,items,correct,okTxt,noTxt,onOk){
+    var box=$(optsSel);items.forEach(function(t,i){var b=el("button",{type:"button",class:"opt",text:t});b.onclick=function(){box.querySelectorAll(".opt").forEach(function(x,k){x.classList.remove("right","wrong");if(k===correct)x.classList.add("right");else if(k===i)x.classList.add("wrong")});var ok=i===correct,fb=$(fbSel);fb.className="fb show "+(ok?"ok":"no");fb.textContent=typeof(ok?okTxt:noTxt)==="function"?(ok?okTxt:noTxt)(i):(ok?okTxt:noTxt);if(ok)onOk()};box.appendChild(b)})}
+
+  /* EXIT 2: three numbers */
+  var nm={t:{},q:false};function chkNm(){if(nm.t.nTarget&&nm.t.nAnchor&&nm.q)mark("nums")}
+  function renderN(){var fl=+$("#nFloor").value,tg=fl+(+$("#nTarget").value),pc=+$("#nAnchor").value,an=Math.round(tg*pc/100/25)*25;
+    $("#nFloorO").textContent=usd(fl);$("#nTargetO").textContent=usd(tg);$("#nAnchorO").textContent=pc+"% → "+usd(an);
+    var p=$("#nPlot");p.innerHTML="";var MAX=Math.max(3000,an*1.1);[[fl,""],[tg,""],[an,"hi"]].forEach(function(v){var w=el("div",{class:"cw"});var c=el("div",{class:"col"+(v[1]?" "+v[1]:"")});c.style.height=(v[0]/MAX*100)+"%";c.appendChild(el("span",{text:usd(v[0])}));w.appendChild(c);p.appendChild(w)});
+    var v=$("#nVerdict");
+    if(pc<103){v.className="pm-verdict over";v.textContent="Anchor target’ga juda yaqin: kelishish uchun joy qolmadi."}
+    else if(pc>120){v.className="pm-verdict over";v.textContent="Anchor juda baland: broker jiddiy qabul qilmasligi mumkin. Misoldagi tavsiya ≈ 115% atrofida."}
+    else{v.className="pm-verdict";v.textContent="Yaxshi: ochilish "+usd(an)+", maqsad "+usd(tg)+", eng past "+usd(fl)+". Siljish uchun joy bor."}
+    $("#nRes").textContent=nm.t.nTarget&&nm.t.nAnchor?"Hisob tayyor":"Maqsad: target va anchor sliderlarini suring"}
+  ["nFloor","nTarget","nAnchor"].forEach(function(id){$("#"+id).addEventListener("input",function(){nm.t[id]=true;renderN();chkNm()})});renderN();
+  quizBlock("#numList",[["Brokerga birinchi bo‘lib aytadigan narx.",0,"Anchor: ochilish narxi, target’dan yuqori."],["Shundan past bo‘lsa, yukni rad etasiz.",2,"Floor: eng past narx."],["Muzokara oxirida yopilishini umid qilgan narx.",1,"Target: maqsad."],["7-darsdagi minimal narx formulasi shu raqamni beradi.",2,"Floor: (CPM + maqsadli foyda) × jami mil."]],["Anchor","Target","Floor"],"#numCheck","#numRes",3,function(){nm.q=true;chkNm()},"three");
+
+  /* EXIT 3: language */
+  quizBlock("#langList",[["“What's your best rate?”",1,"Zararli: bu savol brokerga siz “eng pastini” kutayotganingizni bildiradi va munosabatni qiyinlashtiradi."],["“My rate on this one is $2,075 all-in.”",0,"Yaxshi: narxni birinchi bo‘lib, aniq aytish ishonch bildiradi."],["“That's cheap.”",1,"Zararli: baho berish munosabatga zarar qiladi. Narxni raqam bilan aytgan ma’qul."],["“Another broker is paying me $2,100 for this.”",1,"Zararli: boshqa brokerning narxini ro‘kach qilish ishonchni buzadi. Qadringizni o‘z xizmatingiz bilan tushuntiring."],["“I'm about 60 miles from pickup and I run this lane every week.”",0,"Yaxshi: foydali ma’lumot, narxni asoslaydi."],["“What would it take to get to $1,850?”",0,"Yaxshi: brokerni yechim topishga jalb qiladi."],["“Why is your rate so low?”",1,"Zararli: “nega?” savoli himoyaga o‘tkazadi. “Nima o‘zgarsa…” deb so‘rang."]],["Yaxshi","Zararli"],"#langCheck","#langRes",6,function(){mark("lang")});
+
+  /* EXIT 4: negotiation simulator */
+  var CP=1.6,MI=800,BE=CP*MI,FLOOR=1800,TARGET=1900,FIRST=1600;
+  var SIM={
+    N1:{b:"Hi, I've got Atlanta to Chicago, dry van, $1,600 all-in. Interested?",o:[["Yes, I'll take it.","E_low1600"],["What's your best rate?","N1b"],["That's cheap. Other brokers pay $2,000 for this lane.","N1c"],["My rate on this one is $2,050 all-in. I'm about 60 miles from pickup.","N2"]]},
+    N1b:{b:"$1,600 is my best on this one.",o:[["OK, I'll take it.","E_low1600"],["My rate on this one is $2,050 all-in. I'm about 60 miles from pickup.","N2"]]},
+    N1c:{b:"Then those brokers can have it. $1,600 is what I've got.",o:[["OK, I'll take it.","E_low1600"],["Sorry, let me start over. My rate is $2,050 all-in, and I'm 60 miles from pickup.","N2"]]},
+    N2:{b:"$2,050 is a stretch. I can do $1,700.",o:[["$1,700 works.","E_low1700"],["What would it take to get to $1,950?","N3"],["I need $2,050, no less.","N2b"]]},
+    N2b:{b:"I hear you, but $1,700 is where I am.",o:[["OK, $1,700.","E_low1700"],["What would need to change to get to $1,950?","N3"]]},
+    N3:{b:"I can do $1,800 if you can pick up before 10 a.m.",o:[["Can you do $1,875 if I confirm right now and pick up before 10?","N4"],["OK, $1,800 works.","E_floor"],["That's still low for me. I'll pass on this one, thanks.","E_walk"]]},
+    N4:{b:"$1,850 and we're done. That's my limit.",o:[["Deal. Please send the rate confirmation with the pickup time and detention terms.","E_best"],["Deal.","E_good"],["$1,900 or I'm out.","E_lost"]]}
+  };
+  var ENDS={
+    E_low1600:{rate:1600,k:"bad",t:"Floor’dan past narxga rozi bo‘ldingiz",m:"$1 600 sizning minimal narxingizdan ($1 800) past. Zarar emas, lekin maqsadli foyda qolmadi. Savol berib, o‘z narxingizni ayting."},
+    E_low1700:{rate:1700,k:"bad",t:"Floor’dan past narxga rozi bo‘ldingiz",m:"$1 700 hali ham minimal narxdan ($1 800) past. “Nima o‘zgarsa…” deb so‘rash narxni oshirgan bo‘lardi."},
+    E_floor:{rate:1800,k:"mid",t:"Floor’da yopdingiz",m:"Yomon emas: minimal narxga yetdingiz. Lekin shartli taklif ($1 875) bilan yana $50 ko‘proq olish mumkin edi."},
+    E_walk:{rate:null,k:"mid",t:"Yukni qaytardingiz",m:"Zarar ham, foyda ham yo‘q. Floor’ga yetmagan yukni rad etish to‘g‘ri qaror bo‘lishi mumkin. Keyingi yuk uchun yo‘lni ochiq qoldiring."},
+    E_good:{rate:1850,k:"good",t:"Yaxshi yopdingiz: $1 850",m:"Floor’dan yuqori. Lekin kelishuvdan keyin pickup vaqti va kutish (detention) shartlarini rate confirmation’ga yozdirishni unutmang."},
+    E_best:{rate:1850,k:"good",t:"A’lo yopdingiz: $1 850",m:"Floor’dan yuqori va shartlarni (pickup vaqti, detention) rate confirmation’ga yozdirdingiz. Aynan shunday ishlanadi."},
+    E_lost:{rate:null,k:"bad",t:"Yukni boy berdingiz",m:"Broker o‘z chegarasiga yetgan edi. Yana bir bosim yukni yo‘qotdi. Qachon to‘xtashni bilish ham mahorat."}
+  };
+  var sim={node:"N1",log:[],ok:false,best:0};
+  function renderSim(){var lg=$("#chatLog");lg.innerHTML="";sim.log.forEach(function(m){var d=el("div",{class:"smsg "+m[0]});d.appendChild(el("small",{text:m[0]==="b"?"Broker":"Siz"}));d.appendChild(document.createTextNode(m[1]));lg.appendChild(d)});lg.scrollTop=lg.scrollHeight;
+    var oo=$("#simOpts");oo.innerHTML="";var end=$("#simEnd");end.innerHTML="";
+    var n=SIM[sim.node];
+    if(n){n.o.forEach(function(o){var b=el("button",{type:"button",class:"opt",text:o[0]});b.onclick=function(){sim.log.push(["me",o[0]]);var nx=o[1];if(SIM[nx]){sim.node=nx;sim.log.push(["b",SIM[nx].b])}else{sim.node=nx}renderSim()};oo.appendChild(b)})}
+    else{var E=ENDS[sim.node];var box=el("div",{class:"sim-end "+E.k});box.appendChild(el("div",{class:"t",text:E.t}));box.appendChild(el("div",{text:E.m}));
+      var st=el("div",{class:"sim-stats"});if(E.rate){st.appendChild(el("span",{text:"yopilgan narx: "+usd(E.rate)}));st.appendChild(el("span",{text:"foyda: "+usd(E.rate-BE)}));st.appendChild(el("span",{text:"floor’dan: "+(E.rate-FLOOR>=0?"+":"−")+usd(Math.abs(E.rate-FLOOR))}));st.appendChild(el("span",{text:"birinchi taklifdan: +"+usd(E.rate-FIRST)}))}else st.appendChild(el("span",{text:"yopilgan narx: —"}));
+      box.appendChild(st);end.appendChild(box);
+      if(E.rate&&E.rate>=FLOOR){sim.ok=true;sim.best=Math.max(sim.best,E.rate)}}
+    $("#simRes").textContent=sim.ok?("Eng yaxshi natijangiz: "+usd(sim.best)):"Maqsad: floor’dan yuqori narxda yoping";
+    if(sim.ok)mark("sim")}
+  function startSim(){sim.node="N1";sim.log=[["b",SIM.N1.b]];renderSim()}
+  $("#simReset").onclick=startSim;startSim();
+
+  /* EXIT 5 */
+  var ps={q:false,k:false};function chkPs(){if(ps.q&&ps.k)mark("pos")}
+  quizBlock("#posList",[["Yo‘nalishda load-to-truck ratio 5:1 (yuk ko‘p, truck kam).",0,"Kuchli: truck’ga talab yuqori."],["Yo‘nalishda ratio 0.8:1 (truck ko‘p).",1,"Kuchsiz: truck’lar orasida raqobat bor."],["Pickup joyingizdan 60 mil, truck bo‘sh va tayyor.",0,"Kuchli: brokerga yukni tez yopish imkonini berasiz."],["O‘z floor narxingizni bilmaysiz, “har qanday yuk bo‘lsa bo‘ldi” deysiz.",1,"Kuchsiz: chegara yo‘q, broker siljitadi."],["Shu broker bilan 5 ta yukni muammosiz tashigansiz.",0,"Kuchli: ishonch va takroriy ish narxga ta’sir qiladi."],["Truck ertaga bo‘sh bo‘lmasa, 2 kun bekor turadi va boshqa variant yo‘q.",1,"Kuchsiz: vaqt bosimi sizda. Variantlar oldindan tayyor bo‘lishi kerak."]],["Kuchli","Kuchsiz"],"#posCheck","#posRes",5,function(){ps.q=true;chkPs()});
+  var kt={};
+  function renderK(){var c=+$("#kCent").value,mi=+$("#kMi").value;$("#kCentO").textContent="$0."+(c<10?"0":"")+c;$("#kMiO").textContent=mi.toLocaleString("en-US")+" mil";$("#kYear").textContent=usd(c/100*mi);$("#kLoad").textContent=usd(c/100*700);$("#kRes").textContent=kt.kCent&&kt.kMi?"Hisob tayyor":"Maqsad: ikkala sliderni suring"}
+  ["kCent","kMi"].forEach(function(id){$("#"+id).addEventListener("input",function(){kt[id]=true;renderK();if(kt.kCent&&kt.kMi){ps.k=true;chkPs()}})});renderK();
+
+  /* phrases */
+  var PH=[["My rate on this one is $2,075 all-in.","Bu yuk uchun mening narxim all-in $2 075."],["I'm about 60 miles from pickup, and I run this lane every week.","Men pickup’dan taxminan 60 mil narida turibman va bu yo‘nalishda har hafta ishlayman."],["What would it take to get to $1,850?","$1 850 ga yetish uchun nima kerak?"],["I can do $1,875 if we book it right now.","Hozir band qilsak, $1 875 ga qila olaman."],["Could you add the pickup time and detention terms to the rate confirmation?","Rate confirmation’ga pickup vaqti va kutish (detention) shartlarini qo‘sha olasizmi?"],["Thanks for the offer. I'll pass on this one, but I'd like to work with you on the next one.","Taklif uchun rahmat. Bu yukni olmayman, lekin keyingisida birga ishlashni xohlayman."]];
+  var canSpeak="speechSynthesis" in window;
+  PH.forEach(function(p){var row=el("div",{class:"phrase"});row.appendChild(el("div",{class:"en",text:p[0]}));var acts=el("div",{class:"acts"});
+    if(canSpeak){var sp=el("button",{type:"button",class:"icon-btn",text:"Tinglash"});sp.onclick=function(){try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(p[0]);u.lang="en-US";u.rate=.92;speechSynthesis.speak(u)}catch(e){}};acts.appendChild(sp)}
+    var cp=el("button",{type:"button",class:"icon-btn",text:"Nusxa"});cp.onclick=function(){copyText(cp,p[0])};acts.appendChild(cp);
+    row.appendChild(acts);row.appendChild(el("div",{class:"uz",text:p[1]}));$("#phrases").appendChild(row)});
+  function copyText(btn,t){var ok=function(){btn.textContent="Olindi";setTimeout(function(){btn.textContent="Nusxa"},1200)};try{navigator.clipboard.writeText(t).then(ok,function(){})}catch(e){}}
+
+  /* quiz */
+  var QZ=[
+    ["Muzokaradan oldin qaysi uchta raqamni bilish kerak?",["Anchor, target va floor","Faqat broker narxi","Soliq, sug‘urta va marja"],0,"Ochilish (anchor), maqsad (target) va eng past (floor) narx."],
+    ["Taklif floor’dan past bo‘lsa, siz:",["Qarshi taklif berasiz yoki rad etasiz","Baribir qabul qilasiz","Haydovchini jo‘natib yuborasiz"],0,"Floor’dan past narx qabul qilinmaydi: qarshi taklif bering yoki rad eting."],
+    ["Maqsad $2 000, ochilish ≈ 115% bo‘lsa, anchor taxminan:",["$2 050","$2 500","$2 300"],2,"2 000 × 1.15 = $2 300 (FreightWaves misoli)."],
+    ["Qaysi ibora munosabatga zarar qilishi mumkin?",["What would it take to get to $1,850?","What's your best rate?","I'm 60 miles from pickup."],1,"“Best rate” so‘rash tavsiya etilmaydi."],
+    ["Shartli taklif (conditional offer) qaysi?",["Narxni aytmayman","Narxni har kuni o‘zgartiraman","I can do $1,875 if we book it right now."],2,"Shartli taklif — biror shart bajarilsa narx."],
+    ["Mil boshiga 10 sent farq, yiliga 100 000 mil:",["≈ $10 000","≈ $1 000","≈ $100 000"],0,"0.10 × 100 000 = $10 000."],
+    ["Rate confirmation’ga nimalarni yozdirish kerak?",["Faqat narx","Narx, pickup vaqti va kutish (detention) shartlari","Faqat haydovchi ismi"],1,"Hamma kelishilgan shartlar yozma bo‘lishi kerak."],
+    ["Qaysi holatda sizning pozitsiyangiz kuchli?",["Ratio 0.8:1, truck ko‘p","Floor narxini bilmaysiz","Pickup’ga 60 mil, truck bo‘sh, yuk ko‘p yo‘nalish"],2,"Yaqinlik va talab sizning foydangizga."]
+  ];
+  var qa={};
+  QZ.forEach(function(q,i){var box=el("div",{class:"q"});box.appendChild(el("p",{text:(i+1)+". "+q[0],style:"font-weight:600"}));var o=el("div",{class:"opts"});q[1].forEach(function(a,j){var b=el("button",{type:"button",class:"opt","aria-pressed":"false",text:a});b.onclick=function(){qa[i]=j;o.querySelectorAll(".opt").forEach(function(x){x.setAttribute("aria-pressed",x===b);x.classList.remove("right","wrong")});box.querySelector(".fb").className="fb"};o.appendChild(b)});box.appendChild(o);box.appendChild(el("div",{class:"fb"}));$("#quiz").appendChild(box)});
+  $("#quizCheck").onclick=function(){var ok=0;document.querySelectorAll("#quiz .q").forEach(function(box,i){var q=QZ[i];box.querySelectorAll(".opt").forEach(function(b,j){b.classList.remove("right","wrong");if(j===q[2])b.classList.add("right");else if(qa[i]===j)b.classList.add("wrong")});var fb=box.querySelector(".fb");var r=qa[i]===q[2];if(r)ok++;fb.className="fb show "+(r?"ok":"no");fb.textContent=q[3]});store.set("qz",ok);$("#quizRes").textContent=ok+"/"+QZ.length+(ok>=7?" — a’lo":ok>=5?" — yaxshi":" — yana bir bor ko‘rib chiqing");if(ok>=6)mark("talk");renderFinish()};
+
+  ["ac1","ac2","ac3"].forEach(function(id){var c=$("#"+id);c.checked=!!store.get(id,false);c.onchange=function(){store.set(id,c.checked);if($("#ac1").checked&&$("#ac2").checked&&$("#ac3").checked)mark("app")}});
+  var GL=[["Anchor","ochilish narxi","Brokerga birinchi aytadigan narx."],["Target rate","maqsadli narx","Yopilishini umid qilgan narx."],["Floor","eng past narx","Shundan past bo‘lsa, yukni rad etasiz."],["Counteroffer","qarshi taklif","Taklifga javoban o‘z narxingiz."],["Concession","yon berish","Muzokarada narxdan voz kechish."],["Conditional offer","shartli taklif","Shart bajarilsa amal qiladigan narx."],["Rate confirmation","narx tasdig‘i","Narx va shartlar yozilgan hujjat."],["Detention","kutish haqi","Yuk ortish/tushirishda uzoq kutish uchun to‘lov."],["Accessorials","qo‘shimcha to‘lovlar","Asosiy narxdan tashqari to‘lovlar."],["Benchmark","taqqoslash ko‘rsatkichi","Bozor o‘rtacha narxi: narxni baholash uchun."],["Lane average","yo‘nalish o‘rtachasi","Shu yo‘nalishdagi o‘rtacha narx."],["Reposition","joyni almashtirish","Truck’ni yangi hududga yuborish."],["Break-even","zararsiz narx","Foyda ham zarar ham yo‘q narx."],["Book it","band qilish","Yukni o‘zingizga olib qo‘yish."]];
+  GL.forEach(function(g){var b=el("button",{type:"button",class:"flip","aria-label":g[0]+": bosib izohni ko‘ring"});b.innerHTML='<div class="in"><div class="f"><b></b><span></span></div><div class="b"></div></div>';b.querySelector(".f b").textContent=g[0];b.querySelector(".f span").textContent=g[1];b.querySelector(".b").textContent=g[2];b.onclick=function(){b.classList.toggle("on")};$("#gloss").appendChild(b)});
+  var MQ=["Floor narxim bilan broker taklifi orasida kichik farq qolsa, qachon rozi bo‘laman va qachon rad etaman?","Brokerdan ishonchni yo‘qotmasdan qanday qilib “yo‘q” deyman?","Birinchi taklifni rad etganimda, brokerning bosimi qayerdan paydo bo‘lishi mumkin?"];
+  MQ.forEach(function(q){var r=el("div",{class:"mq"});r.appendChild(el("span",{text:q}));var bt=el("button",{type:"button",class:"icon-btn",text:"Nusxa"});bt.onclick=function(){copyText(bt,q)};r.appendChild(bt);$("#mqs").appendChild(r)});
+})();
+</script>

@@ -1,0 +1,95 @@
+/* Academy pages. Colours come from tokens only. */
+.ac-page { max-width: 1100px; margin: 0 auto; }
+.ac-muted { color: var(--text-3); font-size: 12px; }
+.ac-mono { font-family: 'IBM Plex Mono', monospace; }
+.ac-error { color: var(--red); font-size: 12.5px; margin: 8px 0; }
+
+.ac-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--accent); color: var(--on-accent);
+  border: none; border-radius: 8px; padding: 9px 14px;
+  font: 600 12.5px 'Inter', sans-serif; cursor: pointer; text-decoration: none;
+}
+.ac-btn:hover { opacity: 0.92; }
+.ac-btn:disabled { opacity: 0.5; cursor: default; }
+.ac-btn-ghost {
+  background: var(--panel-2); color: var(--text);
+  border: 1px solid var(--border);
+}
+.ac-btn-sm { padding: 5px 9px; font-size: 11.5px; }
+
+.ac-input {
+  background: var(--panel-2); color: var(--text);
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 8px 10px; font: 13px 'Inter', sans-serif; min-width: 0;
+}
+.ac-input:focus { outline: none; border-color: var(--accent); }
+
+.ac-panel {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px; margin-bottom: 16px;
+}
+.ac-panel h2 { font-size: 14px; font-weight: 600; margin: 0 0 10px; }
+
+/* Home */
+.ac-summary { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; }
+.ac-summary-total { font: 600 26px 'IBM Plex Mono', monospace; }
+.ac-week { margin-bottom: 18px; }
+.ac-week-title { font-size: 12px; font-weight: 600; color: var(--text-2); margin-bottom: 8px; letter-spacing: 0.04em; text-transform: uppercase; }
+.ac-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 12px; }
+.ac-card {
+  display: flex; gap: 14px; align-items: center;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+  padding: 14px; color: var(--text); text-decoration: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.ac-card:hover { border-color: var(--accent); background: var(--panel-2); }
+.ac-card-title { font-size: 13.5px; font-weight: 600; }
+.ac-card-meta { font-size: 11.5px; color: var(--text-3); margin-top: 3px; }
+.ac-ring { flex: none; }
+.ac-ring-bg { stroke: var(--border); fill: none; }
+.ac-ring-fg { stroke: var(--accent); fill: none; stroke-linecap: round; }
+.ac-ring-text { fill: var(--text); font: 600 11px 'IBM Plex Mono', monospace; }
+
+/* Lesson */
+.ac-lesson { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
+.ac-lesson-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.ac-lesson-title { font-size: 17px; font-weight: 600; }
+.ac-seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.ac-seg button {
+  background: var(--panel); color: var(--text-2); border: none;
+  padding: 7px 12px; font: 500 12px 'Inter', sans-serif; cursor: pointer;
+}
+.ac-seg button[aria-pressed='true'] { background: var(--accent); color: var(--on-accent); }
+.ac-frame {
+  width: 100%; height: calc(100vh - 170px); min-height: 520px;
+  border: 1px solid var(--border); border-radius: 12px; background: var(--panel);
+}
+.ac-side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.ac-side .ac-panel { margin-bottom: 0; }
+.ac-advisor-row { display: flex; gap: 8px; }
+.ac-advisor-row .ac-input { flex: 1; }
+.ac-note { border-top: 1px solid var(--border-soft); padding: 8px 0; font-size: 12.5px; }
+.ac-note:first-of-type { border-top: none; }
+.ac-note-by { color: var(--text-3); font-size: 11px; margin-top: 3px; }
+
+/* Mentor */
+.ac-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px; }
+.ac-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.ac-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--panel); }
+.ac-table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+.ac-table th, .ac-table td { padding: 8px 10px; border-bottom: 1px solid var(--border-soft); text-align: center; white-space: nowrap; }
+.ac-table th:first-child, .ac-table td:first-child { text-align: left; position: sticky; left: 0; background: var(--panel); }
+.ac-table a { color: var(--text); text-decoration: none; font-weight: 600; }
+.ac-cell { display: inline-block; min-width: 30px; padding: 3px 6px; border-radius: 6px; font: 600 11.5px 'IBM Plex Mono', monospace; background: var(--panel-2); color: var(--text-3); }
+.ac-cell-full { background: var(--green-bg); color: var(--green); }
+.ac-cell-part { background: var(--amber-bg); color: var(--amber); }
+.ac-cell small { font-weight: 400; margin-left: 4px; }
+.ac-detail { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); gap: 10px; }
+.ac-form { display: flex; flex-direction: column; gap: 8px; }
+.ac-form textarea { min-height: 80px; resize: vertical; }
+
+@media (max-width: 900px) {
+  .ac-lesson { grid-template-columns: minmax(0, 1fr); }
+  .ac-frame { height: 70vh; min-height: 420px; }
+}

@@ -1,11 +1,14 @@
 import { Outlet, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
+import { GraduationCap } from '@phosphor-icons/react'
 import Sidebar from './Sidebar'
 import Topbar from './Topbar'
 import SectionTabs from './SectionTabs'
 import LiveDataNotice from './LiveDataNotice'
 import { useLiveDataHealth } from '../../hooks/useLiveDataHealth'
 import { DISPATCH_SECTIONS, DISPATCH_SETTINGS, titleFor, hasSectionTabs } from './navSections'
+
+const EXTRA_BOTTOM = [{ to: '/academy', icon: GraduationCap, label: 'Academy' }]
 
 export default function AppShell() {
   const location = useLocation()
@@ -21,7 +24,7 @@ export default function AppShell() {
 
   return (
     <div className="app" style={{ position: 'relative', display: 'flex', minHeight: '100vh' }}>
-      <Sidebar sections={DISPATCH_SECTIONS} settings={DISPATCH_SETTINGS} />
+      <Sidebar sections={DISPATCH_SECTIONS} settings={DISPATCH_SETTINGS} extraBottom={EXTRA_BOTTOM} />
       <div className={'main'
         + (hasSectionTabs(DISPATCH_SECTIONS, location.pathname) ? ' has-section-tabs' : '')
         + (liveDataFailing ? ' has-live-notice' : '')} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
