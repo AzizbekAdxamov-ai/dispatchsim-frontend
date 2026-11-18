@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
 import { askAdvisor, getAcademyMe, saveProgress } from '../../api/academy'
 import { lessonByNo, lessonFile } from '../../data/academyLessons'
 import {
-  hasAnything, hydrateFromServer, readLessonState, stateKey, toProgressBody, writeMode,
+  ensureStorageOwner, hasAnything, hydrateFromServer, readLessonState, stateKey, toProgressBody, writeMode,
 } from '../../data/academyStorage'
 import '../PageHeader.css'
 import './academy.css'
@@ -25,12 +26,18 @@ function LessonView({ lesson }) {
   const [notes, setNotes] = useState([])
   const [mode, setMode] = useState('self')
   const [reloadKey, setReloadKey] = useState(0)
+  const [blocked, setBlocked] = useState(false)
+  const { user } = useAuth()
+  const userId = user?.id
   const lastKey = useRef(null)
+  const forbidden = useRef(false) // set on 403: stop retrying the upload
 
   // Server first, frame second: the lesson file reads localStorage when it
   // loads, so what the server knows must already be there.
   useEffect(() => {
     const controller = new AbortController()
+    // Before anything reads the lesson keys: another account's progress must go.
+    ensureStorageOwner(userId)
     getAcademyMe(controller.signal)
       .then((me) => {
         const row = me.lessons.find((l) => l.lessonNo === no)
@@ -40,7 +47,12 @@ function LessonView({ lesson }) {
         // What the server already holds needs no second upload.
         if (row) lastKey.current = stateKey({ exitsDone: row.exitsDone ?? {}, quiz: row.quiz ?? {}, mode: row.mode })
       })
-      .catch(() => {
+      .catch((err) => {
+        if (err?.code === 'FORBIDDEN') {
+          forbidden.current = true
+          setBlocked(true)
+          return
+        }
         // Offline: the lesson still opens from this browser's own copy.
         setMode(readLessonState(no).mode)
       })
@@ -48,14 +60,19 @@ function LessonView({ lesson }) {
         if (!controller.signal.aborted) setReady(true)
       })
     return () => controller.abort()
-  }, [no])
+  }, [no, userId])
 
   const sync = useCallback(() => {
+    if (forbidden.current) return
     const state = readLessonState(no)
     const k = stateKey(state)
     if (k === lastKey.current || !hasAnything(state)) return
     lastKey.current = k
-    saveProgress(no, toProgressBody(state)).catch(() => {
+    saveProgress(no, toProgressBody(state)).catch((err) => {
+      if (err?.code === 'FORBIDDEN') {
+        forbidden.current = true
+        return
+      }
       lastKey.current = null // try again on the next tick
     })
   }, [no])
@@ -97,7 +114,9 @@ function LessonView({ lesson }) {
       </div>
 
       <div className="ac-lesson">
-        {ready ? (
+        {blocked ? (
+          <div className="ac-frame ac-error">Hisobingiz hali Academy‘ga ulanmagan. Mentoringizga murojaat qiling.</div>
+        ) : ready ? (
           <iframe
             key={reloadKey}
             className="ac-frame"

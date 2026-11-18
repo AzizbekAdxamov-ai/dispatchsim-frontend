@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react'
+import { clearLessonKeys } from '../data/academyStorage'
 import { api, ApiError, getToken, setToken, clearToken, setUnauthorizedHandler } from '../api/client'
 
 const AuthContext = createContext(null)
@@ -99,6 +100,7 @@ export function AuthProvider({ children }) {
 
   function logout() {
     clearToken()
+    clearLessonKeys(localStorage, { includeOwner: true }) // next person on this computer starts clean
     try {
       localStorage.removeItem(LEGACY_USER_KEY)
     } catch {

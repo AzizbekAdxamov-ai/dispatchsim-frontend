@@ -34,6 +34,40 @@ function defaultStorage() {
   return globalThis.localStorage
 }
 
+const OWNER_KEY = 'ds-academy-owner'
+// "ds-l" + 1..12 + "-": the trailing dash keeps ds-l1- from matching ds-l10-.
+const LESSON_KEY = /^ds-l(?:[1-9]|1[0-2])-/
+
+// Lesson progress lives in shared localStorage keys, so on a shared computer
+// the next student would inherit (and upload) the previous one's progress.
+// Wipes every lesson key (and optionally the owner mark) from this browser.
+export function clearLessonKeys(storage = defaultStorage(), { includeOwner = false } = {}) {
+  try {
+    const keys = []
+    for (let i = 0; i < storage.length; i++) {
+      const k = storage.key(i)
+      if (k && (LESSON_KEY.test(k) || (includeOwner && k === OWNER_KEY))) keys.push(k)
+    }
+    for (const k of keys) storage.removeItem(k)
+  } catch {
+    // Storage unavailable: nothing to clear.
+  }
+}
+
+// Call before reading or writing any lesson key. A different owner than the
+// one recorded means these keys belong to someone else: drop them.
+export function ensureStorageOwner(userId, storage = defaultStorage()) {
+  if (userId === null || userId === undefined || userId === '') return
+  try {
+    const owner = storage.getItem(OWNER_KEY)
+    if (owner === String(userId)) return
+    clearLessonKeys(storage)
+    storage.setItem(OWNER_KEY, String(userId))
+  } catch {
+    // Storage unavailable: the lesson cannot remember anything anyway.
+  }
+}
+
 export function readLessonState(no, storage = defaultStorage()) {
   const doneRaw = read(storage, no, 'done', {})
   const exitsDone = {}

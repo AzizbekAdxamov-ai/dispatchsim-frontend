@@ -6,11 +6,11 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { readLessonState, hydrateFromServer, writeMode, stateKey } from '../src/data/academyStorage.js'
+import { readLessonState, hydrateFromServer, writeMode, stateKey, ensureStorageOwner, clearLessonKeys } from '../src/data/academyStorage.js'
 
 function memory(seed = {}) {
   const m = new Map(Object.entries(seed))
-  return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => m.set(k, String(v)), dump: () => Object.fromEntries(m) }
+  return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => m.set(k, String(v)), removeItem: (k) => m.delete(k), get length() { return m.size }, key: (i) => [...m.keys()][i] ?? null, dump: () => Object.fromEntries(m) }
 }
 
 test('reads JSON-encoded checkpoints, results and mode', () => {
@@ -42,4 +42,29 @@ test('stateKey ignores key order', () => {
   const a = { exitsDone: { a: true, b: true }, quiz: { qz: 1 }, mode: 'self' }
   const b = { exitsDone: { b: true, a: true }, quiz: { qz: 1 }, mode: 'self' }
   assert.equal(stateKey(a), stateKey(b))
+})
+
+test('a different owner wipes every lesson key, not unrelated ones', () => {
+  const s = memory({
+    'ds-academy-owner': 'A', 'ds-l1-done': '{"a":true}', 'ds-l10-qz': '5', 'ds-l12-mode': '"teach"',
+    'ds-l13-qz': '1', 'ds-lang': '"en"', 'dispatchsim.token': 'x',
+  })
+  ensureStorageOwner('B', s)
+  assert.deepEqual(s.dump(), { 'ds-academy-owner': 'B', 'ds-l13-qz': '1', 'ds-lang': '"en"', 'dispatchsim.token': 'x' })
+})
+
+test('the same owner keeps progress; a first visit records the owner', () => {
+  const s = memory({ 'ds-academy-owner': 'A', 'ds-l1-qz': '7' })
+  ensureStorageOwner('A', s)
+  assert.equal(s.getItem('ds-l1-qz'), '7')
+  const fresh = memory({ 'ds-l2-qz': '3' })
+  ensureStorageOwner('A', fresh)
+  assert.equal(fresh.getItem('ds-l2-qz'), null)
+  assert.equal(fresh.getItem('ds-academy-owner'), 'A')
+})
+
+test('clearLessonKeys on logout also drops the owner mark', () => {
+  const s = memory({ 'ds-academy-owner': 'A', 'ds-l3-done': '{}', other: '1' })
+  clearLessonKeys(s, { includeOwner: true })
+  assert.deepEqual(s.dump(), { other: '1' })
 })

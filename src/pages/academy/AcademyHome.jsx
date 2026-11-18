@@ -37,7 +37,10 @@ export default function AcademyHome() {
     getAcademyMe(controller.signal)
       .then(setMe)
       .catch((err) => {
-        if (err?.name !== 'AbortError') setError('Ma‘lumotni yuklab bo‘lmadi. Qayta urinib ko‘ring.')
+        if (err?.name === 'AbortError') return
+        setError(err?.code === 'FORBIDDEN'
+          ? 'Hisobingiz hali Academy‘ga ulanmagan. Mentoringizga murojaat qiling.'
+          : 'Ma‘lumotni yuklab bo‘lmadi. Qayta urinib ko‘ring.')
       })
     return () => controller.abort()
   }, [])
