@@ -115,3 +115,55 @@
   .ac-focus-label { display: none; }
   .ac-focus-bar { gap: 6px; padding: 0 8px; }
 }
+
+/* Class mode (mentor): the lesson fills the window, the bar hides itself */
+.acx-shell { position: fixed; inset: 0; height: 100dvh; background: var(--bg); overflow: hidden; }
+.acx-frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: var(--panel); }
+.acx-hot { position: fixed; top: 0; left: 0; right: 0; height: 16px; z-index: 11; }
+.acx-bar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 10; min-height: 52px;
+  display: flex; align-items: center; gap: 10px; padding: 6px 12px;
+  background: var(--panel); border-bottom: 1px solid var(--border); box-shadow: 0 8px 24px var(--shadow);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.acx-bar-off { opacity: 0; transform: translateY(-100%); pointer-events: none; }
+.acx-btn {
+  display: inline-flex; align-items: center; gap: 6px; flex: none;
+  background: transparent; color: var(--text-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px 10px; font: 600 12px 'Inter', sans-serif;
+  cursor: pointer; text-decoration: none; transition: background 0.15s ease, color 0.15s ease;
+}
+.acx-btn:hover:not(:disabled) { background: var(--panel-2); color: var(--text); }
+.acx-btn:disabled { opacity: 0.4; cursor: default; }
+.acx-mono { font-family: 'IBM Plex Mono', monospace; }
+.acx-title { display: flex; align-items: baseline; gap: 8px; min-width: 0; font-size: 13px; font-weight: 600; }
+.acx-title-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-2); }
+.acx-steps { display: flex; gap: 4px; flex: 1; min-width: 0; justify-content: center; overflow: hidden; }
+.acx-step {
+  background: transparent; color: var(--text-2); border: 1px solid var(--border-soft);
+  border-radius: 999px; min-width: 30px; padding: 4px 10px; font: 600 12px 'IBM Plex Mono', monospace; cursor: pointer;
+}
+.acx-step:hover { background: var(--panel-2); }
+.acx-step[aria-current='step'] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.acx-arrows, .acx-tools, .acx-timer { display: flex; align-items: center; gap: 6px; flex: none; }
+.acx-count { font-size: 12px; color: var(--text-2); min-width: 36px; text-align: center; }
+.acx-clock { font-size: 15px; font-weight: 600; min-width: 56px; text-align: center; color: var(--text); }
+.acx-timer-over .acx-clock { background: var(--amber-bg); color: var(--amber); border-radius: 6px; padding: 3px 6px; animation: acx-pulse 0.9s ease-out 1; }
+@keyframes acx-pulse { 0% { transform: scale(1); } 40% { transform: scale(1.18); } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .acx-bar { transition: none; }
+  .acx-timer-over .acx-clock { animation: none; }
+}
+@media (max-width: 900px) {
+  .acx-label { display: none; }
+}
+@media (max-width: 700px) {
+  .acx-steps { display: none; }
+  .acx-bar { flex-wrap: wrap; gap: 6px 8px; padding: 6px 8px; }
+  .acx-title { flex: 1; }
+  .acx-tools { margin-left: auto; }
+}
+
+/* Home: card + class link side by side */
+.ac-card-wrap { display: flex; flex-direction: column; gap: 6px; }
+.ac-card-class { align-self: flex-end; }

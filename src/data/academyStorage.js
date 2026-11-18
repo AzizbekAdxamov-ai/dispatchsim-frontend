@@ -125,3 +125,19 @@ export function toProgressBody(state) {
 export function hasAnything(state) {
   return Object.keys(state.exitsDone).length > 0 || Object.keys(state.quiz).length > 0 || state.mode !== 'self'
 }
+
+// Class mode (a mentor presenting) keeps its own copy of the lesson state under
+// "ds-cls-*" so it never mixes with the mentor's own progress. Each class
+// starts clean: the lesson's answers from the last class must not show.
+export function clearClassKeys(storage = defaultStorage()) {
+  try {
+    const keys = []
+    for (let i = 0; i < storage.length; i++) {
+      const k = storage.key(i)
+      if (k && k.startsWith('ds-cls-')) keys.push(k)
+    }
+    for (const k of keys) storage.removeItem(k)
+  } catch {
+    // Storage unavailable: nothing to clear.
+  }
+}

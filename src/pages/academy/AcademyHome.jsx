@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { getAcademyMe } from '../../api/academy'
+import { useAuth } from '../../context/AuthContext'
 import { ACADEMY_LESSONS, EXITS_PER_LESSON, LESSON_COUNT, WEEK_COUNT } from '../../data/academyLessons'
 import '../PageHeader.css'
 import './academy.css'
@@ -31,6 +32,8 @@ function Ring({ done }) {
 export default function AcademyHome() {
   const [me, setMe] = useState(null)
   const [error, setError] = useState('')
+  const { user } = useAuth()
+  const isMentor = user?.isMentor || user?.isAdmin
 
   useEffect(() => {
     const controller = new AbortController()
@@ -83,13 +86,18 @@ export default function AcademyHome() {
           <div className="ac-week-title">{week}-hafta</div>
           <div className="ac-cards">
             {ACADEMY_LESSONS.filter((l) => l.week === week).map((l) => (
-              <Link className="ac-card" key={l.no} to={`/academy/lesson/${l.no}`}>
-                <Ring done={doneOf(l.no)} />
-                <div>
-                  <div className="ac-card-title">{l.no}-dars. {l.title}</div>
-                  <div className="ac-card-meta ac-mono">{l.minutes} daqiqa</div>
-                </div>
-              </Link>
+              <div className="ac-card-wrap" key={l.no}>
+                <Link className="ac-card" to={`/academy/lesson/${l.no}`}>
+                  <Ring done={doneOf(l.no)} />
+                  <div>
+                    <div className="ac-card-title">{l.no}-dars. {l.title}</div>
+                    <div className="ac-card-meta ac-mono">{l.minutes} daqiqa</div>
+                  </div>
+                </Link>
+                {isMentor && (
+                  <Link className="ac-btn ac-btn-ghost ac-btn-sm ac-card-class" to={`/academy/class/${l.no}`}>Darsda</Link>
+                )}
+              </div>
             ))}
           </div>
         </section>

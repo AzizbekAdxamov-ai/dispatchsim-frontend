@@ -56,6 +56,7 @@ import HrDrivers from './pages/HrDrivers'
 import AcademyShell from './components/layout/AcademyShell'
 import AcademyHome from './pages/academy/AcademyHome'
 import AcademyLesson from './pages/academy/AcademyLesson'
+import AcademyClass from './pages/academy/AcademyClass'
 import MentorDashboard from './pages/academy/MentorDashboard'
 import MentorStudent from './pages/academy/MentorStudent'
 
@@ -157,6 +158,7 @@ export default function App() {
             <Route index element={<AdminUsers />} />
             <Route path="invites" element={<AdminInvites />} />
           </Route>
+          <Route path="/academy/class/:no" element={<ProtectedRoute><AcademyClass /></ProtectedRoute>} />
           <Route
             path="/academy"
             element={

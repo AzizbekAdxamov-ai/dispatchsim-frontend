@@ -48,3 +48,9 @@ test('real assets load nothing external', () => {
     assert.ok(!/\bimport\s/.test(text))
   }
 })
+
+test('class mode rewires only this window\'s storage and talks to its own origin', () => {
+  assert.ok(assets.headJs.includes('Storage.prototype'))
+  assert.ok(assets.headJs.includes('ds-cls-'))
+  assert.ok(assets.frameJs.includes('location.origin'))
+})

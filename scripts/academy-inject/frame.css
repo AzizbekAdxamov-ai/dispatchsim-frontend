@@ -1,3 +1,11 @@
 /* Academy frame: the app owns the mode switch, so the lesson's own is hidden. */
 html.ds-embed .mode { display: none !important; }
 html.ds-embed .bar-in { max-width: 100%; }
+
+/* Class mode: big type, one part of the lesson at a time, no lesson header. */
+html.ds-present body { --fs: var(--ds-fs, 22px); }
+html.ds-present .bar { display: none !important; }
+html.ds-present .wrap { max-width: min(1200px, 94vw); padding-top: 64px; }
+html.ds-present .ds-off { display: none !important; }
+html.ds-present .ask { font-size: 1.2em; border-width: 3px; padding: 18px 22px; }
+html.ds-present .ask .lbl { font-size: 14px; }

@@ -68,3 +68,13 @@ test('clearLessonKeys on logout also drops the owner mark', () => {
   clearLessonKeys(s, { includeOwner: true })
   assert.deepEqual(s.dump(), { other: '1' })
 })
+
+test('clearClassKeys removes only ds-cls-* keys', async () => {
+  const { clearClassKeys } = await import('../src/data/academyStorage.js')
+  const st = memory({ 'ds-cls-l1-done': '{}', 'ds-cls-l1-mode': '"teach"', 'ds-l1-done': '{}', 'ds-academy-owner': '5' })
+  clearClassKeys(st)
+  assert.equal(st.getItem('ds-cls-l1-done'), null)
+  assert.equal(st.getItem('ds-cls-l1-mode'), null)
+  assert.equal(st.getItem('ds-l1-done'), '{}')
+  assert.equal(st.getItem('ds-academy-owner'), '5')
+})

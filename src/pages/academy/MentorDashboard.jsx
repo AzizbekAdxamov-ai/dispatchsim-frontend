@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { addMember, createCohort, getCohortStudents, listCohorts } from '../../api/academy'
-import { ACADEMY_LESSONS, EXITS_PER_LESSON, lessonFile } from '../../data/academyLessons'
-import { useAuth } from '../../context/AuthContext'
-import { ensureStorageOwner, writeMode } from '../../data/academyStorage'
+import { ACADEMY_LESSONS, EXITS_PER_LESSON } from '../../data/academyLessons'
 import '../PageHeader.css'
 import './academy.css'
 
@@ -24,14 +22,8 @@ function cellClass(count) {
   return 'ac-cell'
 }
 
-function openInClass(no, userId) {
-  ensureStorageOwner(userId)
-  writeMode(no, 'teach')
-  window.open(lessonFile(no), '_blank')
-}
-
 export default function MentorDashboard() {
-  const { user } = useAuth()
+  const navigate = useNavigate()
   const [cohorts, setCohorts] = useState([])
   const [selected, setSelected] = useState(null)
   const [students, setStudents] = useState([])
@@ -157,7 +149,7 @@ export default function MentorDashboard() {
                 {ACADEMY_LESSONS.map((l) => (
                   <th key={l.no}>
                     <div className="ac-mono">{l.no}</div>
-                    <button type="button" className="ac-btn ac-btn-ghost ac-btn-sm" onClick={() => openInClass(l.no, user?.id)} title={`${l.no}-darsni sinfda ochish`}>Darsda</button>
+                    <button type="button" className="ac-btn ac-btn-ghost ac-btn-sm" onClick={() => navigate(`/academy/class/${l.no}`)} title={`${l.no}-darsni sinfda ochish`}>Darsda</button>
                   </th>
                 ))}
                 <th>Oxirgi faollik</th>
