@@ -51,22 +51,36 @@
 .ac-ring-fg { stroke: var(--accent); fill: none; stroke-linecap: round; }
 .ac-ring-text { fill: var(--text); font: 600 11px 'IBM Plex Mono', monospace; }
 
-/* Lesson */
-.ac-lesson { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
-.ac-lesson-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.ac-lesson-title { font-size: 17px; font-weight: 600; }
-.ac-seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-.ac-seg button {
-  background: var(--panel); color: var(--text-2); border: none;
-  padding: 7px 12px; font: 500 12px 'Inter', sans-serif; cursor: pointer;
+/* Lesson: full window, the lesson file fills it, panels slide over it */
+.ac-focus-shell { height: 100dvh; overflow: hidden; background: var(--bg); }
+.ac-focus { height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+.ac-focus-bar {
+  flex: none; height: 52px; display: flex; align-items: center; gap: 8px;
+  padding: 0 12px; background: var(--panel); border-bottom: 1px solid var(--border);
 }
-.ac-seg button[aria-pressed='true'] { background: var(--accent); color: var(--on-accent); }
-.ac-frame {
-  width: 100%; height: calc(100vh - 170px); min-height: 520px;
-  border: 1px solid var(--border); border-radius: 12px; background: var(--panel);
+.ac-focus-title { flex: 1; min-width: 0; font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ac-focus-btn {
+  display: inline-flex; align-items: center; gap: 6px; flex: none;
+  background: transparent; color: var(--text-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px 10px; font: 500 12px 'Inter', sans-serif;
+  cursor: pointer; text-decoration: none; transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
-.ac-side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
-.ac-side .ac-panel { margin-bottom: 0; }
+.ac-focus-btn:hover { background: var(--panel-2); color: var(--text); }
+.ac-focus-btn[aria-pressed='true'] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.ac-focus-badge {
+  font: 600 10.5px 'IBM Plex Mono', monospace; background: var(--amber-bg); color: var(--amber);
+  border-radius: 999px; padding: 1px 6px;
+}
+.ac-focus-body { position: relative; flex: 1; min-height: 0; }
+.ac-focus-frame { display: block; width: 100%; height: 100%; border: 0; background: var(--panel); }
+.ac-drawer {
+  position: absolute; top: 0; right: 0; bottom: 0; width: min(380px, 100%);
+  background: var(--panel); border-left: 1px solid var(--border);
+  box-shadow: -12px 0 32px var(--shadow); overflow-y: auto; z-index: 5; padding: 14px 16px;
+}
+.ac-drawer-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+.ac-drawer-head h2 { font-size: 14px; font-weight: 600; margin: 0; }
+.ac-drawer-scrim { display: none; }
 .ac-advisor-row { display: flex; gap: 8px; }
 .ac-advisor-row .ac-input { flex: 1; }
 .ac-note { border-top: 1px solid var(--border-soft); padding: 8px 0; font-size: 12.5px; }
@@ -89,7 +103,15 @@
 .ac-form { display: flex; flex-direction: column; gap: 8px; }
 .ac-form textarea { min-height: 80px; resize: vertical; }
 
-@media (max-width: 900px) {
-  .ac-lesson { grid-template-columns: minmax(0, 1fr); }
-  .ac-frame { height: 70vh; min-height: 420px; }
+@media (max-width: 700px) {
+  .ac-drawer-scrim { display: block; position: absolute; inset: 0; background: var(--scrim-soft); z-index: 4; }
+  .ac-drawer {
+    top: auto; left: 0; width: 100%; max-height: 72dvh;
+    border-left: 0; border-top: 1px solid var(--border);
+    border-radius: 14px 14px 0 0; box-shadow: 0 -12px 32px var(--shadow);
+  }
+}
+@media (max-width: 520px) {
+  .ac-focus-label { display: none; }
+  .ac-focus-bar { gap: 6px; padding: 0 8px; }
 }

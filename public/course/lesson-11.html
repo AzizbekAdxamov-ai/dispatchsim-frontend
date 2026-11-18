@@ -3,6 +3,19 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<!-- academy:inject --><script>// Runs first, before the lesson's own styles and script. In a fragment page
+// document.body does not exist yet, so every flag goes on <html>.
+(function () {
+  var root = document.documentElement
+  var embed = false
+  try { embed = window.parent !== window } catch { embed = true }
+  if (embed) root.classList.add('ds-embed')
+  try {
+    var t = window.parent.document.documentElement.getAttribute('data-theme')
+    if (t === 'dark' || t === 'light') root.setAttribute('data-theme', t)
+  } catch { /* cross-origin parent: wait for the ds-theme message */ }
+})()
+</script><!-- /academy:inject -->
 <style>
 [hidden]{display:none!important}
 p.prose{display:block;max-width:68ch}
@@ -936,3 +949,19 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(11,107,66,
   MQ.forEach(function(q){var r=el("div",{class:"mq"});r.appendChild(el("span",{text:q}));var bt=el("button",{type:"button",class:"icon-btn",text:"Nusxa"});bt.onclick=function(){copyText(bt,q)};r.appendChild(bt);$("#mqs").appendChild(r)});
 })();
 </script>
+<!-- academy:inject --><style>/* Academy frame: the app owns the mode switch, so the lesson's own is hidden. */
+html.ds-embed .mode { display: none !important; }
+html.ds-embed .bar-in { max-width: 100%; }
+</style><script>// Runs after the lesson script. Only active inside the Academy frame.
+(function () {
+  if (!document.documentElement.classList.contains('ds-embed')) return
+  document.body.classList.add('embed')
+  window.addEventListener('message', function (e) {
+    if (e.origin !== location.origin || e.source !== window.parent) return
+    var d = e.data
+    if (d && d.type === 'ds-theme' && (d.theme === 'dark' || d.theme === 'light')) {
+      document.documentElement.setAttribute('data-theme', d.theme)
+    }
+  })
+})()
+</script><!-- /academy:inject -->

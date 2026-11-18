@@ -1,0 +1,3 @@
+/* Academy frame: the app owns the mode switch, so the lesson's own is hidden. */
+html.ds-embed .mode { display: none !important; }
+html.ds-embed .bar-in { max-width: 100%; }

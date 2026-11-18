@@ -31,6 +31,17 @@ export default function AcademyShell() {
   const liveDataFailing = useLiveDataHealth().failingCount > 0
   const isMentor = user?.isMentor || user?.isAdmin
   const items = [...STUDENT_NAV, ...(isMentor ? MENTOR_NAV : []), ...WORKSPACE_NAV]
+  // A lesson fills the whole window: no sidebar, topbar or page padding.
+  // No transformed wrapper either, so the lesson's fixed drawer stays anchored.
+  const focus = location.pathname.startsWith('/academy/lesson/')
+
+  if (focus) {
+    return (
+      <div className="ac-focus-shell">
+        <Outlet />
+      </div>
+    )
+  }
 
   return (
     <div className="app" style={{ position: 'relative', display: 'flex', minHeight: '100vh' }}>
