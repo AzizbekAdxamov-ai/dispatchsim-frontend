@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowLeft, ChatCircleDots, ListChecks, Moon, Notebook, Sun, X } from '@phosphor-icons/react'
+import { ArrowLeft, ChatCircleDots, ChalkboardTeacher, ListChecks, Moon, Notebook, Sun, X } from '@phosphor-icons/react'
 import { useTheme } from '../../theme/ThemeProvider'
 import { useAuth } from '../../context/AuthContext'
 import { askAdvisor, getAcademyMe, saveProgress } from '../../api/academy'
@@ -97,6 +97,18 @@ function LessonView({ lesson }) {
   // The advisor's text lives here, not in the drawer: closing the drawer unmounts it.
   const [advisor, setAdvisor] = useState({ message: '', answer: '', busy: false })
   const [panel, setPanel] = useState(null) // null | 'task' | 'advisor' | 'notes'
+  // Last open panel: the exit animation keeps showing it instead of an empty drawer.
+  const [lastPanel, setLastPanel] = useState(null)
+  if (panel && panel !== lastPanel) setLastPanel(panel)
+  const shown = panel ?? lastPanel
+  const [narrow, setNarrow] = useState(() => window.matchMedia('(max-width: 700px)').matches)
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 700px)')
+    const onChange = () => setNarrow(mq.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
+  const slide = narrow ? { y: 16 } : { x: 16 }
   const frameRef = useRef(null)
   const closeRef = useRef(null)
   const toggleRefs = useRef({})
@@ -116,8 +128,19 @@ function LessonView({ lesson }) {
       setPanel(null)
       toggleRefs.current[panel]?.focus()
     }
+    // Esc pressed while focus is inside the lesson frame arrives as a message.
+    const onMessage = (e) => {
+      if (e.origin !== window.location.origin || e.source !== frameRef.current?.contentWindow) return
+      if (e.data?.type !== 'ds-key' || e.data.key !== 'Escape') return
+      setPanel(null)
+      toggleRefs.current[panel]?.focus()
+    }
     document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
+    window.addEventListener('message', onMessage)
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      window.removeEventListener('message', onMessage)
+    }
   }, [panel])
 
   function closePanel() {
@@ -135,7 +158,7 @@ function LessonView({ lesson }) {
     { id: 'advisor', label: 'Maslahatchi', title: 'Maslahatchi', Icon: ChatCircleDots },
     { id: 'notes', label: 'Izohlar', title: 'Mentor izohlari', Icon: Notebook, badge: notes.length },
   ]
-  const active = PANELS.find((p) => p.id === panel)
+  const active = PANELS.find((p) => p.id === shown)
 
   return (
     <div className="ac-focus">
@@ -146,8 +169,9 @@ function LessonView({ lesson }) {
         </Link>
         <div className="ac-focus-title">{no}-dars. {lesson.title}</div>
         {isMentor && (
-          <Link className="ac-focus-btn" to={`/academy/class/${no}`}>
-            <span>Darsda ochish</span>
+          <Link className="ac-focus-btn" to={`/academy/class/${no}`} aria-label="Darsda ochish">
+            <ChalkboardTeacher size={16} weight="bold" />
+            <span className="ac-focus-label">Darsda ochish</span>
           </Link>
         )}
         {PANELS.map(({ id, label, Icon, badge }) => (
@@ -157,7 +181,7 @@ function LessonView({ lesson }) {
             ref={(el) => { toggleRefs.current[id] = el }}
             className="ac-focus-btn"
             aria-pressed={panel === id}
-            aria-controls={`ac-drawer-${id}`}
+            aria-controls={panel === id ? `ac-drawer-${id}` : undefined}
             onClick={() => togglePanel(id)}
           >
             <Icon size={16} weight="bold" />
@@ -198,9 +222,9 @@ function LessonView({ lesson }) {
               className="ac-drawer"
               role="dialog"
               aria-labelledby="ac-drawer-title"
-              initial={{ opacity: 0, x: 16 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 16 }}
+              initial={{ opacity: 0, ...slide }}
+              animate={{ opacity: 1, x: 0, y: 0 }}
+              exit={{ opacity: 0, ...slide }}
               transition={{ duration: 0.18, ease: 'easeOut' }}
             >
               <div className="ac-drawer-head">
@@ -210,13 +234,13 @@ function LessonView({ lesson }) {
                 </button>
               </div>
               {/* All three stay mounted: the advisor's answer must survive closing the drawer. */}
-              <div id="ac-drawer-task" hidden={panel !== 'task'}>
+              <div id="ac-drawer-task" hidden={shown !== 'task'}>
                 <Link className="ac-btn" to={lesson.simulatorPath}>{lesson.simulatorLabel}</Link>
               </div>
-              <div id="ac-drawer-advisor" hidden={panel !== 'advisor'}>
+              <div id="ac-drawer-advisor" hidden={shown !== 'advisor'}>
                 <Advisor lessonNo={no} state={advisor} setState={setAdvisor} />
               </div>
-              <div id="ac-drawer-notes" hidden={panel !== 'notes'}>
+              <div id="ac-drawer-notes" hidden={shown !== 'notes'}>
                 {notes.length === 0 && <div className="ac-muted">Hozircha izoh yo‘q.</div>}
                 {notes.map((n) => (
                   <div className="ac-note" key={n.id}>

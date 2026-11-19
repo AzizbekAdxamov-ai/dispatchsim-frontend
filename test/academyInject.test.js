@@ -53,6 +53,7 @@ test('class mode rewires only this window\'s storage and talks to its own origin
   assert.ok(assets.headJs.includes('Storage.prototype'))
   assert.ok(assets.headJs.includes('ds-cls-'))
   assert.ok(assets.frameJs.includes('location.origin'))
+  assert.ok(assets.frameJs.includes('Escape'))
 })
 
 const scriptsDir = new URL('../scripts/', import.meta.url)

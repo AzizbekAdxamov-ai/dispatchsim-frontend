@@ -25,6 +25,12 @@
     }
   })
 
+  // Esc inside the frame must still close the app's drawer (focus is in the frame).
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape' || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return
+    send({ type: 'ds-key', key: 'Escape' })
+  })
+
   if (!present) return
 
   var main = document.querySelector('main.wrap') || document.body
