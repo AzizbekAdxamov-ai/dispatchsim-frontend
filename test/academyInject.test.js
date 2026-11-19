@@ -54,3 +54,24 @@ test('class mode rewires only this window\'s storage and talks to its own origin
   assert.ok(assets.headJs.includes('ds-cls-'))
   assert.ok(assets.frameJs.includes('location.origin'))
 })
+
+const scriptsDir = new URL('../scripts/', import.meta.url)
+const fxCss = readFileSync(new URL('academy-fx.css', scriptsDir), 'utf8')
+const fxJs = readFileSync(new URL('academy-fx.js', scriptsDir), 'utf8')
+
+test('motion layer respects reduced motion and loads nothing external', () => {
+  assert.ok(fxCss.includes('prefers-reduced-motion'))
+  assert.ok(fxJs.includes('prefers-reduced-motion'))
+  for (const text of [fxCss, fxJs]) {
+    assert.ok(!/https?:\/\//.test(text))
+    assert.ok(!/\bimport\s/.test(text))
+    assert.ok(!/<\/script/i.test(text))
+  }
+  assert.ok(!/#[0-9a-fA-F]{3,8}\b/.test(fxCss))
+})
+
+test('synced lesson pages carry the motion layer exactly once', () => {
+  const html = readFileSync(new URL('../public/course/lesson-01.html', import.meta.url), 'utf8')
+  assert.equal(count(html, 'Motion layer for the lesson pages'), 1)
+  assert.equal(count(html, 'Academy motion layer'), 1)
+})

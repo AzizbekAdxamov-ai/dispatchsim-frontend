@@ -5,8 +5,7 @@
   document.body.classList.add('embed')
 
   var present = root.classList.contains('ds-present')
-  var items = []
-  var current = 0
+  var items
 
   function send(msg) {
     try { window.parent.postMessage(msg, location.origin) } catch { /* parent gone */ }
@@ -60,7 +59,6 @@
     Array.prototype.forEach.call(main.children, function (c) {
       c.classList.toggle('ds-off', keep.indexOf(c) < 0)
     })
-    current = i
     window.scrollTo({ top: 0, behavior: 'instant' })
     if (!reduce && main.animate) main.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, easing: 'ease-out' })
     send({ type: 'ds-section', index: i })

@@ -26,6 +26,8 @@ const assets = {
   headJs: read(assetDir, 'head.js'),
   frameCss: read(assetDir, 'frame.css'),
   frameJs: read(assetDir, 'frame.js'),
+  fxCss: read(join(root, 'scripts'), 'academy-fx.css'),
+  fxJs: read(join(root, 'scripts'), 'academy-fx.js'),
 }
 
 mkdirSync(target, { recursive: true })
