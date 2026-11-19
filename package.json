@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "check:contrast": "node scripts/check-contrast.mjs",
     "sync:course": "node scripts/sync-course.mjs",
     "predev": "npm run sync:course",
     "prebuild": "npm run sync:course",

@@ -52,10 +52,10 @@ test('every custom property used is defined somewhere', () => {
 })
 
 // Kills: one text colour for the accent in both themes. Lime (dark) needs
-// dark text, blue (light) needs white.
+// dark text, navy (light) needs signal white.
 test('text on the accent follows the theme', () => {
   const tokens = readFileSync(join(src, 'theme', 'tokens.css'), 'utf8')
   const block = (sel) => tokens.slice(tokens.indexOf(sel), tokens.indexOf('}', tokens.indexOf(sel)))
-  assert.match(block(':root[data-theme="dark"]'), /--accent: #D9F35C;[\s\S]*--on-accent: #1B1F0C;/)
-  assert.match(block(':root[data-theme="light"]'), /--accent: #3B7DD8;[\s\S]*--on-accent: #FFFFFF;/)
+  assert.match(block(':root[data-theme="dark"]'), /--accent: #B7FF3C;[\s\S]*--on-accent: #0B1020;/)
+  assert.match(block(':root[data-theme="light"]'), /--accent: #0B1020;[\s\S]*--on-accent: #F7F9FC;/)
 })

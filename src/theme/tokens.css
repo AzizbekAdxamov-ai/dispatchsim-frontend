@@ -5,6 +5,20 @@
    broker chat page used to overflow the window by 12px for exactly
    that reason. */
 :root {
+  /* Brand v1 -- one palette, both themes: Midnight #0B1020, Graphite
+     #151C2F, Electric Lime, Signal White #F7F9FC, Steel Gray. Lime is a
+     fill (chip, CTA on dark) and never text on a light surface, so it is
+     a token pair of its own that does not follow the theme. Light is
+     derived from the brand (signal-white surfaces, navy accent). */
+  --lime: #B7FF3C;
+  --on-lime: #0B1020;
+  --lime-deep: #93D92B;
+  --steel: #7E8799;
+
+  --font-display: 'Space Grotesk Variable', 'Inter Variable', 'Inter', sans-serif;
+  --font-body: 'Inter Variable', 'Inter', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
   --shell-chrome-base: 92px;
   --shell-chrome: var(--shell-chrome-base);
   /* The section tab row under the topbar (SectionTabs.css). When a
@@ -33,18 +47,18 @@
 }
 
 :root[data-theme="dark"] {
-  --bg: #0C0F14;
-  --panel: #12161D;
-  --panel-2: #171C25;
-  --panel-3: #1D2330;
-  --border: #242A36;
-  --border-soft: #1B212B;
-  --text: #EDEFF3;
-  --text-2: #8992A3;
-  --text-3: #858B97;
+  --bg: #0B1020;
+  --panel: #151C2F;
+  --panel-2: #1B2338;
+  --panel-3: #222B42;
+  --border: #2A3350;
+  --border-soft: #1E2639;
+  --text: #F7F9FC;
+  --text-2: #A7B0C2;
+  --text-3: #8B94A6;
 
-  --accent: #D9F35C;
-  --accent-dim: #3A3F1E;
+  --accent: #B7FF3C;
+  --accent-dim: rgba(183, 255, 60, 0.14);
 
   --blue: #5B8DEF;
   --blue-dim: rgba(91, 141, 239, 0.16);
@@ -60,24 +74,24 @@
 
   --red: #F0605C;
   --red-bg: rgba(240, 96, 92, 0.14);
-  --red-strong: #F0605C;
+  --red-strong: #FF7A75;
 
-  --shadow: rgba(0, 0, 0, 0.22);
+  --shadow: rgba(0, 0, 0, 0.32);
 
-  /* Text and icons ON a filled colour. The accent is lime here and blue in
+  /* Text and icons ON a filled colour. The accent is lime here and navy in
      light, so one fixed text colour cannot sit on both: white on this lime
      is 1.24:1 and could not be read (the Dispatch, Hire and Assign buttons
      used #fff until 2026-10-08). */
-  --on-accent: #1B1F0C;
+  --on-accent: #0B1020;
   /* The far end of a progress bar's gradient. */
-  --accent-deep: #B8DA3E;
+  --accent-deep: #93D92B;
   --amber-deep: #E0A32E;
-  --on-blue: #FFFFFF;
+  --on-blue: #0B1020;
   --on-green: #08170E;
 
   /* Behind a modal or a side panel. */
-  --scrim: rgba(0, 0, 0, 0.5);
-  --scrim-soft: rgba(0, 0, 0, 0.35);
+  --scrim: rgba(5, 8, 18, 0.6);
+  --scrim-soft: rgba(5, 8, 18, 0.4);
 
   --amber-border: rgba(245, 185, 66, 0.35);
   --amber-sep: rgba(245, 185, 66, 0.5);
@@ -87,22 +101,24 @@
   --violet-bg: rgba(110, 63, 243, 0.16);
 }
 
+/* Light: derived from the brand (the brand has no light theme). Signal-white
+   surfaces, Midnight text, navy accent -- lime is invisible on white. */
 :root[data-theme="light"] {
-  --bg: #F7F2EA;
-  --panel: #FFFDF9;
-  --panel-2: #F1EAE0;
-  --panel-3: #EAE1D2;
-  --border: #E4DACB;
-  --border-soft: #EAE1D2;
-  --text: #3A3229;
-  --text-2: #635A4D;
-  --text-3: #6B6459;
+  --bg: #F7F9FC;
+  --panel: #FFFFFF;
+  --panel-2: #EEF1F7;
+  --panel-3: #E4E9F2;
+  --border: #D5DBE8;
+  --border-soft: #E1E6EF;
+  --text: #0B1020;
+  --text-2: #4A5468;
+  --text-3: #5E677A;
 
-  --accent: #3B7DD8;
-  --accent-dim: #E4EDFB;
+  --accent: #0B1020;
+  --accent-dim: #ECF8D0;
 
-  --blue: #3B7DD8;
-  --blue-dim: #E4EDFB;
+  --blue: #2F6BC4;
+  --blue-dim: #E1EAF8;
   --blue-strong: #2C5CA8;
 
   --green: #3E9558;
@@ -117,18 +133,18 @@
   --red-bg: #FBEAE8;
   --red-strong: #96332B;
 
-  --shadow: rgba(58, 50, 41, 0.16);
+  --shadow: rgba(11, 16, 32, 0.12);
 
-  --on-accent: #FFFFFF;
-  /* Blue to blue here: the light accent is blue, and until 2026-10-08 the
-     bar ran blue into the dark theme's lime. */
-  --accent-deep: #2C5CA8;
+  --on-accent: #F7F9FC;
+  /* Navy to navy here: the light accent is navy (lime does not read on
+     white, 1.1:1), and until 2026-10-08 the bar ran into the dark theme's lime. */
+  --accent-deep: #2A3555;
   --amber-deep: #E0A32E;
   --on-blue: #FFFFFF;
   --on-green: #08170E;
 
-  --scrim: rgba(0, 0, 0, 0.5);
-  --scrim-soft: rgba(0, 0, 0, 0.35);
+  --scrim: rgba(11, 16, 32, 0.45);
+  --scrim-soft: rgba(11, 16, 32, 0.3);
 
   --amber-border: #EDD9AE;
   --amber-sep: #D9BE8C;
