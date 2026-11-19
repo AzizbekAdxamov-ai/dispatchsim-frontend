@@ -53,3 +53,11 @@ test('the SPA rewrite is still there', () => {
   // Kills: replacing "rewrites" while adding "headers".
   assert.deepEqual(config.rewrites, [{ source: '/(.*)', destination: '/index.html' }])
 })
+
+// Kills: a Google Fonts origin creeping back into the CSP -- fonts are
+// self-hosted (brand v1), so no external font origin is needed.
+test('CSP allows no external font origin', () => {
+  const csp = headersFor('/(.*)')['Content-Security-Policy']
+  assert.ok(!/fonts\.(googleapis|gstatic)\.com/.test(csp))
+  assert.deepEqual(directives(csp)['font-src'], ["'self'"])
+})

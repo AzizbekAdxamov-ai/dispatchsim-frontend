@@ -109,6 +109,7 @@ export function readColors() {
   const style = getComputedStyle(document.documentElement)
   const get = (name) => style.getPropertyValue(name).trim()
   return {
+    bg: get('--bg'),
     blue: get('--blue'),
     amber: get('--amber'),
     green: get('--green'),
@@ -116,6 +117,15 @@ export function readColors() {
     muted: get('--text-3'),
     panel: get('--panel'),
     text2: get('--text-2'),
+  }
+}
+
+// Tints the basemap's flat background layer with the theme's --bg so the
+// map sits in the same navy (or signal-white) as the page. Only that one
+// layer: roads, water and labels keep the provider's cartography.
+export function tintBasemap(map, colors) {
+  if (colors.bg && map.getLayer('background')) {
+    map.setPaintProperty('background', 'background-color', colors.bg)
   }
 }
 

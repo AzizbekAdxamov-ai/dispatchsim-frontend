@@ -4,7 +4,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 // This app's colors for MapLibre's own attribution and popup chrome --
 // after MapLibre's stylesheet, and specific enough not to depend on that.
 import '../map/mapBase.css'
-import { STYLE_URL, US_BOUNDS, NORTH_AMERICA_BOUNDS, readColors, currentTheme } from '../map/mapBase'
+import { STYLE_URL, US_BOUNDS, NORTH_AMERICA_BOUNDS, readColors, tintBasemap, currentTheme } from '../map/mapBase'
 
 // The planner's map: the trip's road line, its waypoints (A, 1..5, B) and
 // the stops the HOS-legal plan makes on the way. Same basemap and bounds
@@ -98,6 +98,7 @@ function stopPopupEl(props) {
 }
 
 function addLayers(map, trip, colors) {
+  tintBasemap(map, colors)
   map.addSource('trip-line', { type: 'geojson', data: lineGeoJSON(trip?.geometry) })
   map.addLayer({
     id: 'trip-line', type: 'line', source: 'trip-line',

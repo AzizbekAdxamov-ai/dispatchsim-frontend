@@ -112,7 +112,7 @@ export const PAIRS = [
 // under the middle scrim stop, then the glass card over that.
 function loginPairs(tokens) {
   if (!('login-ink' in tokens)) return []
-  return ['login-ink', 'login-ink-2', 'login-ink-3'].map((fg) => ({ fg, bg: 'login-glass', need: 4.5, login: true }))
+  return ['login-ink', 'login-ink-2', 'login-ink-3', 'login-error', 'lime'].map((fg) => ({ fg, bg: 'login-glass', need: 4.5, login: true }))
 }
 
 function value(tokens, name, under) {

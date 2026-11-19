@@ -35,7 +35,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 // after MapLibre's stylesheet, and specific enough not to depend on that.
 import '../map/mapBase.css'
 
-import { STYLE_URL, US_BOUNDS, NORTH_AMERICA_BOUNDS, readColors, currentTheme } from '../map/mapBase'
+import { STYLE_URL, US_BOUNDS, NORTH_AMERICA_BOUNDS, readColors, tintBasemap, currentTheme } from '../map/mapBase'
 
 function idStr(id) {
   return id == null ? '' : String(id)
@@ -245,6 +245,7 @@ const FACILITY_LABEL = {
 }
 
 function addLayers(map, { loads, idleTrucks = [], cities, facilities, selected, selectedFullGeometry, colors }) {
+  tintBasemap(map, colors)
   const selectedId = idStr(selected)
   const selectedLoad = loads.find((l) => idStr(l.id) === selectedId) ?? null
 

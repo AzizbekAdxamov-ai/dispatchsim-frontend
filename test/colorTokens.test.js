@@ -21,9 +21,9 @@ function files(dir) {
   })
 }
 
-// The theme defines colours; the sign-in pages sit on a photograph with a
-// palette of their own, before any theme is chosen (Login.css says so).
-const ALLOWED = new Set(['theme/tokens.css', 'index.css', 'pages/Login.css', 'pages/Pending.css'])
+// The theme defines colours; the sign-in pages use the --login-* tokens
+// from the theme too (a glass card over a photograph).
+const ALLOWED = new Set(['theme/tokens.css', 'index.css'])
 const LITERAL = /#[0-9a-fA-F]{3,8}\b|rgba?\(|hsla?\(/
 const COMMENT = /^\s*(\/\/|\*|\/\*)/
 

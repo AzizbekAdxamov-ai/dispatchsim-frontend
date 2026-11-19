@@ -15,6 +15,24 @@
   --lime-deep: #93D92B;
   --steel: #7E8799;
 
+  /* Sign-in pages: a navy glass card over a photograph, light ink. One
+     look in both themes -- the photo does not change with the theme. */
+  --login-scrim-top: rgba(11, 16, 32, 0.30);
+  --login-scrim-mid: rgba(11, 16, 32, 0.45);
+  --login-scrim-bottom: rgba(11, 16, 32, 0.70);
+  --login-ink: #F7F9FC;
+  --login-ink-2: #A7B0C2;
+  --login-ink-3: #9AA3B5;
+  --login-error: #FF7A75;
+  --login-glass: rgba(11, 16, 32, 0.72);
+  --login-glass-border: rgba(247, 249, 252, 0.14);
+  --login-glass-shadow: rgba(0, 0, 0, 0.35);
+  --login-text-shadow: rgba(11, 16, 32, 0.5);
+  --login-field: rgba(11, 16, 32, 0.45);
+  --login-field-border: rgba(126, 135, 153, 0.45);
+  --login-field-focus: rgba(11, 16, 32, 0.7);
+  --login-divider: rgba(126, 135, 153, 0.35);
+
   --font-display: 'Space Grotesk Variable', 'Inter Variable', 'Inter', sans-serif;
   --font-body: 'Inter Variable', 'Inter', sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
