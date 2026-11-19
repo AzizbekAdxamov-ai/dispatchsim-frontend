@@ -7,6 +7,7 @@ import { ApiError } from '../api/client'
 import { LOGIN_FEEDBACK, cooldownSeconds } from '../data/loginFeedback'
 import truckBg from '../assets/truck-bg.webp'
 import './Login.css'
+import { BRAND } from '../brand.js'
 
 function loginErrorMessage(err) {
   if (err instanceof ApiError) {
@@ -113,10 +114,10 @@ export default function Login() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, ease: 'easeOut' }}
       >
-        <div className="brand-mark">DS</div>
+        <div className="brand-mark">{BRAND.shortName}</div>
         <div>
-          <div className="login-brand-text">DispatchSim</div>
-          <div className="login-brand-sub">Dispatch operations</div>
+          <div className="login-brand-text">{BRAND.name}</div>
+          <div className="login-brand-sub">{BRAND.tagline}</div>
         </div>
       </motion.div>
 
