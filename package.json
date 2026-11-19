@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "check:contrast": "node scripts/check-contrast.mjs",
+    "sync:fonts": "node scripts/sync-fonts.mjs",
     "sync:course": "node scripts/sync-course.mjs",
-    "predev": "npm run sync:course",
-    "prebuild": "npm run sync:course",
+    "predev": "npm run sync:fonts && npm run sync:course",
+    "prebuild": "npm run sync:fonts && npm run sync:course",
     "dev": "vite",
     "build": "vite build",
     "build:map": "node scripts/build-us-map.mjs",

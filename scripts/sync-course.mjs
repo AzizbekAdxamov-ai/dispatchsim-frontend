@@ -28,6 +28,8 @@ const assets = {
   frameJs: read(assetDir, 'frame.js'),
   fxCss: read(join(root, 'scripts'), 'academy-fx.css'),
   fxJs: read(join(root, 'scripts'), 'academy-fx.js'),
+  brandCss: read(join(root, 'scripts'), 'academy-brand.css'),
+  recolorMap: JSON.parse(read(join(root, 'scripts'), 'academy-recolor.json')),
 }
 
 mkdirSync(target, { recursive: true })

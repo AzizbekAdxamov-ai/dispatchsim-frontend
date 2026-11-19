@@ -76,3 +76,60 @@ test('synced lesson pages carry the motion layer exactly once', () => {
   assert.equal(count(html, 'Motion layer for the lesson pages'), 1)
   assert.equal(count(html, 'Academy motion layer'), 1)
 })
+
+// ---- brand v1: recolor, self-hosted fonts, brand layer ----
+import { readdirSync, existsSync } from 'node:fs'
+import { recolor, stripExternalFonts } from '../scripts/academyInject.mjs'
+
+const root = new URL('../', import.meta.url)
+const scripts = new URL('scripts/', root)
+const brandCss = readFileSync(new URL('academy-brand.css', scripts), 'utf8')
+const recolorMap = JSON.parse(readFileSync(new URL('academy-recolor.json', scripts), 'utf8'))
+const brandAssets = { ...assets, brandCss, recolorMap }
+
+// Kills: a recolor/strip step that is not idempotent (files drift on every sync).
+test('brand injection twice equals once', () => {
+  const page = '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter">\n<style>a{color:#0E6B43}</style>\n<script>var L=1</script>'
+  assert.equal(inject(inject(page, brandAssets), brandAssets), inject(page, brandAssets))
+})
+
+// Kills: the Google Fonts link surviving in a lesson.
+test('Google Fonts links are removed', () => {
+  const out = stripExternalFonts('<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n<link rel="stylesheet" href="https://fonts.googleapis.com/css2?x">\n<p>x</p>')
+  assert.equal(out, '<p>x</p>')
+})
+
+// Kills: recolor rewriting the lesson's JS (logic must stay untouched).
+test('recolor changes style but never script', () => {
+  const out = recolor('<style>a{color:#0E6B43}</style><script>var c="#0E6B43"</script><svg fill="#0e6b43"/>', recolorMap)
+  assert.ok(out.includes('<style>a{color:#1B2338}</style>'))
+  assert.ok(out.includes('<script>var c="#0E6B43"</script>'))
+  assert.ok(out.includes('fill="#1B2338"'))
+})
+
+// Kills: a value that is also a key (a second pass would chain the swap).
+test('recolor map keys and values do not overlap', () => {
+  const keys = new Set(Object.keys(recolorMap).map((k) => k.toLowerCase()))
+  assert.deepEqual(Object.values(recolorMap).filter((v) => keys.has(v.toLowerCase())), [])
+})
+
+test('brand css is safe to inline and its fonts exist', () => {
+  assert.ok(!/https?:/.test(brandCss))
+  assert.ok(!brandCss.includes('<!--'))
+  assert.ok(!/<\/script/i.test(brandCss))
+  for (const m of brandCss.matchAll(/url\('\/fonts\/([^']+)'\)/g)) {
+    assert.ok(existsSync(new URL(`public/fonts/${m[1]}`, root)), m[1])
+  }
+})
+
+// Kills: a generated lesson that still pulls Google Fonts or carries the brand layer twice.
+test('every generated lesson is branded exactly once', () => {
+  const dirUrl = new URL('public/course/', root)
+  const files = readdirSync(dirUrl).filter((n) => /^lesson-\d+\.html$/.test(n))
+  assert.ok(files.length > 0)
+  for (const n of files) {
+    const html = readFileSync(new URL(n, dirUrl), 'utf8')
+    assert.ok(!html.includes('fonts.googleapis'), n)
+    assert.equal(count(html, '@font-face{font-family:"Space Grotesk Variable"'), 2, n)
+  }
+})
