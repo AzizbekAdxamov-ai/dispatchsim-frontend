@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
-
 * {
   box-sizing: border-box;
   margin: 0;
@@ -13,14 +11,37 @@ html, body, #root {
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-body);
   font-size: 13px;
   line-height: 1.5;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .mono {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Space Grotesk for headings, brand, tabs, KPI figures and the main
+   call-to-action buttons -- not every button, and never body text or
+   tables (those stay Inter). Plain selectors, not :where(): index.css
+   sets `button { font-family: inherit }`, and a zero-specificity rule
+   would lose to it. */
+h1, h2, h3,
+.page-title, .panel-title, .topbar-title,
+.brand-name, .brand-mark, .section-tab, .page-tab, .stat-value,
+.login-brand-text, .login-card-title, .login-dialog-title,
+.ac-card-title, .ac-week-title, .ac-focus-title, .ac-drawer-head h2, .acx-title, .ac-btn,
+.adp-btn, .dp-btn, .bc-send, .bc-send-btn, .bc-accept-btn, .bk-btn, .hr-hire-btn,
+.settings-save-btn, .admin-modal-save, .hos-action-primary,
+.driver-detail-btn.primary, .truck-detail-btn.primary, .load-detail-btn.primary, .invoice-detail-btn.primary {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+/* Figures line up in columns. */
+.stat-value, .ac-table td {
+  font-variant-numeric: tabular-nums;
 }
 
 button {

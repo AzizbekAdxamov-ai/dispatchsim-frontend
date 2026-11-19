@@ -71,7 +71,7 @@
   color: var(--on-accent);
   font-size: 13px;
   font-weight: 500;
-  font-family: inherit;
+  font-family: var(--font-display);
   cursor: pointer;
   transition: opacity 0.15s;
 }
