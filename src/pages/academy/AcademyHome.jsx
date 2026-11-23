@@ -10,10 +10,13 @@ import './academy.css'
 const R = 20
 const C = 2 * Math.PI * R
 
+// done === null: the server has not answered yet. Showing "0/7" then reads as
+// "no progress", so the ring stays empty and says so.
 function Ring({ done }) {
-  const ratio = Math.min(1, done / EXITS_PER_LESSON)
+  const loading = done === null
+  const ratio = loading ? 0 : Math.min(1, done / EXITS_PER_LESSON)
   return (
-    <svg className="ac-ring" width="52" height="52" viewBox="0 0 52 52" role="img" aria-label={`${done} / ${EXITS_PER_LESSON}`}>
+    <svg className="ac-ring" width="52" height="52" viewBox="0 0 52 52" role="img" aria-busy={loading} aria-label={loading ? 'Yuklanmoqda' : `${done} / ${EXITS_PER_LESSON}`}>
       <circle className="ac-ring-bg" cx="26" cy="26" r={R} strokeWidth="4" />
       <motion.circle
         className="ac-ring-fg"
@@ -24,7 +27,7 @@ function Ring({ done }) {
         transition={{ duration: 0.6, ease: 'easeOut' }}
         transform="rotate(-90 26 26)"
       />
-      <text className="ac-ring-text" x="26" y="30" textAnchor="middle">{done}/{EXITS_PER_LESSON}</text>
+      <text className="ac-ring-text" x="26" y="30" textAnchor="middle">{loading ? '–' : done}/{EXITS_PER_LESSON}</text>
     </svg>
   )
 }
@@ -50,6 +53,7 @@ export default function AcademyHome() {
 
   const byNo = new Map((me?.lessons ?? []).map((l) => [l.lessonNo, l]))
   const doneOf = (no) => byNo.get(no)?.exitsCount ?? 0
+  const ringOf = (no) => (me ? doneOf(no) : null)
   const total = ACADEMY_LESSONS.reduce((sum, l) => sum + doneOf(l.no), 0)
   const next = ACADEMY_LESSONS.find((l) => doneOf(l.no) < EXITS_PER_LESSON) ?? null
 
@@ -67,9 +71,9 @@ export default function AcademyHome() {
 
       {error && <div className="ac-error">{error}</div>}
 
-      <div className="ac-panel ac-summary">
+      <div className="ac-panel ac-summary" aria-busy={!me && !error}>
         <div>
-          <div className="ac-summary-total">{total}/{LESSON_COUNT * EXITS_PER_LESSON}</div>
+          <div className="ac-summary-total">{me ? total : '–'}/{LESSON_COUNT * EXITS_PER_LESSON}</div>
           <div className="ac-muted">bajarilgan nuqta (EXIT)</div>
         </div>
         {next ? (
@@ -88,7 +92,7 @@ export default function AcademyHome() {
             {ACADEMY_LESSONS.filter((l) => l.week === week).map((l) => (
               <div className="ac-card-wrap" key={l.no}>
                 <Link className="ac-card" to={`/academy/lesson/${l.no}`}>
-                  <Ring done={doneOf(l.no)} />
+                  <Ring done={ringOf(l.no)} />
                   <div>
                     <div className="ac-card-title">{l.no}-dars. {l.title}</div>
                     <div className="ac-card-meta ac-mono">{l.minutes} daqiqa</div>

@@ -52,9 +52,13 @@ function initials(name) {
 // opens every time; nothing depends on it.
 const COLLAPSE_KEY = 'ds.sidebar.collapsed'
 
+// No saved choice on a phone-width screen: start collapsed. The open rail is
+// 236px, which leaves a 390px screen almost no room for the page itself.
 function readCollapsed() {
   try {
-    return window.localStorage.getItem(COLLAPSE_KEY) === '1'
+    const saved = window.localStorage.getItem(COLLAPSE_KEY)
+    if (saved !== null) return saved === '1'
+    return window.matchMedia('(max-width: 700px)').matches
   } catch {
     return false
   }

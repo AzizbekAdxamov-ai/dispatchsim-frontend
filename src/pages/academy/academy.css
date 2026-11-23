@@ -167,3 +167,8 @@
 /* Home: card + class link side by side */
 .ac-card-wrap { display: flex; flex-direction: column; gap: 6px; }
 .ac-card-class { align-self: flex-end; }
+
+/* Long names and e-mails wrap instead of widening the page. */
+.ac-page { min-width: 0; }
+.ac-page .page-head > div { min-width: 0; }
+.ac-page .page-title, .ac-page .page-sub, .ac-card-title { overflow-wrap: anywhere; }
