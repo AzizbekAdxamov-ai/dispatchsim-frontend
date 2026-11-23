@@ -141,10 +141,14 @@
 
 /* Phones: the quick-link chips (~280px) plus clocks, cash and switcher cannot
    fit in 390px and stretched every page sideways. The same destinations stay
-   reachable from the sidebar; the bar keeps title, switcher and icons. */
+   reachable from the sidebar. The balance stays in view (compact). */
 @media (max-width: 700px) {
   .topbar { padding: 0 12px; gap: 10px; min-width: 0; }
   .topbar-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .topbar-links { display: none; }
-  .tz-strip, .cash-chip { display: none; }
+  .tz-strip { display: none; }
+  .cash-chip { padding: 3px 8px; gap: 5px; }
+  .cash-chip-sub { display: none; }
+  .cash-chip-state { padding-left: 5px; }
+  .cash-chip-value { font-size: 12px; }
 }

@@ -12,11 +12,11 @@ const C = 2 * Math.PI * R
 
 // done === null: the server has not answered yet. Showing "0/7" then reads as
 // "no progress", so the ring stays empty and says so.
-function Ring({ done }) {
+function Ring({ done, busy }) {
   const loading = done === null
   const ratio = loading ? 0 : Math.min(1, done / EXITS_PER_LESSON)
   return (
-    <svg className="ac-ring" width="52" height="52" viewBox="0 0 52 52" role="img" aria-busy={loading} aria-label={loading ? 'Yuklanmoqda' : `${done} / ${EXITS_PER_LESSON}`}>
+    <svg className="ac-ring" width="52" height="52" viewBox="0 0 52 52" role="img" aria-busy={busy} aria-label={busy ? 'Yuklanmoqda' : loading ? `– / ${EXITS_PER_LESSON}` : `${done} / ${EXITS_PER_LESSON}`}>
       <circle className="ac-ring-bg" cx="26" cy="26" r={R} strokeWidth="4" />
       <motion.circle
         className="ac-ring-fg"
@@ -92,7 +92,7 @@ export default function AcademyHome() {
             {ACADEMY_LESSONS.filter((l) => l.week === week).map((l) => (
               <div className="ac-card-wrap" key={l.no}>
                 <Link className="ac-card" to={`/academy/lesson/${l.no}`}>
-                  <Ring done={ringOf(l.no)} />
+                  <Ring done={ringOf(l.no)} busy={!me && !error} />
                   <div>
                     <div className="ac-card-title">{l.no}-dars. {l.title}</div>
                     <div className="ac-card-meta ac-mono">{l.minutes} daqiqa</div>

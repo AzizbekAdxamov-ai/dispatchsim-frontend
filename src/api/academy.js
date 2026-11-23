@@ -1,13 +1,13 @@
 // Thin layer over api/client.js for /academy. Student calls first, then the
 // mentor calls (the server refuses those for anyone who is not a mentor).
 import { api } from './client'
-import { settleSaves, trackSave } from '../data/academyPending'
+import { readAfterSaves, trackSave } from '../data/academyPending'
 
 const opts = (signal) => ({ auth: true, signal })
 
-// Waits for uploads still in flight so the list never reads stale progress.
+// Waits (at most a few seconds) for uploads still in flight so the list never reads stale progress.
 export function getAcademyMe(signal) {
-  return settleSaves().then(() => api.get('/academy/me', opts(signal)))
+  return readAfterSaves(() => api.get('/academy/me', opts(signal)))
 }
 
 export function saveProgress(lessonNo, body, signal) {

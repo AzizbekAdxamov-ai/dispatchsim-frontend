@@ -3,6 +3,9 @@
 // without waiting, the list can read the state from before that upload.
 // Pure: no storage, no network.
 
+// A hung upload must not hold the list hostage: after this the read goes ahead.
+export const SAVE_WAIT_CAP_MS = 4000
+
 const inflight = new Set()
 
 // Tracks a promise until it settles. Returns the same promise.
@@ -13,9 +16,21 @@ export function trackSave(promise) {
   return promise
 }
 
-// Resolves once every upload started so far has settled (failures included:
-// a failed upload must not block the read).
-export function settleSaves() {
+// Uploads still running (for tests).
+export function pendingCount() {
+  return inflight.size
+}
+
+// Resolves once every upload started so far has settled (failures included),
+// or after capMs, whichever comes first.
+export function settleSaves(capMs = SAVE_WAIT_CAP_MS) {
   if (inflight.size === 0) return Promise.resolve()
-  return Promise.allSettled([...inflight]).then(() => undefined)
+  let timer
+  const cap = new Promise((resolve) => { timer = setTimeout(resolve, capMs) })
+  return Promise.race([Promise.allSettled(inflight), cap]).then(() => clearTimeout(timer))
+}
+
+// Runs read() after pending uploads have settled (bounded by capMs).
+export function readAfterSaves(read, capMs = SAVE_WAIT_CAP_MS) {
+  return settleSaves(capMs).then(read)
 }
