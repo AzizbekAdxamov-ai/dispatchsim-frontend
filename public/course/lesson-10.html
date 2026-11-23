@@ -1,5 +1,6 @@
 <title>Rejalash va strategiya</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<script>document.documentElement.setAttribute("lang","uz")</script>
 <!-- academy:inject --><script>// Runs first, before the lesson's own styles and script. In a fragment page
 // document.body does not exist yet, so every flag goes on <html>.
 (function () {
@@ -674,7 +675,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
 <header class="bar" role="banner">
   <div class="bar-in">
     <div class="bar-title">5-hafta · 10-dars · Rejalash va strategiya</div>
-    <div class="prog" aria-label="Dars bo‘yicha jarayon">
+    <div class="prog" role="group" aria-label="Dars bo‘yicha jarayon">
       <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
       <span class="prog-num" id="progNum">0/7</span>
     </div>
@@ -978,7 +979,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
 
   ["ac1","ac2","ac3"].forEach(function(id){var c=$("#"+id);c.checked=!!store.get(id,false);c.onchange=function(){store.set(id,c.checked);if($("#ac1").checked&&$("#ac2").checked&&$("#ac3").checked)mark("app")}});
   var GL=[["Headhaul","asosiy yo‘nalish","Talab kuchli tomonga olib boradigan yuk."],["Backhaul","qaytish yuki","Qaytish yo‘lidagi, odatda arzonroq yuk."],["Reload","keyingi yuk","Yetkazib bergan joyingizdan olinadigan yangi yuk."],["Outbound","chiqish","Bozordan chiqib ketayotgan yuk."],["Inbound","kelish","Bozorga kirayotgan yuk."],["Market area","bozor zonasi","Yuk va truck talabi o‘xshash hudud."],["Load chain","yuk zanjiri","Bir-biriga ulangan ketma-ket yuklar."],["Deadhead","bo‘sh yurish","Yuksiz haydalgan mil."],["Roundtrip","aylanma yo‘l","Bordi-keldi yo‘l: headhaul + backhaul."],["Dead market","zaif bozor","Chiqish yuki kam va arzon hudud."],["Strict appointment","qat’iy vaqt","Belgilangan vaqtdan kechikib bo‘lmaydi."],["HOS","ish soatlari","Hours of service: haydovchi ish va dam olish qoidalari."],["10-hour break","10 soatlik dam","Yangi smenadan oldin majburiy dam."],["Weekly plan","haftalik reja","Boshlanish, o‘rta va yakun nuqtalari bo‘yicha reja."]];
-  GL.forEach(function(g){var b=el("button",{type:"button",class:"flip","aria-label":g[0]+": bosib izohni ko‘ring"});b.innerHTML='<div class="in"><div class="f"><b></b><span></span></div><div class="b"></div></div>';b.querySelector(".f b").textContent=g[0];b.querySelector(".f span").textContent=g[1];b.querySelector(".b").textContent=g[2];b.onclick=function(){b.classList.toggle("on")};$("#gloss").appendChild(b)});
+  GL.forEach(function(g){var b=el("button",{type:"button",class:"flip","aria-expanded":"false"});b.innerHTML='<div class="in"><div class="f"><b></b><span></span></div><div class="b"></div></div>';b.querySelector(".f b").textContent=g[0];b.querySelector(".f span").textContent=g[1];b.querySelector(".b").textContent=g[2];b.onclick=function(){b.setAttribute("aria-expanded",b.classList.toggle("on")?"true":"false")};$("#gloss").appendChild(b)});
   var MQ=["Headhaul narxi juda yuqori bo‘lsa ham uni qachon rad etaman?","Zaif bozorda qolib ketgan truck uchun deadhead qilishni qachon tanlayman?","Haftalik rejani qanday qilib kunlik o‘zgarishlarga moslashtiraman?"];
   MQ.forEach(function(q){var r=el("div",{class:"mq"});r.appendChild(el("span",{text:q}));var bt=el("button",{type:"button",class:"icon-btn",text:"Nusxa"});bt.onclick=function(){copyText(bt,q)};r.appendChild(bt);$("#mqs").appendChild(r)});
 })();

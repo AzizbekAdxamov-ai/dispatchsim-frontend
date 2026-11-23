@@ -1,5 +1,6 @@
 <title>Narxlash va foyda</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<script>document.documentElement.setAttribute("lang","uz")</script>
 <!-- academy:inject --><script>// Runs first, before the lesson's own styles and script. In a fragment page
 // document.body does not exist yet, so every flag goes on <html>.
 (function () {
@@ -658,7 +659,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
 <header class="bar" role="banner">
   <div class="bar-in">
     <div class="bar-title">4-hafta · 7-dars · Narxlash va foyda</div>
-    <div class="prog" aria-label="Dars bo‘yicha jarayon">
+    <div class="prog" role="group" aria-label="Dars bo‘yicha jarayon">
       <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
       <span class="prog-num" id="progNum">0/7</span>
     </div>
@@ -971,7 +972,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
 
   ["ac1","ac2","ac3"].forEach(function(id){var c=$("#"+id);c.checked=!!store.get(id,false);c.onchange=function(){store.set(id,c.checked);if($("#ac1").checked&&$("#ac2").checked&&$("#ac3").checked)mark("app")}});
   var GL=[["CPM","mil boshiga xarajat","Jami xarajat ÷ jami mil."],["Fixed cost","o‘zgarmas xarajat","Truck yurmasa ham to‘lanadigan xarajat."],["Variable cost","o‘zgaruvchan xarajat","Yurgan milga qarab o‘sadigan xarajat."],["Break-even","zararsiz narx","Foyda ham zarar ham bo‘lmaydigan narx."],["Gross","tushum","Barcha xarajatlardan oldingi jami tushum."],["Net / profit","sof foyda","Tushumdan barcha xarajatlar ayirilgandan keyingi qoldiq."],["Deadhead","bo‘sh yurish","Yuksiz haydalgan mil."],["Total miles","jami mil","Yukli mil + deadhead mil."],["Loaded miles","yukli mil","Yuk bilan haydalgan mil."],["MPG","mil/gallon","Yoqilg‘i sarfi: 1 gallon bilan necha mil."],["Toll","yo‘l to‘lovi","Pullik yo‘ldan o‘tish uchun to‘lov."],["Dispatch fee","dispatcher haqi","Dispatcher xizmati uchun, ko‘pincha tushumdan foiz."],["All-in rate","yakuniy narx","Yoqilg‘i va boshqa qo‘shimchalar kiritilgan narx."],["Target profit","maqsadli foyda","Siz uchun qabul qilinadigan foyda darajasi."]];
-  GL.forEach(function(g){var b=el("button",{type:"button",class:"flip","aria-label":g[0]+": bosib izohni ko‘ring"});b.innerHTML='<div class="in"><div class="f"><b></b><span></span></div><div class="b"></div></div>';b.querySelector(".f b").textContent=g[0];b.querySelector(".f span").textContent=g[1];b.querySelector(".b").textContent=g[2];b.onclick=function(){b.classList.toggle("on")};$("#gloss").appendChild(b)});
+  GL.forEach(function(g){var b=el("button",{type:"button",class:"flip","aria-expanded":"false"});b.innerHTML='<div class="in"><div class="f"><b></b><span></span></div><div class="b"></div></div>';b.querySelector(".f b").textContent=g[0];b.querySelector(".f span").textContent=g[1];b.querySelector(".b").textContent=g[2];b.onclick=function(){b.setAttribute("aria-expanded",b.classList.toggle("on")?"true":"false")};$("#gloss").appendChild(b)});
   var MQ=["Mening truck’imning CPM’ini qanday aniq hisoblayman va qaysi xarajatlarni unutmasligim kerak?","Brokerning narxi break-even va minimal narx orasida bo‘lsa, qanday muzokara boshlayman?","Eng ko‘p tushum keltirgan yukni emas, foydalisini tanlaganimni mijozga qanday tushuntiraman?"];
   MQ.forEach(function(q){var r=el("div",{class:"mq"});r.appendChild(el("span",{text:q}));var bt=el("button",{type:"button",class:"icon-btn",text:"Nusxa"});bt.onclick=function(){copyText(bt,q)};r.appendChild(bt);$("#mqs").appendChild(r)});
 })();

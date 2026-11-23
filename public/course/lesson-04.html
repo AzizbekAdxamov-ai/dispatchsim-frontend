@@ -1,5 +1,6 @@
 <title>Fleet va texnik xizmat</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<script>document.documentElement.setAttribute("lang","uz")</script>
 <!-- academy:inject --><script>// Runs first, before the lesson's own styles and script. In a fragment page
 // document.body does not exist yet, so every flag goes on <html>.
 (function () {
@@ -611,7 +612,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
 <header class="bar" role="banner">
   <div class="bar-in">
     <div class="bar-title">2-hafta · 4-dars · Fleet va texnik xizmat</div>
-    <div class="prog" aria-label="Dars bo‘yicha jarayon">
+    <div class="prog" role="group" aria-label="Dars bo‘yicha jarayon">
       <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
       <span class="prog-num" id="progNum">0/7</span>
     </div>
@@ -685,7 +686,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
       <div class="rule" data-label="MOY"><b>25K</b><span>mil: moy va filtrlar. Misol uchun: haqiqiy oraliq ishlab chiqaruvchiga bog‘liq.</span></div>
       <div class="rule" data-label="TORMOZ"><b>50K</b><span>mil: tormoz va shina tekshiruvi. Misol uchun, fleet qoidasiga qarang.</span></div>
       <div class="rule" data-label="YILLIK"><b>12</b><span>oy: yillik inspeksiya. Federal talab (49 CFR 396.17): kamida har 12 oyda.</span></div>
-      <div class="rule" data-label="DVIR"><b>1×</b><span>har kuni: driver kunlik inspeksiya hisobotini to‘ldiradi.</span></div>
+      <div class="rule" data-label="DVIR"><b>Har kuni</b><span>driver truckni tekshiradi. Nosozlik topilsa yoki ma’lum bo‘lsa, DVIR yoziladi va ta’mir qayd etiladi. Carrier qoidasi esa har kuni yozma hisobotni ham talab qilishi mumkin.</span></div>
     </div>
     <p class="prose"><b>PM (preventive maintenance)</b> — buzilishni kutmasdan, masofa yoki muddat bo‘yicha oldindan qilinadigan servis. Dispatcher PM qilmaydi, lekin <b>qachon truck yuk uchun yaroqli</b> ekanini biladi va servisni yuklar orasidagi bo‘sh vaqtga qo‘yadi.</p>
     <div class="card pm">
@@ -713,11 +714,11 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
       <circle class="twinkle" cx="296" cy="100" r="5" fill="#F28C28"/><circle class="twinkle" cx="296" cy="100" r="11" fill="#F28C28" opacity=".25"/>
       <g transform="translate(690,34)"><rect x="-1.5" y="38" width="3" height="40" fill="#A7B0C2"/><rect x="-44" y="0" width="88" height="40" rx="5" fill="#151C2F" stroke="#fff" stroke-width="2.5"/><text x="0" y="17" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#C9D6EE">MILE MARKER</text><text x="0" y="33" text-anchor="middle" font-family="Overpass,Arial,sans-serif" font-weight="800" font-size="17" fill="#fff">214</text></g>
     </svg>
-    <p class="prose">Driver yo‘l chetida to‘xtadi. Federal qoidaga ko‘ra u to‘xtagandan keyin <b>10 daqiqa ichida</b> truckning orqasiga ogohlantiruvchi uchburchaklarni qo‘yishi kerak (49 CFR 392.22). Dispatcherning vazifasi esa tartibni ushlab turish.</p>
+    <p class="prose">Driver yo‘l chetida to‘xtadi. To‘xtagan zahoti avariya chiroqlarini yoqadi, federal qoidaga ko‘ra <b>10 daqiqa ichida</b> esa ogohlantiruvchi uchburchaklarni qo‘yadi (49 CFR 392.22). Joylashuv yo‘l turiga bog‘liq: ikki yo‘nalishli yo‘lda truckning oldida va orqasida, bir yo‘nalishli yo‘lda yoki tepalik/burilishda masofalar boshqacha. Aniq joylashuvni driver qoidadan oladi. Dispatcherning vazifasi esa tartibni ushlab turish.</p>
     <div class="card ex ord" id="exOrd">
       <div class="ex-head"><h3>Mashq: harakatlar tartibini tuzing</h3><span class="tag">bosish tartibi muhim</span></div>
       <p style="font-size:14px;color:var(--muted)">“Driver aytdi: shina portladi.” Beshta qadamni to‘g‘ri tartibda bosing.</p>
-      <div class="built" id="ordBuilt" aria-label="Tanlangan tartib"></div>
+      <div class="built" id="ordBuilt" role="group" aria-label="Tanlangan tartib"></div>
       <div class="pool" id="ordPool"></div>
       <div class="btn-row"><button type="button" class="btn" id="ordCheck">Tekshirish</button><button type="button" class="btn ghost" id="ordReset">Qaytadan</button><span class="result" id="ordRes"></span></div>
       <div class="fb" id="ordFb"></div>
@@ -894,9 +895,9 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
   ["fMpg","fPrice","fMiles","fIdle"].forEach(function(id){$("#"+id).addEventListener("input",function(){if(id==="fMpg")fMoved.mpg=true;if(id==="fIdle")fMoved.idle=true;renderFuel()})});renderFuel();
 
   /* triage */
-  var TR=[["Havo tormozidan sizish eshitilyapti, havo bosimi ogohlantirishi yonib turibdi",0,"Tormoz xavfsizlikning asosi. To‘xtash va tekshirish kerak."],["Old shinada ichki kord ko‘rinib qolgan",0,"Shina yorilish xavfi bor: to‘xtash va almashtirish."],["Orqa marker chiroqlaridan bittasi yonmayapti",1,"Darhol to‘xtatish shart emas, lekin DVIR’ga yozilib tez tuzatilishi kerak."],["Dvigatel harorati qizil zonada, check-engine yonib turibdi",0,"Dvigatelni qizdirib haydash katta shikast beradi: to‘xtash."],["Salon ichidagi kichik chiroq yonmayapti",1,"Xavfsizlikka ta’sir qilmaydi: keyingi servisda tuzatiladi."],["Oyna yuvish suyuqligi tugagan",1,"Yo‘lda to‘ldiriladi, truckni to‘xtatmaydi."],["Fifth wheel mahkamlanishi bo‘shab qolgan, trailer qimirlayapti",0,"Trailer ajralib ketishi mumkin: darhol to‘xtash."],["Rul haddan ortiq bo‘sh, truck yo‘lda “sudralib” ketyapti",0,"Boshqaruv yo‘qolishi xavfi: to‘xtash va tekshirish."]];
+  var TR=[["Havo tormozidan sizish eshitilyapti, havo bosimi ogohlantirishi yonib turibdi",0,"Tormoz xavfsizlikning asosi. To‘xtash va tekshirish kerak."],["Old shinada ichki kord ko‘rinib qolgan",0,"Shina yorilish xavfi bor: to‘xtash va almashtirish."],["Orqa marker chiroqlaridan bittasi yonmayapti",1,"Darhol to‘xtatish shart emas, lekin ish tugamaydi: DVIR’ga yozing va birinchi imkoniyatda tuzating. Ishlamaydigan chiroq bilan uzoq yurish jarima va yurish taqiqi xavfini oshiradi."],["Dvigatel harorati qizil zonada, check-engine yonib turibdi",0,"Dvigatelni qizdirib haydash katta shikast beradi: to‘xtash."],["Salon ichidagi kichik chiroq yonmayapti",1,"Xavfsizlikka ta’sir qilmaydi: DVIR’ga yozilib, rejali servisda tuzatiladi."],["Oyna yuvish suyuqligi tugagan",1,"Ko‘rish uchun kerak: yo‘lda to‘ldiriladi, truckni to‘xtatmaydi, lekin kechiktirmang."],["Fifth wheel mahkamlanishi bo‘shab qolgan, trailer qimirlayapti",0,"Trailer ajralib ketishi mumkin: darhol to‘xtash."],["Rul haddan ortiq bo‘sh, truck yo‘lda “sudralib” ketyapti",0,"Boshqaruv yo‘qolishi xavfi: to‘xtash va tekshirish."]];
   var tAns={};
-  TR.forEach(function(t,i){var r=el("div",{class:"tri"});r.appendChild(el("p",{text:(i+1)+". "+t[0]}));var o=el("div",{class:"opts"});["Darhol to‘xtating","Keyingi servisda tuzatish"].forEach(function(a,j){var b=el("button",{type:"button",class:"opt","aria-pressed":"false",text:a});b.onclick=function(){tAns[i]=j;o.querySelectorAll(".opt").forEach(function(x){x.setAttribute("aria-pressed",x===b);x.classList.remove("right","wrong")});r.querySelector(".fb").className="fb"};o.appendChild(b)});r.appendChild(o);r.appendChild(el("div",{class:"fb"}));$("#triList").appendChild(r)});
+  TR.forEach(function(t,i){var r=el("div",{class:"tri"});r.appendChild(el("p",{text:(i+1)+". "+t[0]}));var o=el("div",{class:"opts"});["Darhol to‘xtating","Yurib, DVIR’ga yozing va tez tuzating"].forEach(function(a,j){var b=el("button",{type:"button",class:"opt","aria-pressed":"false",text:a});b.onclick=function(){tAns[i]=j;o.querySelectorAll(".opt").forEach(function(x){x.setAttribute("aria-pressed",x===b);x.classList.remove("right","wrong")});r.querySelector(".fb").className="fb"};o.appendChild(b)});r.appendChild(o);r.appendChild(el("div",{class:"fb"}));$("#triList").appendChild(r)});
   $("#triCheck").onclick=function(){var ok=0;document.querySelectorAll("#triList .tri").forEach(function(r,i){var t=TR[i];r.querySelectorAll(".opt").forEach(function(b,j){b.classList.remove("right","wrong");if(j===t[1])b.classList.add("right");else if(tAns[i]===j)b.classList.add("wrong")});var good=tAns[i]===t[1];if(good)ok++;var fb=r.querySelector(".fb");fb.className="fb show "+(good?"ok":"no");fb.textContent=t[2]});$("#triRes").textContent=ok+"/"+TR.length;if(ok>=6)mark("insp")};
 
   /* phrases */
@@ -925,7 +926,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
 
   ["ac1","ac2","ac3"].forEach(function(id){var c=$("#"+id);c.checked=!!store.get(id,false);c.onchange=function(){store.set(id,c.checked);if($("#ac1").checked&&$("#ac2").checked&&$("#ac3").checked)mark("app")}});
   var GL=[["PM","oldindan servis","Preventive maintenance: buzilishdan oldin masofa yoki muddat bo‘yicha servis."],["DVIR","inspeksiya hisoboti","Driver Vehicle Inspection Report: nosozliklar yoziladi."],["Pre-trip","yo‘lga chiqishdan oldin","Driver truckni yo‘lga chiqishdan oldin tekshiradi."],["Post-trip","kun oxiri tekshiruvi","Kun oxirida nosozliklar yoziladi."],["Annual inspection","yillik inspeksiya","Kamida har 12 oyda rasmiy tekshiruv."],["Out-of-service","yurish taqiqi","Inspektor buyrug‘i: muammo hal bo‘lguncha yurilmaydi."],["Downtime","bekor turish","Truck daromad keltirmay turgan vaqt."],["Roadside service","yo‘ldagi yordam","Yo‘lda ta’mir yoki evakuator xizmati."],["Tow","evakuator","Truckni sudrab olib ketish."],["Idle","bekor ishlash","Dvigatel ishlaydi, truck yurmaydi."],["MPG","mil/gallon","Bir galloni nechta mil yurishi."],["DEF","dizel suyuqligi","Diesel exhaust fluid: chiqindi tozalash uchun qo‘shiladi."],["Fuel card","yoqilg‘i kartasi","Fleet yoqilg‘i to‘laydigan karta."],["Warning triangles","ogohlantiruvchi uchburchaklar","To‘xtagan truck orqasiga qo‘yiladi."]];
-  GL.forEach(function(g){var b=el("button",{type:"button",class:"flip","aria-label":g[0]+": bosib izohni ko‘ring"});b.innerHTML='<div class="in"><div class="f"><b></b><span></span></div><div class="b"></div></div>';b.querySelector(".f b").textContent=g[0];b.querySelector(".f span").textContent=g[1];b.querySelector(".b").textContent=g[2];b.onclick=function(){b.classList.toggle("on")};$("#gloss").appendChild(b)});
+  GL.forEach(function(g){var b=el("button",{type:"button",class:"flip","aria-expanded":"false"});b.innerHTML='<div class="in"><div class="f"><b></b><span></span></div><div class="b"></div></div>';b.querySelector(".f b").textContent=g[0];b.querySelector(".f span").textContent=g[1];b.querySelector(".b").textContent=g[2];b.onclick=function(){b.setAttribute("aria-expanded",b.classList.toggle("on")?"true":"false")};$("#gloss").appendChild(b)});
   var MQ=["PM sliderida qaysi holatda yangi yuk bermas edim va nega?","Driver shina yomon ekanini aytdi, lekin yuk juda foydali. Qanday qaror qilaman?","Buzilgandan keyin brokerga ETA haqida qanday yozaman?"];
   MQ.forEach(function(q){var r=el("div",{class:"mq"});r.appendChild(el("span",{text:q}));var bt=el("button",{type:"button",class:"icon-btn",text:"Nusxa"});bt.onclick=function(){copyText(bt,q)};r.appendChild(bt);$("#mqs").appendChild(r)});
 })();

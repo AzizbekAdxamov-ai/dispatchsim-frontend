@@ -1,5 +1,6 @@
 <title>Load board va bozor</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<script>document.documentElement.setAttribute("lang","uz")</script>
 <!-- academy:inject --><script>// Runs first, before the lesson's own styles and script. In a fragment page
 // document.body does not exist yet, so every flag goes on <html>.
 (function () {
@@ -656,7 +657,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
 <header class="bar" role="banner">
   <div class="bar-in">
     <div class="bar-title">3-hafta · 6-dars · Load board va bozor</div>
-    <div class="prog" aria-label="Dars bo‘yicha jarayon">
+    <div class="prog" role="group" aria-label="Dars bo‘yicha jarayon">
       <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
       <span class="prog-num" id="progNum">0/7</span>
     </div>
@@ -970,7 +971,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
 
   ["ac1","ac2","ac3"].forEach(function(id){var c=$("#"+id);c.checked=!!store.get(id,false);c.onchange=function(){store.set(id,c.checked);if($("#ac1").checked&&$("#ac2").checked&&$("#ac3").checked)mark("app")}});
   var GL=[["Load board","yuk taxtasi","Yuklar e’lon qilinadigan va qidiriladigan joy."],["Posted rate","e’lon narxi","Broker e’lon qilgan narx."],["Post age","e’lon yoshi","E’lon qo‘yilganidan beri o‘tgan vaqt."],["Origin / Destination","qayerdan / qayerga","Yuk olinadigan va yetkaziladigan joy."],["Equipment","trailer turi","Yukka kerak trailer: dry van, reefer, flatbed."],["Pickup window","yuk olish oynasi","Yukni olish mumkin bo‘lgan vaqt oralig‘i."],["Deadhead","bo‘sh yurish","Yuksiz haydalgan mil."],["Effective RPM","haqiqiy $/mil","Narx ÷ (yukli mil + deadhead mil)."],["Market rate","bozor narxi","Yo‘nalishda odatdagi narx."],["Lane","yo‘nalish","Pickup va delivery shaharlari orasidagi yo‘nalish."],["MC number","MC raqami","Kompaniyaning federal faoliyat ruxsati raqami."],["Rate confirmation","narx tasdig‘i","Narx va shartlar yozilgan hujjat; imzolashdan oldin o‘qing."],["Double brokering","ikkilamchi brokerlik","Yuk ruxsatsiz yana boshqa brokerga uzatilishi: xavfli holat."],["Booking","band qilish","Yukni o‘zingizga olib qo‘yish."]];
-  GL.forEach(function(g){var b=el("button",{type:"button",class:"flip","aria-label":g[0]+": bosib izohni ko‘ring"});b.innerHTML='<div class="in"><div class="f"><b></b><span></span></div><div class="b"></div></div>';b.querySelector(".f b").textContent=g[0];b.querySelector(".f span").textContent=g[1];b.querySelector(".b").textContent=g[2];b.onclick=function(){b.classList.toggle("on")};$("#gloss").appendChild(b)});
+  GL.forEach(function(g){var b=el("button",{type:"button",class:"flip","aria-expanded":"false"});b.innerHTML='<div class="in"><div class="f"><b></b><span></span></div><div class="b"></div></div>';b.querySelector(".f b").textContent=g[0];b.querySelector(".f span").textContent=g[1];b.querySelector(".b").textContent=g[2];b.onclick=function(){b.setAttribute("aria-expanded",b.classList.toggle("on")?"true":"false")};$("#gloss").appendChild(b)});
   var MQ=["Load board’da yukni tanlashdan oldin qaysi 3 narsani ketma-ket tekshirasiz?","Mening hisobimda ikki yukning e’londagi narxi bir xil, lekin effective narx har xil. Qaysi birini olaman?","Broker shubhali ko‘rinsa, yukni rad etishdan oldin nimani aniqlayman?"];
   MQ.forEach(function(q){var r=el("div",{class:"mq"});r.appendChild(el("span",{text:q}));var bt=el("button",{type:"button",class:"icon-btn",text:"Nusxa"});bt.onclick=function(){copyText(bt,q)};r.appendChild(bt);$("#mqs").appendChild(r)});
 })();

@@ -1,5 +1,6 @@
 <title>Dispatch operatsiyalari</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<script>document.documentElement.setAttribute("lang","uz")</script>
 <!-- academy:inject --><script>// Runs first, before the lesson's own styles and script. In a fragment page
 // document.body does not exist yet, so every flag goes on <html>.
 (function () {
@@ -673,7 +674,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
 <header class="bar" role="banner">
   <div class="bar-in">
     <div class="bar-title">5-hafta · 9-dars · Dispatch operatsiyalari</div>
-    <div class="prog" aria-label="Dars bo‘yicha jarayon">
+    <div class="prog" role="group" aria-label="Dars bo‘yicha jarayon">
       <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
       <span class="prog-num" id="progNum">0/7</span>
     </div>
@@ -748,7 +749,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
     <p class="prose">Yangi broker bilan birinchi yukdan oldin odatda <b>carrier packet</b> so‘raladi: kompaniya nomi va MC raqami, sug‘urta hujjatlari, faoliyat ruxsati (authority), xavfsizlik va tekshiruv yozuvlari va soliq uchun W-9. Brokerlar buni qonuniylik, xavfni kamaytirish va tez ro‘yxatga olish uchun talab qiladi. Packet tayyor bo‘lsa, yuk band qilishda vaqt yo‘qotmaysiz.</p>
     <div class="card ex" id="exOrd">
       <div class="ex-head"><h3>Mashq: to‘g‘ri tartibga soling</h3><span class="tag">bosqichlarni ketma-ket bosing</span></div>
-      <div class="seq"><div class="seq-built" id="ordBuilt" aria-label="Tartiblangan bosqichlar"></div><div class="opts seq-pool" id="ordPool"></div></div>
+      <div class="seq"><div class="seq-built" id="ordBuilt" role="group" aria-label="Tartiblangan bosqichlar"></div><div class="opts seq-pool" id="ordPool"></div></div>
       <div class="btn-row"><button type="button" class="btn" id="ordCheck">Tekshirish</button><button type="button" class="btn ghost" id="ordReset">Boshidan</button><span class="result" id="ordRes"></span></div>
       <div class="fb" id="ordFb"></div>
     </div>
@@ -977,7 +978,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
 
   ["ac1","ac2","ac3"].forEach(function(id){var c=$("#"+id);c.checked=!!store.get(id,false);c.onchange=function(){store.set(id,c.checked);if($("#ac1").checked&&$("#ac2").checked&&$("#ac3").checked)mark("app")}});
   var GL=[["Rate confirmation","narx tasdig‘i","Narx va shartlar yozilgan hujjat."],["BOL","yuk hujjati","Bill of lading: yuk haqidagi hujjat."],["POD","yetkazish isboti","Proof of delivery: yetkazilganini tasdiqlovchi hujjat."],["Detention","kutish haqi","Uzoq kutish uchun qo‘shimcha to‘lov."],["TONU","bekor qilingan yuk haqi","Truck ordered, not used: truck buyurilgan, lekin ishlatilmagan."],["Layover","tunash haqi","Kutish tufayli bir kunga qolish uchun to‘lov."],["Lumper","yuk tushiruvchi","Omborda yuk tushirishga yordam xizmati (haqi bilan)."],["Check call","nazorat qo‘ng‘irog‘i","Yuk va haydovchi holatini aniqlash."],["ETA","kelish vaqti","Estimated time of arrival."],["Appointment","belgilangan vaqt","Pickup yoki delivery uchun belgilangan oyna."],["FCFS","kim oldin kelsa","First come, first served: aniq vaqt belgilanmagan."],["Net 30","30 kunlik to‘lov","Hujjat qabul qilinganidan 30 kun ichida to‘lov."],["Quick pay","tezkor to‘lov","Pulni tez olish evaziga foiz to‘lash."],["Carrier packet","carrier hujjat to‘plami","MC, sug‘urta, W-9 va boshqa hujjatlar to‘plami."]];
-  GL.forEach(function(g){var b=el("button",{type:"button",class:"flip","aria-label":g[0]+": bosib izohni ko‘ring"});b.innerHTML='<div class="in"><div class="f"><b></b><span></span></div><div class="b"></div></div>';b.querySelector(".f b").textContent=g[0];b.querySelector(".f span").textContent=g[1];b.querySelector(".b").textContent=g[2];b.onclick=function(){b.classList.toggle("on")};$("#gloss").appendChild(b)});
+  GL.forEach(function(g){var b=el("button",{type:"button",class:"flip","aria-expanded":"false"});b.innerHTML='<div class="in"><div class="f"><b></b><span></span></div><div class="b"></div></div>';b.querySelector(".f b").textContent=g[0];b.querySelector(".f span").textContent=g[1];b.querySelector(".b").textContent=g[2];b.onclick=function(){b.setAttribute("aria-expanded",b.classList.toggle("on")?"true":"false")};$("#gloss").appendChild(b)});
   var MQ=["Haydovchi yo‘lda bo‘lganda rate con’da xato topsam, qaysi qadamlarni ketma-ket qilaman?","Receiver kutdirsa, detention’ni qanday qilib isbotlayman va qachon so‘rayman?","Pulni tez olish uchun quick pay’ni qachon tanlash mantiqli?"];
   MQ.forEach(function(q){var r=el("div",{class:"mq"});r.appendChild(el("span",{text:q}));var bt=el("button",{type:"button",class:"icon-btn",text:"Nusxa"});bt.onclick=function(){copyText(bt,q)};r.appendChild(bt);$("#mqs").appendChild(r)});
 })();

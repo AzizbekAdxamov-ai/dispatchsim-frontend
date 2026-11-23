@@ -1,5 +1,6 @@
 <title>Muzokara va broker</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<script>document.documentElement.setAttribute("lang","uz")</script>
 <!-- academy:inject --><script>// Runs first, before the lesson's own styles and script. In a fragment page
 // document.body does not exist yet, so every flag goes on <html>.
 (function () {
@@ -677,7 +678,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
 <header class="bar" role="banner">
   <div class="bar-in">
     <div class="bar-title">4-hafta · 8-dars · Muzokara va broker</div>
-    <div class="prog" aria-label="Dars bo‘yicha jarayon">
+    <div class="prog" role="group" aria-label="Dars bo‘yicha jarayon">
       <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
       <span class="prog-num" id="progNum">0/7</span>
     </div>
@@ -978,7 +979,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
 
   ["ac1","ac2","ac3"].forEach(function(id){var c=$("#"+id);c.checked=!!store.get(id,false);c.onchange=function(){store.set(id,c.checked);if($("#ac1").checked&&$("#ac2").checked&&$("#ac3").checked)mark("app")}});
   var GL=[["Anchor","ochilish narxi","Brokerga birinchi aytadigan narx."],["Target rate","maqsadli narx","Yopilishini umid qilgan narx."],["Floor","eng past narx","Shundan past bo‘lsa, yukni rad etasiz."],["Counteroffer","qarshi taklif","Taklifga javoban o‘z narxingiz."],["Concession","yon berish","Muzokarada narxdan voz kechish."],["Conditional offer","shartli taklif","Shart bajarilsa amal qiladigan narx."],["Rate confirmation","narx tasdig‘i","Narx va shartlar yozilgan hujjat."],["Detention","kutish haqi","Yuk ortish/tushirishda uzoq kutish uchun to‘lov."],["Accessorials","qo‘shimcha to‘lovlar","Asosiy narxdan tashqari to‘lovlar."],["Benchmark","taqqoslash ko‘rsatkichi","Bozor o‘rtacha narxi: narxni baholash uchun."],["Lane average","yo‘nalish o‘rtachasi","Shu yo‘nalishdagi o‘rtacha narx."],["Reposition","joyni almashtirish","Truck’ni yangi hududga yuborish."],["Break-even","zararsiz narx","Foyda ham zarar ham yo‘q narx."],["Book it","band qilish","Yukni o‘zingizga olib qo‘yish."]];
-  GL.forEach(function(g){var b=el("button",{type:"button",class:"flip","aria-label":g[0]+": bosib izohni ko‘ring"});b.innerHTML='<div class="in"><div class="f"><b></b><span></span></div><div class="b"></div></div>';b.querySelector(".f b").textContent=g[0];b.querySelector(".f span").textContent=g[1];b.querySelector(".b").textContent=g[2];b.onclick=function(){b.classList.toggle("on")};$("#gloss").appendChild(b)});
+  GL.forEach(function(g){var b=el("button",{type:"button",class:"flip","aria-expanded":"false"});b.innerHTML='<div class="in"><div class="f"><b></b><span></span></div><div class="b"></div></div>';b.querySelector(".f b").textContent=g[0];b.querySelector(".f span").textContent=g[1];b.querySelector(".b").textContent=g[2];b.onclick=function(){b.setAttribute("aria-expanded",b.classList.toggle("on")?"true":"false")};$("#gloss").appendChild(b)});
   var MQ=["Floor narxim bilan broker taklifi orasida kichik farq qolsa, qachon rozi bo‘laman va qachon rad etaman?","Brokerdan ishonchni yo‘qotmasdan qanday qilib “yo‘q” deyman?","Birinchi taklifni rad etganimda, brokerning bosimi qayerdan paydo bo‘lishi mumkin?"];
   MQ.forEach(function(q){var r=el("div",{class:"mq"});r.appendChild(el("span",{text:q}));var bt=el("button",{type:"button",class:"icon-btn",text:"Nusxa"});bt.onclick=function(){copyText(bt,q)};r.appendChild(bt);$("#mqs").appendChild(r)});
 })();

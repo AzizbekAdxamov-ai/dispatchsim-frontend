@@ -1,5 +1,6 @@
 <title>Truck bu yukni ola oladimi?</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<script>document.documentElement.setAttribute("lang","uz")</script>
 <!-- academy:inject --><script>// Runs first, before the lesson's own styles and script. In a fragment page
 // document.body does not exist yet, so every flag goes on <html>.
 (function () {
@@ -534,7 +535,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
 <header class="bar" role="banner">
   <div class="bar-in">
     <div class="bar-title">1-hafta · 2-dars · Truck bu yukni ola oladimi?</div>
-    <div class="prog" aria-label="Dars bo‘yicha jarayon">
+    <div class="prog" role="group" aria-label="Dars bo‘yicha jarayon">
       <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
       <span class="prog-num" id="progNum">0/7</span>
     </div>
@@ -858,7 +859,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
   /* app + glossary */
   ["ac1","ac2","ac3"].forEach(function(id){var c=$("#"+id);c.checked=!!store.get(id,false);c.onchange=function(){store.set(id,c.checked);if($("#ac1").checked&&$("#ac2").checked&&$("#ac3").checked)mark("app")}});
   var GL=[["Dry van","yopiq trailer","Eng keng tarqalgan tur: quruq, paletli yuk. Kodi V."],["Reefer","sovutgichli trailer","Harorat nazorati bor trailer. Kodi R."],["Flatbed","ochiq platforma","Po‘lat, yog‘och, uskunalar. Strap, zanjir, tarp. Kodi F."],["Step deck","pog‘onali platforma","Past orqa deck: baland yuk uchun. Kodi SD."],["Power only","faqat tractor","Shipper yoki brokerning trailerini tortish. Kodi PO."],["Gross weight","umumiy og‘irlik","Truck + trailer + yoqilg‘i + yuk. Chegara 80,000 lbs."],["Tare weight","bo‘sh og‘irlik","Yuksiz truck va trailer og‘irligi."],["Payload","yuk sig‘imi","Olib ketish mumkin bo‘lgan yuk og‘irligi."],["Tandem","juft o‘q","Ikki o‘q birga; chegara 34,000 lbs."],["CAT scale","tarozi","Truck stoplardagi tarozi: o‘qlar bo‘yicha og‘irlikni ko‘rsatadi."],["Hazmat","xavfli yuk","Placard, H endorsement va maxsus sug‘urta talab qiladi."],["Tarp","brezent","Flatbed yukini yomg‘ir va changdan himoya qiladi."],["Continuous / cycle","reefer rejimi","Agregat doimiy ishlaydi yoki yonib-o‘chib turadi."],["Oversize","gabaritdan katta","Eni 8'6\" yoki ruxsat etilgan balandlikdan oshgan yuk; permit kerak."]];
-  GL.forEach(function(g){var b=el("button",{type:"button",class:"flip","aria-label":g[0]+": bosib izohni ko‘ring"});b.innerHTML='<div class="in"><div class="f"><b></b><span></span></div><div class="b"></div></div>';b.querySelector(".f b").textContent=g[0];b.querySelector(".f span").textContent=g[1];b.querySelector(".b").textContent=g[2];b.onclick=function(){b.classList.toggle("on")};$("#gloss").appendChild(b)});
+  GL.forEach(function(g){var b=el("button",{type:"button",class:"flip","aria-expanded":"false"});b.innerHTML='<div class="in"><div class="f"><b></b><span></span></div><div class="b"></div></div>';b.querySelector(".f b").textContent=g[0];b.querySelector(".f span").textContent=g[1];b.querySelector(".b").textContent=g[2];b.onclick=function(){b.setAttribute("aria-expanded",b.classList.toggle("on")?"true":"false")};$("#gloss").appendChild(b)});
   var MQ=["Yukni olishdan oldin qaysi uchta raqamni tekshiraman va nega?", "Truck og‘irligi ma’lum bo‘lmasa, brokerga qanday savol beraman?", "Reefer yoki dry van tanlashda eng ko‘p qanday xato bo‘ladi?"];
   function copyText(btn,t){var ok=function(){btn.textContent="Olindi";setTimeout(function(){btn.textContent="Nusxa"},1200)};try{navigator.clipboard.writeText(t).then(ok,function(){})}catch(e){}}
   MQ.forEach(function(q){var r=el("div",{class:"mq"});r.appendChild(el("span",{text:q}));var bt=el("button",{type:"button",class:"icon-btn",text:"Nusxa"});bt.onclick=function(){copyText(bt,q)};r.appendChild(bt);$("#mqs").appendChild(r)});

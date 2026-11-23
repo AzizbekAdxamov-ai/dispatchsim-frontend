@@ -1,5 +1,6 @@
 <title>Xavfsiz va qonuniy v2</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<script>document.documentElement.setAttribute("lang","uz")</script>
 <!-- academy:inject --><script>// Runs first, before the lesson's own styles and script. In a fragment page
 // document.body does not exist yet, so every flag goes on <html>.
 (function () {
@@ -571,7 +572,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
 <header class="bar" role="banner">
   <div class="bar-in">
     <div class="bar-title">2-hafta · 3-dars · Xavfsiz va qonuniy</div>
-    <div class="prog" aria-label="Dars bo‘yicha jarayon">
+    <div class="prog" role="group" aria-label="Dars bo‘yicha jarayon">
       <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
       <span class="prog-num" id="progNum">0/7</span>
     </div>
@@ -654,7 +655,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
     <div class="card hos" id="hosTool">
       <div class="ex-head"><h3>HOS simulyatori: driverning kunini yig‘ing</h3><span class="tag">10 soat dam olgandan keyin · 05:00</span></div>
       <div class="clocks" id="clocks"></div>
-      <div class="tline" id="tline" aria-label="Kun jadvali"></div>
+      <div class="tline" id="tline" role="group" aria-label="Kun jadvali"></div>
       <div class="tscale"><span>05:00</span><span>11:00</span><span>17:00</span><span>23:00</span><span>05:00</span></div>
       <div class="now" id="now"></div>
       <div class="legend"><span><i style="background:#4ADE80"></i>Haydash</span><span><i style="background:#F2B705"></i>On duty</span><span><i style="background:#7E8799"></i>Off duty</span><span><i style="background:var(--sb)"></i>Sleeper</span><span><i style="background:#E5392F"></i>Qoidabuzarlik</span></div>
@@ -674,7 +675,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
 
   <section class="sec" id="s-eld" data-sec="eld">
     <div class="sign"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-eld"/></svg><div class="st-txt"><div class="exitno">EXIT 3</div><h2>ELD va to‘rt holat</h2></div><div class="time">15 daqiqa</div><span class="stamp" aria-hidden="true">O‘TILDI ✓</span></div>
-    <p class="prose">ELD (Electronic Logging Device) truckning dvigateliga ulanadi va driverning holatini yozadi. Truck yura boshlasa, ELD o‘zi <b>Driving</b> holatiga o‘tadi. Driver qolgan holatlarni o‘zi tanlaydi. Dispatcher ELD ma’lumotini ko‘ra oladi, lekin uni o‘zgartirishni so‘rash qonunbuzarlik.</p>
+    <p class="prose">ELD (Electronic Logging Device) truckning dvigateliga ulanadi va driverning holatini yozadi. Truck yura boshlasa, ELD o‘zi <b>Driving</b> holatiga o‘tadi. Driver qolgan holatlarni o‘zi tanlaydi. Dispatcher ELD ma’lumotini ko‘ra oladi. Aniq xatolar (masalan, noto‘g‘ri tanlangan holat) tuzatilishi mumkin: asl yozuv saqlanadi, tuzatishni driver o‘zi ko‘rib tasdiqlaydi. Dispatcher soatni “yaxshiroq ko‘rsatish” uchun yozuvni o‘zgartirishni so‘rashi yoki driverga bosim qilishi esa soxtalashtirish va majburlash, ya’ni qonunbuzarlik.</p>
     <div class="eld-grid">
       <svg class="eld-dev" viewBox="0 0 300 220" role="img" aria-label="ELD qurilmasi ekrani">
         <rect x="20" y="8" width="260" height="176" rx="20" fill="#0B1020" stroke="#2A3350" stroke-width="3"/>
@@ -873,7 +874,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
     {t:"Receiver’gacha 260 mil",chips:["Haydash qoldi 8:00","Oyna qoldi 9:00","Tanaffusdan beri 4:00 haydagan"],opts:["Yetadi, tanaffussiz","Yetadi, yo‘lda 30 daqiqalik tanaffus bilan","Yetmaydi"],c:1,why:"260 mil ≈ 5 soat. 4 soatdan keyin 8 soatlik chegara keladi, shuning uchun 30 daqiqa tanaffus kerak. Jami 5:30, oyna 9:00: yetadi."},
     {t:"Receiver’gacha 400 mil",chips:["Haydash qoldi 6:00","Oyna qoldi 10:00","Tanaffusdan beri 1:00"],opts:["Yetadi","Yetmaydi: 6 soatdan keyin 10 soat dam. Brokerga hozir yangi ETA","Yetadi, agar 65 mph bilan haydasa"],c:1,why:"400 mil ≈ 8 soat, haydash esa 6 soat qoldi. Tezlik bilan “yutish” qonunbuzarlik va xavf. Brokerga darhol yangi ETA bering."},
     {t:"Receiver’gacha 300 mil",chips:["Haydash qoldi 9:00","Oyna qoldi 5:00","Tanaffusdan beri 2:00"],opts:["Yetadi: haydash soati yetarli","Yetmaydi: 14 soatlik oyna 5 soatda yopiladi","1 soat off duty olib, oynani uzaytiradi"],c:1,why:"Eng ko‘p uchraydigan tuzoq: haydash soati bor, lekin oyna yopilmoqda. Off duty tanaffus 14 soatlik oynani to‘xtatmaydi."},
-    {t:"Ertangi yuk: 9 soat haydash",chips:["Oxirgi 8 kunda 69 soat ishlagan","70 soatlik limit","Bugun 10 soat dam oladi"],opts:["Muammo yo‘q: ertaga 11 soat bor","Haftalik limit yetmaydi: 34 soatlik restart yoki boshqa driver","10 soat dam olsa yetadi"],c:1,why:"10 soatlik dam kunlik soatlarni tiklaydi, lekin 70 soatlik haftalik hisobni emas. Restart yoki boshqa driver kerak."}
+    {t:"Ertangi yuk: 9 soat haydash",chips:["Oxirgi 8 kunda 69 soat ishlagan (ish vaqti)","Ertaga 8 kunlik oynadan eski kundagi 4 soat tushib ketadi","70 soatlik limit","Bugun 10 soat dam oladi"],opts:["Muammo yo‘q: ertaga 11 soat bor","Haftalik limit yetmaydi: 34 soatlik restart yoki boshqa driver","10 soat dam olsa yetadi"],c:1,why:"10 soatlik dam kunlik soatlarni tiklaydi, lekin haftalik hisobni emas. 69 soatga ertaga 4 soat qaytsa ham 70 limitgacha atigi 5 soat qoladi, 9 soatlik haydash uchun yetmaydi. Restart (34 soat) yoki boshqa driver kerak. Eslatma: limit haydashni emas, butun ish vaqtini (on duty) sanaydi."}
   ];
   var pRes={};
   function renderPlans(){var box=$("#plans");box.innerHTML="";PLANS.forEach(function(P,i){var c=el("div",{class:"lcard"});c.appendChild(el("div",{class:"lane",text:(i+1)+". "+P.t}));var r=el("div",{class:"lrow"});P.chips.forEach(function(x){r.appendChild(el("span",{class:"chip",text:x}))});c.appendChild(r);var o=el("div",{class:"opts"});var fb=el("div",{class:"fb"});
@@ -914,7 +915,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
 
   ["ac1","ac2","ac3"].forEach(function(id){var c=$("#"+id);c.checked=!!store.get(id,false);c.onchange=function(){store.set(id,c.checked);if($("#ac1").checked&&$("#ac2").checked&&$("#ac3").checked)mark("app")}});
   var GL=[["HOS","haydash soatlari","Hours of Service: driver qancha haydashi va dam olishi qoidalari."],["ELD","elektron jurnal","Electronic Logging Device: holatlarni avtomatik yozadi."],["11-hour rule","11 soat qoidasi","10 soat dam olgandan keyin eng ko‘pi 11 soat haydash."],["14-hour window","14 soatlik oyna","Ish boshlangandan 14 soat o‘tgach haydash taqiqlanadi."],["30-minute break","30 daqiqa tanaffus","8 soat haydashdan keyin kamida 30 daqiqa haydamaslik."],["60/70","haftalik limit","7 kunda 60 yoki 8 kunda 70 soat ish."],["34-hour restart","34 soatlik restart","34 soat ketma-ket dam haftalik hisobni nolga tushiradi."],["Sleeper berth","yotoq kabina","Kabinadagi dam olish joyi va ELD holati."],["On duty","ishda, haydamay","Yoqilg‘i, inspection, yuklash, hujjat."],["Off duty","ishdan ozod","Dam, ovqat, shaxsiy vaqt."],["Out-of-service","yurish taqiqi","Inspektor buyrug‘i: muammo hal bo‘lguncha truck yurmaydi."],["CSA","xavfsizlik tarixi","Carrier’ning inspeksiya va buzilishlar reytingi tizimi."],["DVIR","truck tekshiruv hisoboti","Driver Vehicle Inspection Report: nosozliklar yoziladi."],["Coercion","majburlash","Driverni qoidani buzishga undash yoki tahdid qilish. Taqiqlangan."]];
-  GL.forEach(function(g){var b=el("button",{type:"button",class:"flip","aria-label":g[0]+": bosib izohni ko‘ring"});b.innerHTML='<div class="in"><div class="f"><b></b><span></span></div><div class="b"></div></div>';b.querySelector(".f b").textContent=g[0];b.querySelector(".f span").textContent=g[1];b.querySelector(".b").textContent=g[2];b.onclick=function(){b.classList.toggle("on")};$("#gloss").appendChild(b)});
+  GL.forEach(function(g){var b=el("button",{type:"button",class:"flip","aria-expanded":"false"});b.innerHTML='<div class="in"><div class="f"><b></b><span></span></div><div class="b"></div></div>';b.querySelector(".f b").textContent=g[0];b.querySelector(".f span").textContent=g[1];b.querySelector(".b").textContent=g[2];b.onclick=function(){b.setAttribute("aria-expanded",b.classList.toggle("on")?"true":"false")};$("#gloss").appendChild(b)});
   var MQ=["HOS simulyatorida eng ko‘p qaysi qoidada adashdim va nega?","Driverning 14 soatlik oynasi 1 soatda yopiladi, menga yangi yuk taklif qilishdi. Qanday qaror qilaman?","Brokerga kechikish haqida yozyapman: ETA va sababni qanday ishonchli yozaman?"];
   function copyText(btn,t){var ok=function(){btn.textContent="Olindi";setTimeout(function(){btn.textContent="Nusxa"},1200)};try{navigator.clipboard.writeText(t).then(ok,function(){})}catch(e){}}
   MQ.forEach(function(q){var r=el("div",{class:"mq"});r.appendChild(el("span",{text:q}));var bt=el("button",{type:"button",class:"icon-btn",text:"Nusxa"});bt.onclick=function(){copyText(bt,q)};r.appendChild(bt);$("#mqs").appendChild(r)});

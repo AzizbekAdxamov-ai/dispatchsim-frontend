@@ -1,5 +1,6 @@
 <title>Muammolar va muloqot</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<script>document.documentElement.setAttribute("lang","uz")</script>
 <!-- academy:inject --><script>// Runs first, before the lesson's own styles and script. In a fragment page
 // document.body does not exist yet, so every flag goes on <html>.
 (function () {
@@ -672,7 +673,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
 <header class="bar" role="banner">
   <div class="bar-in">
     <div class="bar-title">6-hafta · 11-dars · Muammolar va muloqot</div>
-    <div class="prog" aria-label="Dars bo‘yicha jarayon">
+    <div class="prog" role="group" aria-label="Dars bo‘yicha jarayon">
       <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
       <span class="prog-num" id="progNum">0/7</span>
     </div>
@@ -964,7 +965,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
 
   ["ac1","ac2","ac3"].forEach(function(id){var c=$("#"+id);c.checked=!!store.get(id,false);c.onchange=function(){store.set(id,c.checked);if($("#ac1").checked&&$("#ac2").checked&&$("#ac3").checked)mark("app")}});
   var GL=[["Breakdown","buzilish","Truck yo‘lda ishlamay qolishi."],["Roadside service","yo‘ldagi xizmat","Yo‘lda ta’mirlash yoki yordam ko‘rsatish."],["Tow","evakuator","Truck’ni shopga tortib olib borish."],["Repower","truck almashtirish","Boshqa truck yukni davom ettiradi."],["ETA","yetib borish vaqti","Estimated time of arrival."],["Check call","holat so‘rovi","Yukning joyi va holati haqida qisqa aloqa."],["Delay","kechikish","Rejadagi vaqtdan keyin qolish."],["Appointment","belgilangan vaqt","Yuklash yoki tushirish uchun band qilingan vaqt."],["Reschedule","vaqtni ko‘chirish","Appointment’ni boshqa vaqtga o‘tkazish."],["TONU","yuk bekor bo‘lsa to‘lov","Truck Ordered Not Used."],["Layover","kutish kuni","Haydovchi bir kundan ko‘proq kutib qolishi."],["Detention","kutish to‘lovi","Uzoq kutish uchun qo‘shimcha to‘lov."],["Documentation","hujjatlar","Surat, email, vaqt belgisi: isbot."],["Escalate","yuqoriga ko‘tarish","Muammoni yuqori darajadagi odamga yetkazish."]];
-  GL.forEach(function(g){var b=el("button",{type:"button",class:"flip","aria-label":g[0]+": bosib izohni ko‘ring"});b.innerHTML='<div class="in"><div class="f"><b></b><span></span></div><div class="b"></div></div>';b.querySelector(".f b").textContent=g[0];b.querySelector(".f span").textContent=g[1];b.querySelector(".b").textContent=g[2];b.onclick=function(){b.classList.toggle("on")};$("#gloss").appendChild(b)});
+  GL.forEach(function(g){var b=el("button",{type:"button",class:"flip","aria-expanded":"false"});b.innerHTML='<div class="in"><div class="f"><b></b><span></span></div><div class="b"></div></div>';b.querySelector(".f b").textContent=g[0];b.querySelector(".f span").textContent=g[1];b.querySelector(".b").textContent=g[2];b.onclick=function(){b.setAttribute("aria-expanded",b.classList.toggle("on")?"true":"false")};$("#gloss").appendChild(b)});
   var MQ=["Buzilgan truck uchun brokerga qanday xabar yozgan bo‘lardim?","TONU talab qilish uchun qanday hujjatlarni oldindan yig‘ib qo‘yaman?","Qiyin suhbatda fakt, ta’sir va so‘rovni qanday tartibga solaman?"];
   MQ.forEach(function(q){var r=el("div",{class:"mq"});r.appendChild(el("span",{text:q}));var bt=el("button",{type:"button",class:"icon-btn",text:"Nusxa"});bt.onclick=function(){copyText(bt,q)};r.appendChild(bt);$("#mqs").appendChild(r)});
 })();

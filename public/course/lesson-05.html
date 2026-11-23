@@ -1,5 +1,6 @@
 <title>Bozor va narx</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<script>document.documentElement.setAttribute("lang","uz")</script>
 <!-- academy:inject --><script>// Runs first, before the lesson's own styles and script. In a fragment page
 // document.body does not exist yet, so every flag goes on <html>.
 (function () {
@@ -635,7 +636,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
 <header class="bar" role="banner">
   <div class="bar-in">
     <div class="bar-title">3-hafta · 5-dars · Bozor va narx</div>
-    <div class="prog" aria-label="Dars bo‘yicha jarayon">
+    <div class="prog" role="group" aria-label="Dars bo‘yicha jarayon">
       <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
       <span class="prog-num" id="progNum">0/7</span>
     </div>
@@ -949,7 +950,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
 
   ["ac1","ac2","ac3"].forEach(function(id){var c=$("#"+id);c.checked=!!store.get(id,false);c.onchange=function(){store.set(id,c.checked);if($("#ac1").checked&&$("#ac2").checked&&$("#ac3").checked)mark("app")}});
   var GL=[["Spot rate","hozirgi narx","Aniq yuk uchun qisqa muddatli bozor narxi."],["Contract rate","shartnoma narxi","Uzoq muddatli kelishuv narxi."],["Lane","yo‘nalish","Pickup va delivery shaharlari orasidagi yo‘nalish."],["Load-to-truck ratio","yuk va truck nisbati","Yo‘nalishdagi yuklar soni, truck soniga bo‘lingan."],["Headhaul","asosiy yo‘nalish","Talab kuchli tomonga ketish: odatda yaxshi to‘laydi."],["Backhaul","qaytish yuki","Qaytish yo‘lidagi yuk: ko‘pincha arzonroq."],["Deadhead","bo‘sh yurish","Yuksiz haydalgan mil."],["All-in rate","yakuniy narx","Linehaul va yoqilg‘i qo‘shimchasi bitta summada."],["Linehaul","asosiy narx","Yoqilg‘i qo‘shimchasiz asosiy tashish narxi."],["Fuel surcharge (FSC)","yoqilg‘i qo‘shimchasi","Dizel narxiga qarab qo‘shiladigan to‘lov."],["Posted rate","e’lon qilingan narx","Load board’dagi yoki broker e’lon qilgan narx."],["Margin","marja","Broker shipper’dan olgan va carrier’ga bergan summa farqi."],["Capacity","sig‘im","Mavjud truck’lar soni va tashish imkoniyati."],["RPM","mil boshiga narx","Rate per mile: narx ÷ mil."]];
-  GL.forEach(function(g){var b=el("button",{type:"button",class:"flip","aria-label":g[0]+": bosib izohni ko‘ring"});b.innerHTML='<div class="in"><div class="f"><b></b><span></span></div><div class="b"></div></div>';b.querySelector(".f b").textContent=g[0];b.querySelector(".f span").textContent=g[1];b.querySelector(".b").textContent=g[2];b.onclick=function(){b.classList.toggle("on")};$("#gloss").appendChild(b)});
+  GL.forEach(function(g){var b=el("button",{type:"button",class:"flip","aria-expanded":"false"});b.innerHTML='<div class="in"><div class="f"><b></b><span></span></div><div class="b"></div></div>';b.querySelector(".f b").textContent=g[0];b.querySelector(".f span").textContent=g[1];b.querySelector(".b").textContent=g[2];b.onclick=function(){b.setAttribute("aria-expanded",b.classList.toggle("on")?"true":"false")};$("#gloss").appendChild(b)});
   var MQ=["Qaysi holatda contract, qaysida spot tanlayman va nega?","Brokerning marjasi 15% bo‘lsa, men nima uchun baribir yaxshi narx so‘rashim kerak?","Eng yuqori narxli yukni emas, qaytish yuki bilan yaxshi yukni qanday tanlayman?"];
   MQ.forEach(function(q){var r=el("div",{class:"mq"});r.appendChild(el("span",{text:q}));var bt=el("button",{type:"button",class:"icon-btn",text:"Nusxa"});bt.onclick=function(){copyText(bt,q)};r.appendChild(bt);$("#mqs").appendChild(r)});
 })();
