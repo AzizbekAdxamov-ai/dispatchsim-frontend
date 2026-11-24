@@ -12,7 +12,6 @@ const config = JSON.parse(await readFile(new URL('../vercel.json', import.meta.u
 
 const APP = '/((?!course/).*)'
 const COURSE = '/course/(.*)'
-const PREVIEW_ORIGIN = 'https://dispatchsim-backend-git-feature-academy-v1-azizbek16.vercel.app'
 
 function headersFor(source) {
   const rule = (config.headers ?? []).find((h) => h.source === source)
@@ -54,9 +53,13 @@ test('app rule denies framing and inline/eval script, and allows the API origins
   assert.ok(!csp['script-src'].includes("'unsafe-eval'"))
   // Kills: reverting to frame-src 'none' (breaks lesson iframes) or opening external frames.
   assert.deepEqual(csp['frame-src'], ["'self'"])
-  // Kills: forgetting the backend origins, which breaks every API call.
+  // Kills: forgetting the backend origin, which breaks every API call.
+  assert.ok(csp['connect-src'].includes("'self'"))
   assert.ok(csp['connect-src'].includes(BACKEND_ORIGIN))
-  assert.ok(csp['connect-src'].includes(PREVIEW_ORIGIN))
+  // Kills: a staging/preview (-git-) backend or a *.vercel.app wildcard sneaking back in.
+  const vercelOrigins = csp['connect-src'].filter((v) => /vercel\.app/.test(v))
+  assert.deepEqual(vercelOrigins, [BACKEND_ORIGIN])
+  assert.ok(!csp['connect-src'].some((v) => v.includes('*')))
   // Kills: opening object/base-uri/form-action.
   assert.deepEqual(csp['object-src'], ["'none'"])
   assert.deepEqual(csp['base-uri'], ["'self'"])
