@@ -626,7 +626,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
       <div class="calc-row">
         <div><label for="cType">Trailer turi</label><select id="cType"></select></div>
         <div><label for="cFuel">Yoqilg‘i <output id="oFuel"></output></label><input type="range" id="cFuel" min="40" max="240" step="10" value="150"></div>
-        <div><label for="cCargo">Yuk og‘irligi <output id="oCargo"></output></label><input type="range" id="cCargo" min="5000" max="52000" step="500" value="42000"></div>
+        <div><label for="cCargo">Yuk og‘irligi <output id="oCargo"></output></label><input type="range" id="cCargo" min="5000" max="52000" step="100" value="42000"></div>
       </div>
       <div class="wbar" id="wbar" aria-hidden="true">
         <div class="wseg tare" id="segTare"></div><div class="wseg fuel" id="segFuel"></div><div class="wseg cargo" id="segCargo"></div><div class="wseg over" id="segOver"></div>
@@ -797,7 +797,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
     if(over>0){v.className="verdict no";v.textContent="Gross "+fmt(gross)+" lbs · "+fmt(over)+" lbs ortiqcha. Olib bo‘lmaydi."}
     else{v.className="verdict ok";v.textContent="Gross "+fmt(gross)+" lbs · yana "+fmt(LIMIT-gross)+" lbs joy bor. Maksimal yuk: "+fmt(room)+" lbs."}
     var steer=Math.min(12000,10500+cargo*0.02),rest=gross-steer,drive=rest*0.5,trl=rest*0.5;var ax=$("#axles");ax.innerHTML="";
-    [["Rul o‘qi",steer,12000],["Drive tandem",drive,TANDEM],["Trailer tandem",trl,TANDEM]].forEach(function(a){var bad=a[1]>a[2];var d=el("div",{class:"axle"});d.appendChild(el("b",{text:fmt(a[1]),style:bad?"color:var(--bad)":""}));d.appendChild(el("span",{text:a[0]+" · chegara "+fmt(a[2])}));ax.appendChild(d)});
+    [["Rul o‘qi (misol taxmini)",steer,12000],["Drive tandem",drive,TANDEM],["Trailer tandem",trl,TANDEM]].forEach(function(a){var bad=a[1]>a[2];var d=el("div",{class:"axle"});d.appendChild(el("b",{text:fmt(a[1]),style:bad?"color:var(--bad)":""}));d.appendChild(el("span",{text:a[0]+" · chegara "+fmt(a[2])}));ax.appendChild(d)});
     moved++;if(moved>3)mark("weight")}
   var moved=0;
   ["cType","cFuel","cCargo"].forEach(function(id){$("#"+id).addEventListener("input",calc)});
@@ -809,7 +809,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
     {lane:"Las Vegas, NV → Phoenix, AZ",eq:"V 53'",com:"General merchandise · 22 palet",w:38000,extra:"",ans:"yes",why:"Equipment mos. 34,000 + 38,000 = 72,000 lbs: chegaradan 8,000 kam. Olamiz."},
     {lane:"Las Vegas, NV → Salt Lake City, UT",eq:"R 53'",com:"Frozen food · −10°F",w:40000,extra:"",ans:"eq",why:"Muzlatilgan yuk reefer talab qiladi. Dry van’da harorat nazorati yo‘q."},
     {lane:"Henderson, NV → Los Angeles, CA",eq:"V 53'",com:"Canned goods · 26 palet",w:47500,extra:"",ans:"weight",why:"34,000 + 47,500 = 81,500 lbs. 1,500 lbs ortiqcha. Narx qanchalik yaxshi bo‘lmasin, olib bo‘lmaydi."},
-    {lane:"North Las Vegas, NV → Denver, CO",eq:"V 53'",com:"Paint · Hazmat class 3",w:31000,extra:"Placard kerak",ans:"hazmat",why:"Og‘irlik va trailer mos, lekin hazmat yuk uchun driverda H endorsement va carrierda hazmat sug‘urtasi bo‘lishi kerak."},
+    {lane:"North Las Vegas, NV → Denver, CO",eq:"V 53'",com:"Paint · Hazmat class 3",w:31000,extra:"Placard kerak",ans:"hazmat",why:"Og‘irlik va trailer mos, lekin placard talab qiladigan hazmat yuk uchun driverda H endorsement, carrierda esa tegishli hazmat sug‘urtasi va ruxsatlari bo‘lishi kerak. Aniq talab materialga bog‘liq."},
     {lane:"Las Vegas, NV → Dallas, TX",eq:"F 48'",com:"Steel beams · tarps",w:42000,extra:"",ans:"eq",why:"Po‘lat to‘sinlar flatbed’da tashiladi. Dry van’ga kran bilan yuklab bo‘lmaydi."},
     {lane:"Las Vegas, NV → Reno, NV",eq:"V 48'",com:"Paper products · 20 palet",w:30000,extra:"",ans:"yes",why:"53' trailer 48' talab qilingan yukni odatda sig‘diradi, og‘irlik 64,000. Olamiz. Lekin brokerdan so‘rang: ba’zi manzillar faqat 48' trailer qabul qiladi."}
   ];
@@ -850,7 +850,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
     ["Reefer agregatni o‘chirib quruq yuk olsa bo‘ladimi?",["Ha, odatda bo‘ladi","Yo‘q, hech qachon"],0,"Reefer yopiq trailer: quruq yukni ham oladi."],
     ["Flatbed yukidan oldin qaysi savol eng muhim?",["Set temperature?","Tarps and straps?","Is it palletized?"],1,"Mahkamlash va himoya: tarp, strap, zanjir."],
     ["200 gallon dizel taxminan qancha og‘irlik?",["200 lbs","1,400 lbs","5,000 lbs"],1,"Dizel ~7 lbs/gallon: 200 × 7 ≈ 1,400 lbs."],
-    ["Hazmat yuk uchun driverga nima kerak?",["Hech narsa, CDL yetadi","CDL’da H (hazmat) endorsement","Faqat reefer trailer"],1,"Hazmat endorsement, placard va carrierning tegishli sug‘urtasi."]
+    ["Hazmat yuk uchun driverga nima kerak?",["Hech narsa, CDL yetadi","CDL’da H (hazmat) endorsement","Faqat reefer trailer"],1,"Placard talab qiladigan hazmat yuk uchun H endorsement, placard va carrierning tegishli sug‘urtasi kerak. Aniq talab materialga bog‘liq."]
   ];
   var qa={};
   QZ.forEach(function(q,i){var box=el("div",{class:"q"});box.appendChild(el("p",{text:(i+1)+". "+q[0],style:"font-weight:600"}));var o=el("div",{class:"opts"});q[1].forEach(function(a,j){var b=el("button",{type:"button",class:"opt","aria-pressed":"false",text:a});b.onclick=function(){qa[i]=j;o.querySelectorAll(".opt").forEach(function(x){x.setAttribute("aria-pressed",x===b);x.classList.remove("right","wrong")});box.querySelector(".fb").className="fb"};o.appendChild(b)});box.appendChild(o);box.appendChild(el("div",{class:"fb"}));$("#quiz").appendChild(box)});

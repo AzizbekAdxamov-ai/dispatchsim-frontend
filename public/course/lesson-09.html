@@ -922,7 +922,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
     ["Appointment","Pickup va delivery","Manzil va vaqt telefondagi gapingizga mosmi? Qat‘iy appointment va first-come-first-served xavfi turlicha. Vaqt zonasiga e’tibor bering: EST va CST aralashsa, appointment o‘tib ketishi mumkin."],
     ["Narx","Linehaul va all-in","Jami summa kelishilganga mosmi? All-in narx detention, yoqilg‘i, qo‘shimcha to‘xtash va lumper’ni ham qoplashi mumkin: nimani o‘z ichiga olishini so‘rang."],
     ["Detention","Detention, layover, TONU","Detention odatda taxminan 2 soatdan keyin boshlanadi, ba’zan oldindan xabar yoki yozma ruxsat talab qilinadi. Layover ko‘pincha kunlik qat‘iy summa. TONU siyosati yozilganmi? (Bular manbalardagi tipik misollar.)"],
-    ["Yuk","Yuk, og‘irlik, equipment","Reefer bo‘lsa harorat yozma bo‘lsin. Og‘irlikni pickup’da tekshiring: e’lon qilingan va haqiqiy og‘irlik farq qilsa, jo‘nashdan oldin hujjatlashtiring. “Tailgate” yoki “driver count” so‘zlari tushirishni siz bajarishingizni bildirishi mumkin."],
+    ["Yuk","Yuk, og‘irlik, equipment","Reefer bo‘lsa harorat yozma bo‘lsin. Og‘irlikni pickup’da tekshiring: e’lon qilingan va haqiqiy og‘irlik farq qilsa, jo‘nashdan oldin hujjatlashtiring. “Tailgate” (receiver tekshirmay, driver yukni trailer eshigida topshiradi) yoki “driver count” (yuk sonini driver o‘zi sanaydi) so‘zlari tushirishni siz bajarishingizni bildirishi mumkin."],
     ["To‘lov","Muddat va quick pay","Net 30 yoki Net 45 odatiy: muddat faktura va imzolangan BOL olinganidan boshlanadi. Quick pay taxminan 2–5% bo‘lishi mumkin. Fakturani topshirish muddati bormi?"],
     ["Javobgarlik","Yuk va da’volar","Yukka pickup’dan delivery’gacha siz javob berasiz. Da’volar uchun qisqa muddatlarga va “setoff” (boshqa yuk to‘lovini ushlab qolish) bandlariga e’tibor bering."],
     ["O‘zgarishlar","Jarimalar va o‘zgarishlar","Kech kelish, tozalanmagan trailer yoki tracking ilovasi uchun jarima bormi? Pickup, delivery yoki narx o‘zgarsa, yangi rate con so‘rang: og‘zaki kelishuvni isbotlash qiyin."]],
@@ -946,7 +946,7 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
   var py={t:{},q:false};function chkPy(){if(py.t.pDelay&&(py.t.pNet||py.t.pQuick)&&py.q)mark("pay")}
   function renderPay(){var a=+$("#pAmt").value,net=+$("#pNet").value,d=+$("#pDelay").value,q=+$("#pQuick").value;
     $("#pAmtO").textContent=usd(a);$("#pNetO").textContent="Net "+net;$("#pDelayO").textContent=d+" kun";$("#pQuickO").textContent=q===0?"yo‘q":q+"%";
-    var days=q>0?3:net+d,fee=a*q/100;$("#pDays").textContent=q>0?"≈ 3":String(days);$("#pFee").textContent=usd(fee);$("#pGet").textContent=usd(a-fee);
+    var days=q>0?3+d:net+d,fee=a*q/100;$("#pDays").textContent=q>0?"≈ "+days:String(days);$("#pFee").textContent=usd(fee);$("#pGet").textContent=usd(a-fee);
     var v=$("#pVerdict");if(q>0){v.textContent="Quick pay: pul tez keladi, lekin "+usd(fee)+" yo‘qotasiz. Bu qaror kassadagi ehtiyojga bog‘liq."}else if(d>0){v.textContent="Hujjatni "+d+" kun kech yuborsangiz, pul Net "+net+" emas, taxminan "+days+" kunda keladi."}else{v.textContent="Hujjatni darhol yuborsangiz, pul Net "+net+" muddatida keladi."}
     $("#pRes").textContent=py.t.pDelay&&(py.t.pNet||py.t.pQuick)?"Hisob tayyor":"Maqsad: kechikish va (muddat yoki quick pay) sliderlarini suring"}
   ["pAmt","pNet","pDelay","pQuick"].forEach(function(id){$("#"+id).addEventListener("input",function(){py.t[id]=true;renderPay();chkPy()})});renderPay();
