@@ -5,6 +5,7 @@ import { ArrowLeft, ChatCircleDots, ChalkboardTeacher, ListChecks, Moon, Noteboo
 import { useTheme } from '../../theme/ThemeProvider'
 import { useAuth } from '../../context/AuthContext'
 import { askAdvisor, getAcademyMe, saveProgress } from '../../api/academy'
+import { ACADEMY_COPY, canTeachClass } from '../../data/academyAccess'
 import { lessonByNo, lessonFile } from '../../data/academyLessons'
 import {
   ensureStorageOwner, hasAnything, hydrateFromServer, readLessonState, stateKey, toProgressBody, writeMode,
@@ -113,7 +114,7 @@ function LessonView({ lesson }) {
   const closeRef = useRef(null)
   const toggleRefs = useRef({})
   const { theme, toggleTheme } = useTheme()
-  const isMentor = user?.isMentor || user?.isAdmin
+  const isMentor = canTeachClass(user)
 
   const postTheme = useCallback(() => {
     frameRef.current?.contentWindow?.postMessage({ type: 'ds-theme', theme }, window.location.origin)
@@ -174,7 +175,7 @@ function LessonView({ lesson }) {
             <span className="ac-focus-label">Darsda ochish</span>
           </Link>
         )}
-        {PANELS.map(({ id, label, Icon, badge }) => (
+        {!blocked && PANELS.map(({ id, label, Icon, badge }) => (
           <button
             key={id}
             type="button"
@@ -201,7 +202,12 @@ function LessonView({ lesson }) {
 
       <div className="ac-focus-body">
         {blocked ? (
-          <div className="ac-focus-frame ac-error">Hisobingiz hali Academy‘ga ulanmagan. Mentoringizga murojaat qiling.</div>
+          <div className="ac-focus-frame">
+            <div className="ac-panel ac-locked" role="status">
+              <h2>{ACADEMY_COPY.inviteOnly}</h2>
+              <div className="ac-muted">{ACADEMY_COPY.inviteOnlyHint}</div>
+            </div>
+          </div>
         ) : ready ? (
           <iframe
             ref={frameRef}

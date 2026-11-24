@@ -30,6 +30,9 @@ const FILES = [
   'data/driverContact.js',
   'data/invoiceActionCopy.js',
   'data/loginFeedback.js',
+  'data/academyAccess.js',
+  'pages/academy/AcademyHome.jsx',
+  'pages/academy/AcademyLesson.jsx',
 ]
 
 // Text a person can read: quoted strings and the text between JSX tags.

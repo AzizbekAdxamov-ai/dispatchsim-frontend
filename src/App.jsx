@@ -158,7 +158,7 @@ export default function App() {
             <Route index element={<AdminUsers />} />
             <Route path="invites" element={<AdminInvites />} />
           </Route>
-          <Route path="/academy/class/:no" element={<ProtectedRoute><AcademyClass /></ProtectedRoute>} />
+          <Route path="/academy/class/:no" element={<ProtectedRoute requireMentor><AcademyClass /></ProtectedRoute>} />
           <Route
             path="/academy"
             element={

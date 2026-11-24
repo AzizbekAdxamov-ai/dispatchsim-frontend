@@ -5,13 +5,19 @@ import Sidebar from './Sidebar'
 import Topbar from './Topbar'
 import SectionTabs from './SectionTabs'
 import LiveDataNotice from './LiveDataNotice'
+import { useAuth } from '../../context/AuthContext'
+import { hasAcademyAccess } from '../../data/academyAccess'
 import { useLiveDataHealth } from '../../hooks/useLiveDataHealth'
 import { DISPATCH_SECTIONS, DISPATCH_SETTINGS, titleFor, hasSectionTabs } from './navSections'
 
-const EXTRA_BOTTOM = [{ to: '/academy', icon: GraduationCap, label: 'Academy' }]
+const ACADEMY_LINK = [{ to: '/academy', icon: GraduationCap, label: 'Academy' }]
+const NO_LINKS = []
 
 export default function AppShell() {
   const location = useLocation()
+  const { user } = useAuth()
+  // Academy is invite-only: no entry for people who cannot open it.
+  const extraBottom = hasAcademyAccess(user) ? ACADEMY_LINK : NO_LINKS
   // The notice is chrome: while it is on screen every full-height page
   // below it has 29px less to live in (tokens.css's --chrome-notice).
   // Read from the same store the notice itself reads, so the class and
@@ -24,7 +30,7 @@ export default function AppShell() {
 
   return (
     <div className="app" style={{ position: 'relative', display: 'flex', minHeight: '100vh' }}>
-      <Sidebar sections={DISPATCH_SECTIONS} settings={DISPATCH_SETTINGS} extraBottom={EXTRA_BOTTOM} />
+      <Sidebar sections={DISPATCH_SECTIONS} settings={DISPATCH_SETTINGS} extraBottom={extraBottom} />
       <div className={'main'
         + (hasSectionTabs(DISPATCH_SECTIONS, location.pathname) ? ' has-section-tabs' : '')
         + (liveDataFailing ? ' has-live-notice' : '')} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { getAcademyMe } from '../../api/academy'
 import { useAuth } from '../../context/AuthContext'
+import { ACADEMY_COPY, academyLoadError, canTeachClass } from '../../data/academyAccess'
 import { ACADEMY_LESSONS, EXITS_PER_LESSON, LESSON_COUNT, WEEK_COUNT } from '../../data/academyLessons'
 import '../PageHeader.css'
 import './academy.css'
@@ -34,9 +35,9 @@ function Ring({ done, busy }) {
 
 export default function AcademyHome() {
   const [me, setMe] = useState(null)
-  const [error, setError] = useState('')
+  const [load, setLoad] = useState(null) // null | 'forbidden' | 'failed'
   const { user } = useAuth()
-  const isMentor = user?.isMentor || user?.isAdmin
+  const isMentor = canTeachClass(user)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -44,9 +45,7 @@ export default function AcademyHome() {
       .then(setMe)
       .catch((err) => {
         if (err?.name === 'AbortError') return
-        setError(err?.code === 'FORBIDDEN'
-          ? 'Hisobingiz hali Academy‘ga ulanmagan. Mentoringizga murojaat qiling.'
-          : 'Ma‘lumotni yuklab bo‘lmadi. Qayta urinib ko‘ring.')
+        setLoad(academyLoadError(err))
       })
     return () => controller.abort()
   }, [])
@@ -69,9 +68,15 @@ export default function AcademyHome() {
         </div>
       </div>
 
-      {error && <div className="ac-error">{error}</div>}
+      {load === 'forbidden' ? (
+        <div className="ac-panel ac-locked" role="status">
+          <h2>{ACADEMY_COPY.inviteOnly}</h2>
+          <div className="ac-muted">{ACADEMY_COPY.inviteOnlyHint}</div>
+        </div>
+      ) : (<>
+      {load === 'failed' && <div className="ac-error">{ACADEMY_COPY.loadFailed}</div>}
 
-      <div className="ac-panel ac-summary" aria-busy={!me && !error}>
+      <div className="ac-panel ac-summary" aria-busy={!me && !load}>
         <div>
           <div className="ac-summary-total">{me ? total : '–'}/{LESSON_COUNT * EXITS_PER_LESSON}</div>
           <div className="ac-muted">bajarilgan nuqta (EXIT)</div>
@@ -92,7 +97,7 @@ export default function AcademyHome() {
             {ACADEMY_LESSONS.filter((l) => l.week === week).map((l) => (
               <div className="ac-card-wrap" key={l.no}>
                 <Link className="ac-card" to={`/academy/lesson/${l.no}`}>
-                  <Ring done={ringOf(l.no)} busy={!me && !error} />
+                  <Ring done={ringOf(l.no)} busy={!me && !load} />
                   <div>
                     <div className="ac-card-title">{l.no}-dars. {l.title}</div>
                     <div className="ac-card-meta ac-mono">{l.minutes} daqiqa</div>
@@ -106,6 +111,7 @@ export default function AcademyHome() {
           </div>
         </section>
       ))}
+      </>)}
     </div>
   )
 }

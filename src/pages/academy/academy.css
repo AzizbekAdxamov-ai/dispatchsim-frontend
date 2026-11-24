@@ -2,6 +2,9 @@
 .ac-page { max-width: 1100px; margin: 0 auto; }
 .ac-muted { color: var(--text-3); font-size: 12px; }
 .ac-mono { font-family: var(--font-mono); }
+.ac-locked { max-width: 520px; margin: 48px auto; text-align: center; }
+.ac-locked h2 { color: var(--text); font-size: 15px; font-weight: 600; margin: 0 0 6px; }
+.ac-locked .ac-muted { color: var(--text-2); font-size: 13px; }
 .ac-error { color: var(--red); font-size: 12.5px; margin: 8px 0; }
 
 .ac-btn {
