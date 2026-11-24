@@ -5,6 +5,7 @@
 /* Scroll reveal: opacity + transform only, so the page never reflows. */
 html.rv-on .rv{opacity:0;transform:translateY(16px);transition:opacity .42s cubic-bezier(.25,1,.5,1) var(--rvd,0ms),transform .52s cubic-bezier(.25,1,.5,1) var(--rvd,0ms);will-change:opacity,transform}
 html.rv-on .rv.in{opacity:1;transform:none;will-change:auto}
+html.rv-on .rv.lcard{transition:opacity .42s cubic-bezier(.25,1,.5,1) var(--rvd,0ms),transform .52s cubic-bezier(.25,1,.5,1) var(--rvd,0ms),border-color .2s}
 @media (prefers-reduced-motion:reduce){html.rv-on .rv{opacity:1!important;transform:none!important;transition:none!important}}
 @media print{html.rv-on .rv{opacity:1!important;transform:none!important}}
 </style><script>(function(){try{

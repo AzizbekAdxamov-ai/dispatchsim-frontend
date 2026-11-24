@@ -39,6 +39,7 @@ for (const [name, html] of lessons) {
     assert.ok(head.includes('translateY(16px)'))
     assert.ok(head.includes('opacity .42s cubic-bezier(.25,1,.5,1)'))
     assert.ok(head.includes('transform .52s cubic-bezier(.25,1,.5,1)'))
+    assert.ok(head.includes('html.rv-on .rv.lcard{transition:') && head.includes('border-color .2s'), 'lcard keeps its border-color transition')
     assert.ok(tail.includes('STEP=55') && tail.includes('MAXSTEP=4'))
     assert.ok(tail.includes("threshold:0.06,rootMargin:'0px 0px -5% 0px'"))
     assert.ok(tail.includes("'.sec > *, .finish, .mentor'"))
