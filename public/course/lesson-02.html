@@ -1,6 +1,16 @@
 <title>Truck bu yukni ola oladimi?</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <script>document.documentElement.setAttribute("lang","uz")</script>
+<!-- reveal:start --><style>
+/* Scroll reveal: opacity + transform only, so the page never reflows. */
+html.rv-on .rv{opacity:0;transform:translateY(16px);transition:opacity .42s cubic-bezier(.25,1,.5,1) var(--rvd,0ms),transform .52s cubic-bezier(.25,1,.5,1) var(--rvd,0ms);will-change:opacity,transform}
+html.rv-on .rv.in{opacity:1;transform:none;will-change:auto}
+@media (prefers-reduced-motion:reduce){html.rv-on .rv{opacity:1!important;transform:none!important;transition:none!important}}
+@media print{html.rv-on .rv{opacity:1!important;transform:none!important}}
+</style><script>(function(){try{
+  var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if('IntersectionObserver' in window && !reduced) document.documentElement.classList.add('rv-on');
+}catch(e){}})()</script><!-- reveal:head-end -->
 <!-- academy:inject --><script>// Runs first, before the lesson's own styles and script. In a fragment page
 // document.body does not exist yet, so every flag goes on <html>.
 (function () {
@@ -1075,8 +1085,9 @@ html.ds-present .ask .lbl { font-size: 14px; }
     io.observe(el)
   }
 
-  // 1. Sections slide in as they are reached (not in class mode: one part at a time).
-  if (!present) {
+  // 1. Sections slide in as they are reached (not in class mode: one part at a time;
+  //    not when the scroll-reveal layer rv-on is active: it animates the same elements).
+  if (!present && !root.classList.contains('rv-on')) {
     qa('section.sec').forEach(function (sec) {
       if (sec.getBoundingClientRect().top <= window.innerHeight) return
       sec.classList.add('ds-pre')
@@ -1299,3 +1310,59 @@ html.ds-present .ask .lbl { font-size: 14px; }
   }).observe(document.body, { subtree: true, attributes: true, attributeFilter: ['class'], attributeOldValue: true })
 })()
 </script><!-- /academy:inject -->
+<!-- reveal:tail --><script>(function(){
+  var root=document.documentElement;
+  if(!root.classList.contains('rv-on')) return;
+  var els=[];
+  // Content must never stay hidden: on any error drop the mode and every .rv.
+  function bail(){
+    root.classList.remove('rv-on');
+    [].forEach.call(document.querySelectorAll('.rv'),function(el){el.classList.remove('rv','in')});
+  }
+  try{
+    var STEP=55, MAXSTEP=4;
+    // Direct children of a section, the finish card and the mentor card.
+    // Form controls and frames are never animated.
+    var SKIP='button,input,select,textarea,a,canvas,iframe,[role=slider]';
+    els=[].filter.call(document.querySelectorAll('.sec > *, .finish, .mentor'),function(el){return !el.matches(SKIP)});
+    els.forEach(function(el){el.classList.add('rv')});
+    var io=new IntersectionObserver(function(entries){
+      try{
+        var enter=entries.filter(function(e){return e.isIntersecting})
+          .sort(function(a,b){return a.boundingClientRect.top-b.boundingClientRect.top});
+        enter.forEach(function(e,i){
+          e.target.style.setProperty('--rvd',Math.min(i,MAXSTEP)*STEP+'ms');
+          e.target.classList.add('in');
+        });
+        entries.forEach(function(e){
+          if(e.isIntersecting) return;
+          var below=e.boundingClientRect.top>window.innerHeight*0.5;
+          if(below){
+            // Left through the bottom (user scrolled up): hide again so scrolling down re-animates.
+            e.target.style.setProperty('--rvd','0ms');
+            e.target.classList.remove('in');
+          }else{
+            // Left through the top (scrolled down / hash jump): stay visible, no animation.
+            e.target.classList.add('in');
+          }
+        });
+      }catch(err){bail()}
+    },{threshold:0.06,rootMargin:'0px 0px -5% 0px'});
+    els.forEach(function(el){io.observe(el)});
+    // After a fast jump (scrollbar drag, End) blocks skipped above the viewport must not stay hidden.
+    var tick=false;
+    function sweep(){
+      tick=false;
+      try{els.forEach(function(el){if(!el.classList.contains('in')&&el.getBoundingClientRect().bottom<0)el.classList.add('in')})}
+      catch(err){bail()}
+    }
+    addEventListener('scroll',function(){if(!tick){tick=true;requestAnimationFrame(sweep)}},{passive:true});
+    // Safety net: anything inside the viewport after 1.5s that is still hidden becomes visible.
+    setTimeout(function(){
+      try{els.forEach(function(el){
+        var r=el.getBoundingClientRect();
+        if(!el.classList.contains('in')&&r.bottom>0&&r.top<window.innerHeight*0.9)el.classList.add('in');
+      })}catch(err){bail()}
+    },1500);
+  }catch(err){bail()}
+})()</script><!-- /reveal -->

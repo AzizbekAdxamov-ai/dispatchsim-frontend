@@ -28,8 +28,9 @@
     io.observe(el)
   }
 
-  // 1. Sections slide in as they are reached (not in class mode: one part at a time).
-  if (!present) {
+  // 1. Sections slide in as they are reached (not in class mode: one part at a time;
+  //    not when the scroll-reveal layer rv-on is active: it animates the same elements).
+  if (!present && !root.classList.contains('rv-on')) {
     qa('section.sec').forEach(function (sec) {
       if (sec.getBoundingClientRect().top <= window.innerHeight) return
       sec.classList.add('ds-pre')
