@@ -1,6 +1,6 @@
 import { Outlet, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { UsersThree, Ticket } from '@phosphor-icons/react'
+import { UsersThree, Ticket, GraduationCap } from '@phosphor-icons/react'
 import Sidebar from './Sidebar'
 import Topbar from './Topbar'
 import LiveDataNotice from './LiveDataNotice'
@@ -9,6 +9,7 @@ import { useLiveDataHealth } from '../../hooks/useLiveDataHealth'
 const ADMIN_NAV_ITEMS = [
   { to: '/admin', icon: UsersThree, label: 'Users', end: true },
   { to: '/admin/invites', icon: Ticket, label: 'Invite codes', shortLabel: 'Invites' },
+  { to: '/academy', icon: GraduationCap, label: 'Academy' },
 ]
 
 const TITLES = {

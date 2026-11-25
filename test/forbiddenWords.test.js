@@ -33,6 +33,7 @@ const FILES = [
   'data/academyAccess.js',
   'pages/academy/AcademyHome.jsx',
   'pages/academy/AcademyLesson.jsx',
+  'components/layout/AdminShell.jsx',
 ]
 
 // Text a person can read: quoted strings and the text between JSX tags.
