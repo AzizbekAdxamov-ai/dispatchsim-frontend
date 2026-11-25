@@ -245,3 +245,9 @@
     font-size: 13px;
   }
 }
+
+/* The company clock sits on the accent tint; the dimmest text colour is
+   4.48:1 there (needs 4.5), so its zone label steps up one. */
+.tz-item.company .tz-zone {
+  color: var(--text-2);
+}
