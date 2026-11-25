@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../theme/ThemeProvider'
 import { useResource } from '../hooks/useResource'
 import { getOverview } from '../api/finance'
+import WorkspaceSwitcher from '../components/layout/WorkspaceSwitcher'
 import ChangePasswordPanel from '../components/settings/ChangePasswordPanel'
 import { PASSWORD_COPY } from '../data/passwordCopy'
 import '../components/dashboard/Panel.css'
@@ -20,6 +21,11 @@ const COST_COPY = {
 }
 
 const PERCENT_FACTOR = 100
+
+const WORKSPACE_COPY = {
+  title: 'Workspaces',
+  note: 'Choosing one opens that workspace.',
+}
 
 function initials(name) {
   return (name || '')
@@ -43,6 +49,7 @@ export default function FinanceSettings() {
 
   const name = user?.name ?? ''
   const company = user?.company ?? ''
+  const hasSeveralWorkspaces = (user?.roles?.length ?? 0) >= 2
   const assumptions = overview?.assumptions
 
   const costRows = [
@@ -100,6 +107,15 @@ export default function FinanceSettings() {
         </div>
 
         <div>
+          {hasSeveralWorkspaces && (
+            <div className="panel">
+              <div className="panel-head"><div className="panel-title">{WORKSPACE_COPY.title}</div></div>
+              <div className="settings-body">
+                <WorkspaceSwitcher />
+                <div className="settings-row-desc">{WORKSPACE_COPY.note}</div>
+              </div>
+            </div>
+          )}
           <div className="panel">
             <div className="panel-head"><div className="panel-title">Appearance</div></div>
             <div className="settings-body">

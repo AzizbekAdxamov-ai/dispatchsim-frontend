@@ -1,11 +1,17 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../theme/ThemeProvider'
+import WorkspaceSwitcher from '../components/layout/WorkspaceSwitcher'
 import ChangePasswordPanel from '../components/settings/ChangePasswordPanel'
 import { PASSWORD_COPY } from '../data/passwordCopy'
 import '../components/dashboard/Panel.css'
 import './PageHeader.css'
 import './Settings.css'
+
+const WORKSPACE_COPY = {
+  title: 'Workspaces',
+  note: 'Choosing one opens that workspace.',
+}
 
 function initials(name) {
   return (name || '')
@@ -24,6 +30,7 @@ export default function FleetSettings() {
 
   const name = user?.name ?? ''
   const company = user?.company ?? ''
+  const hasSeveralWorkspaces = (user?.roles?.length ?? 0) >= 2
 
   function handleLogout() {
     logout()
@@ -65,6 +72,15 @@ export default function FleetSettings() {
         </div>
 
         <div>
+          {hasSeveralWorkspaces && (
+            <div className="panel">
+              <div className="panel-head"><div className="panel-title">{WORKSPACE_COPY.title}</div></div>
+              <div className="settings-body">
+                <WorkspaceSwitcher />
+                <div className="settings-row-desc">{WORKSPACE_COPY.note}</div>
+              </div>
+            </div>
+          )}
           <div className="panel">
             <div className="panel-head"><div className="panel-title">Appearance</div></div>
             <div className="settings-body">

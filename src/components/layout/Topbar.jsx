@@ -1,7 +1,6 @@
 import { Moon, Sun, MapTrifold, Package, MagnifyingGlass, List } from '@phosphor-icons/react'
 import { NavLink } from 'react-router-dom'
 import { useTheme } from '../../theme/ThemeProvider'
-import WorkspaceSwitcher from './WorkspaceSwitcher'
 import CashChip from './CashChip'
 import AlertsBell from './AlertsBell'
 import ZoneClocks from './ZoneClocks'
@@ -72,7 +71,6 @@ export default function Topbar({ title, copy = TOPBAR_COPY }) {
           own header says why. Leaving it out made the component dead code
           and took the number off every page at the same time. */}
       <CashChip />
-      <WorkspaceSwitcher />
       <div className="topbar-icons">
         <button className="icon-btn topbar-theme-btn" onClick={toggleTheme} aria-label={copy.toggleTheme}>
           {theme === 'dark' ? <Moon size={17} weight="fill" /> : <Sun size={17} weight="fill" />}

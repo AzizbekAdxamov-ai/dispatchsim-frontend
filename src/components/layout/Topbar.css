@@ -140,14 +140,6 @@
    anything had happened. The bell now shows a count of conditions that are
    actually true; see AlertsBell.css. */
 
-/* Placement-specific spacing for WorkspaceSwitcher inside the topbar; the
-   component's own look (trigger, popover, items) lives in WorkspaceSwitcher.css. */
-.workspace-switcher {
-  border-left: 1px solid var(--border-soft);
-  padding-left: 10px;
-  margin-right: 4px;
-}
-
 /* The three US clocks (ZoneClocks.jsx). */
 .tz-strip {
   display: flex;

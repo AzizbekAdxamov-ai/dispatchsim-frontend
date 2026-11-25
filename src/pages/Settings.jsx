@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../theme/ThemeProvider'
 import { roleLabel, sortRoles } from '../data/roleRoutes'
+import WorkspaceSwitcher from '../components/layout/WorkspaceSwitcher'
 import CarrierPanel from '../components/settings/CarrierPanel'
 import ChangePasswordPanel from '../components/settings/ChangePasswordPanel'
 import { PASSWORD_COPY } from '../data/passwordCopy'
@@ -22,6 +23,11 @@ function initials(name) {
 
 const SETTINGS_EMAIL_COPY = { label: 'Sign-in email' }
 
+const WORKSPACE_NOTE = {
+  single: 'Your administrator decides which workspaces are open to you.',
+  several: 'Choosing one opens that workspace.',
+}
+
 export default function Settings({ emailCopy = SETTINGS_EMAIL_COPY }) {
   const { user, logout } = useAuth()
   const { theme, setTheme } = useTheme()
@@ -29,6 +35,7 @@ export default function Settings({ emailCopy = SETTINGS_EMAIL_COPY }) {
 
   const name = user?.name ?? ''
   const company = user?.company ?? ''
+  const hasSeveralWorkspaces = (user?.roles?.length ?? 0) >= 2
 
   function handleLogout() {
     logout()
@@ -69,19 +76,23 @@ export default function Settings({ emailCopy = SETTINGS_EMAIL_COPY }) {
               </div>
               <div className="settings-field">
                 <label>Workspaces</label>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                  {sortRoles(user?.roles).map((key) => (
-                    <span
-                      key={key}
-                      className={'badge ' + (key === user?.activeRole ? 'done' : 'neutral')}
-                    >
-                      <span className="dot"></span>
-                      {roleLabel(key)}
-                    </span>
-                  ))}
-                </div>
+                {hasSeveralWorkspaces ? (
+                  <WorkspaceSwitcher />
+                ) : (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    {sortRoles(user?.roles).map((key) => (
+                      <span
+                        key={key}
+                        className={'badge ' + (key === user?.activeRole ? 'done' : 'neutral')}
+                      >
+                        <span className="dot"></span>
+                        {roleLabel(key)}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 <div className="settings-row-desc">
-                  Your administrator decides which workspaces are open to you. Switch between them from the top bar.
+                  {hasSeveralWorkspaces ? WORKSPACE_NOTE.several : WORKSPACE_NOTE.single}
                 </div>
               </div>
             </div>
