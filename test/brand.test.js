@@ -19,7 +19,7 @@ function files(dir) {
 
 // Kills: an empty constant (a blank logo/title).
 test('brand constants are filled', () => {
-  for (const k of ['name', 'shortName', 'slogan', 'tagline', 'description', 'logoAlt', 'favicon', 'favicon32', 'appleTouchIcon', 'ogImage', 'siteUrl', 'logoWhite', 'logoWhite2x', 'logoDark', 'logoDark2x', 'mark']) {
+  for (const k of ['name', 'shortName', 'slogan', 'tagline', 'description', 'logoAlt', 'favicon', 'favicon32', 'appleTouchIcon', 'ogImage', 'siteUrl', 'logoWhite', 'logoWhite2x', 'logoDark', 'logoDark2x', 'mark', 'wordmarkDark', 'wordmarkDark2x']) {
     assert.ok(typeof BRAND[k] === 'string' && BRAND[k].trim(), k)
   }
 })
@@ -45,7 +45,7 @@ test('index.html takes title, favicon and share card from the brand', () => {
 
 // Kills: a brand path pointing at a file that was never shipped.
 test('every brand image exists in public/', () => {
-  for (const k of ['favicon', 'favicon32', 'appleTouchIcon', 'ogImage', 'logoWhite', 'logoWhite2x', 'logoDark', 'logoDark2x', 'mark']) {
+  for (const k of ['favicon', 'favicon32', 'appleTouchIcon', 'ogImage', 'logoWhite', 'logoWhite2x', 'logoDark', 'logoDark2x', 'mark', 'wordmarkDark', 'wordmarkDark2x']) {
     assert.ok(existsSync(join(root, 'public', BRAND[k])), BRAND[k])
   }
 })
