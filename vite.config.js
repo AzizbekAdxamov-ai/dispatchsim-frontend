@@ -10,8 +10,7 @@ const TOKENS = {
   '%BRAND_FAVICON%': BRAND.favicon,
   '%BRAND_FAVICON32%': BRAND.favicon32,
   '%BRAND_APPLE_TOUCH_ICON%': BRAND.appleTouchIcon,
-  '%BRAND_OG_IMAGE%': BRAND.ogImage,
-  '%BRAND_THEME_COLOR%': BRAND.themeColor,
+  '%BRAND_OG_IMAGE%': BRAND.siteUrl + BRAND.ogImage,
 }
 const brandHtml = {
   name: 'brand-html',

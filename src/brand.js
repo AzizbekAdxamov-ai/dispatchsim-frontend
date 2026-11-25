@@ -14,7 +14,8 @@ export const BRAND = {
   favicon32: '/brand/favicon-32.png',
   appleTouchIcon: '/brand/apple-touch-icon.png',
   ogImage: '/brand/og-image.png',
-  themeColor: '#0B1020',
+  // Share cards need an absolute image URL. Current production host; change here if the domain moves.
+  siteUrl: 'https://dispatchsim-frontend.vercel.app',
   logoWhite: '/brand/logo-white.png',
   logoWhite2x: '/brand/logo-white@2x.png',
   logoDark: '/brand/logo-dark.png',

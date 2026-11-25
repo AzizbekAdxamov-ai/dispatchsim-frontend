@@ -19,7 +19,7 @@ function files(dir) {
 
 // Kills: an empty constant (a blank logo/title).
 test('brand constants are filled', () => {
-  for (const k of ['name', 'shortName', 'slogan', 'tagline', 'description', 'logoAlt', 'favicon', 'favicon32', 'appleTouchIcon', 'ogImage', 'themeColor', 'logoWhite', 'logoWhite2x', 'logoDark', 'logoDark2x', 'mark']) {
+  for (const k of ['name', 'shortName', 'slogan', 'tagline', 'description', 'logoAlt', 'favicon', 'favicon32', 'appleTouchIcon', 'ogImage', 'siteUrl', 'logoWhite', 'logoWhite2x', 'logoDark', 'logoDark2x', 'mark']) {
     assert.ok(typeof BRAND[k] === 'string' && BRAND[k].trim(), k)
   }
 })
@@ -41,7 +41,6 @@ test('index.html takes title, favicon and share card from the brand', () => {
   assert.ok(html.includes('%BRAND_NAME%'))
   assert.ok(html.includes('%BRAND_FAVICON%'))
   assert.ok(html.includes('%BRAND_OG_IMAGE%'))
-  assert.ok(html.includes('%BRAND_THEME_COLOR%'))
 })
 
 // Kills: a brand path pointing at a file that was never shipped.
