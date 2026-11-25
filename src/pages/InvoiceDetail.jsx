@@ -186,28 +186,30 @@ export default function InvoiceDetail() {
         <div className="panel-head">
           <div className="panel-title">Line items</div>
         </div>
-        <table className="invoice-line-items">
-          <thead>
-            <tr>
-              <th>Description</th>
-              <th>Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            {invoice.lineItems.map((item, i) => (
-              <tr key={i}>
-                <td>{item.label}</td>
-                <td className="mono">{formatMoney(item.amountUsd)}</td>
+        <div className="table-scroll">
+          <table className="invoice-line-items">
+            <thead>
+              <tr>
+                <th>Description</th>
+                <th>Amount</th>
               </tr>
-            ))}
-          </tbody>
-          <tfoot>
-            <tr className="invoice-line-items-total">
-              <td>Total</td>
-              <td className="mono">{formatMoney(invoice.amountUsd)}</td>
-            </tr>
-          </tfoot>
-        </table>
+            </thead>
+            <tbody>
+              {invoice.lineItems.map((item, i) => (
+                <tr key={i}>
+                  <td>{item.label}</td>
+                  <td className="mono">{formatMoney(item.amountUsd)}</td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr className="invoice-line-items-total">
+                <td>Total</td>
+                <td className="mono">{formatMoney(invoice.amountUsd)}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
       </div>
 
       {load && (
@@ -257,22 +259,24 @@ export default function InvoiceDetail() {
         {invoice.payments.length === 0 ? (
           <div className="page-empty">No payments received yet.</div>
         ) : (
-          <table className="invoice-payments">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {invoice.payments.map((payment, i) => (
-                <tr key={i}>
-                  <td>{formatDate(payment.paidAt)}</td>
-                  <td className="mono">{formatMoney(payment.amountUsd)}</td>
+          <div className="table-scroll">
+            <table className="invoice-payments">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Amount</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {invoice.payments.map((payment, i) => (
+                  <tr key={i}>
+                    <td>{formatDate(payment.paidAt)}</td>
+                    <td className="mono">{formatMoney(payment.amountUsd)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

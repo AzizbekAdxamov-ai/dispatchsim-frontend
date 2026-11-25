@@ -29,7 +29,7 @@
 
 .tld-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr);
+  grid-template-columns: minmax(0, 1.5fr) minmax(min(100%, 280px), 1fr);
   gap: 24px;
   align-items: start;
 }
@@ -242,7 +242,7 @@
    in a column of thirteen rows. */
 .tld-sheet-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 168px), 1fr));
 }
 
 .tld-spec {

@@ -96,3 +96,12 @@
   background: var(--green);
   color: var(--panel);
 }
+
+@media (max-width: 479px) {
+  .call-widget {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    width: auto;
+  }
+}

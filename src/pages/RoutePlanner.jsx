@@ -238,7 +238,7 @@ export default function RoutePlanner() {
                 <button key={r.key} type="button" className={'routes-btn' + (report === r.key ? ' active' : '')} onClick={() => openReport(r.key)}>{r.label}</button>
               ))}
             </div>
-            <div className="routes-report">
+            <div className="routes-report table-scroll">
               {report === 'legs' && (
                 <table>
                   <thead><tr><th>Leg</th><th>Miles</th><th>Driving</th></tr></thead>

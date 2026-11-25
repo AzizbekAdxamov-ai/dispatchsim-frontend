@@ -135,3 +135,9 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
+@media (max-width: 479px) {
+  .ds-top-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

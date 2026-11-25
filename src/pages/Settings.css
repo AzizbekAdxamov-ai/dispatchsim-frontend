@@ -1,6 +1,6 @@
 .settings-grid {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
   gap: 16px;
 }
 
@@ -203,9 +203,9 @@
   border-color: var(--red);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1023px) {
   .settings-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 

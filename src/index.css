@@ -17,6 +17,12 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+/* A table that is wider than its box scrolls inside it, never the page. */
+.table-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
 .mono {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;

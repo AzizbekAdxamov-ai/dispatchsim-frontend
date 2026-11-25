@@ -9,7 +9,7 @@
 
 .lb-detail-drawer {
   width: 420px;
-  max-width: 90vw;
+  max-width: 100vw;
   height: 100%;
   background: var(--panel);
   border-left: 1px solid var(--border-soft);
@@ -309,4 +309,10 @@
   font-size: 11.5px;
   color: var(--accent);
   text-decoration: none;
+}
+
+@media (max-width: 479px) {
+  .lb-detail-drawer {
+    width: 100%;
+  }
 }

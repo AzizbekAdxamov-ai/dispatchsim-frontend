@@ -118,6 +118,13 @@
 
 .sb-date-pair .sb-input { width: 130px; }
 
+/* The row already wraps; on a phone each control may also give way. */
+@media (max-width: 767px) {
+  .sb-picker { flex: 1 1 140px; }
+  .sb-dates { flex: 1 1 auto; }
+  .sb-date-pair .sb-input { width: auto; min-width: 0; flex: 1 1 0; }
+}
+
 .sb-dash { color: var(--text-3); }
 
 .sb-search {

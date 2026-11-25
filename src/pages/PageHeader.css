@@ -2,7 +2,13 @@
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
   margin-bottom: 18px;
+}
+
+.page-head > * {
+  min-width: 0;
 }
 
 .page-head-plain {
@@ -12,16 +18,19 @@
 .page-title {
   font-size: 19px;
   font-weight: 600;
+  overflow-wrap: anywhere;
 }
 
 .page-sub {
   font-size: 12px;
   color: var(--text-3);
   margin-top: 2px;
+  overflow-wrap: anywhere;
 }
 
 .page-tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   margin-bottom: 16px;
 }
@@ -66,6 +75,7 @@
 .page-toolbar {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 16px;
 }
@@ -78,7 +88,8 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 8px 12px;
-  flex: 1;
+  flex: 1 1 200px;
+  min-width: 0;
   max-width: 320px;
   color: var(--text-3);
   font-size: 12.5px;
@@ -116,4 +127,11 @@
   text-align: center;
   color: var(--text-3);
   padding: 24px 16px;
+}
+
+/* Tablet and phone widths: tabs are 40px targets. */
+@media (max-width: 1023px) {
+  .page-tab {
+    min-height: 40px;
+  }
 }

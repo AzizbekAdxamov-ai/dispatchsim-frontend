@@ -130,28 +130,30 @@ export default function BrokerCheck() {
           </div>
         )}
         {!loading && !logError && checks.length > 0 && (
-          <table className="bk-table">
-            <thead>
-              <tr>
-                <th>MC number</th>
-                <th>Broker</th>
-                <th>Rating</th>
-                <th>Pays in</th>
-                <th>Checked</th>
-              </tr>
-            </thead>
-            <tbody>
-              {checks.map((c) => (
-                <tr key={c.id}>
-                  <td className="mono">{c.mcNumber}</td>
-                  <td>{c.brokerName || 'No record'}</td>
-                  <td className="mono">{c.creditRating || '—'}</td>
-                  <td className="mono">{c.daysToPay != null ? `${c.daysToPay} days` : '—'}</td>
-                  <td className="bk-when">{formatChecked(c.checkedAt)}</td>
+          <div className="table-scroll">
+            <table className="bk-table">
+              <thead>
+                <tr>
+                  <th>MC number</th>
+                  <th>Broker</th>
+                  <th>Rating</th>
+                  <th>Pays in</th>
+                  <th>Checked</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {checks.map((c) => (
+                  <tr key={c.id}>
+                    <td className="mono">{c.mcNumber}</td>
+                    <td>{c.brokerName || 'No record'}</td>
+                    <td className="mono">{c.creditRating || '—'}</td>
+                    <td className="mono">{c.daysToPay != null ? `${c.daysToPay} days` : '—'}</td>
+                    <td className="bk-when">{formatChecked(c.checkedAt)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </>

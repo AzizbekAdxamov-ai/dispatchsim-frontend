@@ -3,7 +3,7 @@ import { standingMessage } from '../utils/companyStanding'
 import { chatLimitMessage } from '../utils/chatBudget.js'
 import { carrierCheckMessage } from '../utils/carrierCheck.js'
 import { Link, useSearchParams } from 'react-router-dom'
-import { ChatCircle, DownloadSimple, FileText, CheckCircle } from '@phosphor-icons/react'
+import { ChatCircle, DownloadSimple, FileText, CheckCircle, CaretLeft } from '@phosphor-icons/react'
 import {
   listConversations,
   openConversation,
@@ -78,7 +78,11 @@ function actionErrorText(err) {
   }
 }
 
-export default function BrokerChat({ emailCopy = BROKER_EMAIL_COPY, bookedBarCopy = BOOKED_BAR_COPY }) {
+// Below 1024px the list and the thread take the screen one at a time; this
+// is the way back from a thread to the list.
+const BACK_COPY = { back: 'All conversations' }
+
+export default function BrokerChat({ emailCopy = BROKER_EMAIL_COPY, bookedBarCopy = BOOKED_BAR_COPY, backCopy = BACK_COPY }) {
   // "Contact broker" on the load board links here with ?posting=<id>. That
   // opens (or reopens) the thread for that posting and selects it, so the
   // dispatcher lands in the conversation instead of a list they then have
@@ -270,7 +274,7 @@ export default function BrokerChat({ emailCopy = BROKER_EMAIL_COPY, bookedBarCop
   }
 
   return (
-    <div className="broker-chat">
+    <div className={'broker-chat' + (selected ? ' has-selection' : '')}>
       <div className="bc-list">
         <div className="bc-list-head">
           Brokers <span className="panel-count">{conversations.length}</span>
@@ -323,6 +327,19 @@ export default function BrokerChat({ emailCopy = BROKER_EMAIL_COPY, bookedBarCop
         {selected && (
           <>
             <div className="bc-thread-head">
+              <button
+                type="button"
+                className="bc-back"
+                aria-label={backCopy.back}
+                onClick={() => {
+                  selectedIdRef.current = null
+                  setSelectedId(null)
+                  setActionError('')
+                  setAcceptWarnings([])
+                }}
+              >
+                <CaretLeft size={18} aria-hidden="true" />
+              </button>
               <div className="bc-thread-route">
                 {selected.originCity}, {selected.originState} → {selected.destinationCity}, {selected.destinationState}
               </div>

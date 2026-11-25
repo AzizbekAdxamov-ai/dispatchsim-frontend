@@ -150,39 +150,41 @@ export default function FinanceSettlements() {
       {filtered.length === 0 ? (
         <div className="page-empty">Nothing here.</div>
       ) : (
-        <table className="settlement-table">
-          <thead>
-            <tr>
-              <th>Driver</th>
-              <th>Load</th>
-              <th>Lane</th>
-              <th className="num">Gross</th>
-              <th className="num">Deductions</th>
-              <th className="num">Net</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((s) => (
-              <tr key={s.id}>
-                <td>{s.driverName}</td>
-                <td className="mono">{s.loadId}</td>
-                <td className="settlement-lane">
-                  {s.originCity}, {s.originState} → {s.destinationCity}, {s.destinationState}
-                </td>
-                <td className="num mono">{formatMoney(s.grossUsd)}</td>
-                <td className="num mono">{formatMoney(s.deductionsUsd)}</td>
-                <td className="num mono">{formatMoney(s.netUsd)}</td>
-                <td>
-                  {s.status === 'paid' && 'Paid'}
-                  {s.status === 'accrued' && 'Accruing'}
-                  {/* The number, not a colour. How late it is, is a fact. */}
-                  {s.status === 'overdue' && `${describeWait(s.daysOverdue)} late`}
-                </td>
+        <div className="table-scroll">
+          <table className="settlement-table">
+            <thead>
+              <tr>
+                <th>Driver</th>
+                <th>Load</th>
+                <th>Lane</th>
+                <th className="num">Gross</th>
+                <th className="num">Deductions</th>
+                <th className="num">Net</th>
+                <th>Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filtered.map((s) => (
+                <tr key={s.id}>
+                  <td>{s.driverName}</td>
+                  <td className="mono">{s.loadId}</td>
+                  <td className="settlement-lane">
+                    {s.originCity}, {s.originState} → {s.destinationCity}, {s.destinationState}
+                  </td>
+                  <td className="num mono">{formatMoney(s.grossUsd)}</td>
+                  <td className="num mono">{formatMoney(s.deductionsUsd)}</td>
+                  <td className="num mono">{formatMoney(s.netUsd)}</td>
+                  <td>
+                    {s.status === 'paid' && 'Paid'}
+                    {s.status === 'accrued' && 'Accruing'}
+                    {/* The number, not a colour. How late it is, is a fact. */}
+                    {s.status === 'overdue' && `${describeWait(s.daysOverdue)} late`}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   )

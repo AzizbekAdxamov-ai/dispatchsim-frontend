@@ -109,28 +109,30 @@ export default function CashLedger() {
           </div>
         )}
         {!loading && entries.length > 0 && (
-          <table className="cl-table">
-            <thead>
-              <tr>
-                <th>When</th>
-                <th>Type</th>
-                <th>Detail</th>
-                <th className="right">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {entries.map((e) => (
-                <tr key={e.id}>
-                  <td className="cl-when">{when(e.occurredAt)}</td>
-                  <td>{KIND_LABEL[e.kind] || e.kind}</td>
-                  <td className="cl-detail">{e.description}</td>
-                  <td className={`right mono ${e.amountUsd < 0 ? 'neg' : 'pos'}`}>
-                    {signed(e.amountUsd)}
-                  </td>
+          <div className="table-scroll">
+            <table className="cl-table">
+              <thead>
+                <tr>
+                  <th>When</th>
+                  <th>Type</th>
+                  <th>Detail</th>
+                  <th className="right">Amount</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {entries.map((e) => (
+                  <tr key={e.id}>
+                    <td className="cl-when">{when(e.occurredAt)}</td>
+                    <td>{KIND_LABEL[e.kind] || e.kind}</td>
+                    <td className="cl-detail">{e.description}</td>
+                    <td className={`right mono ${e.amountUsd < 0 ? 'neg' : 'pos'}`}>
+                      {signed(e.amountUsd)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </>

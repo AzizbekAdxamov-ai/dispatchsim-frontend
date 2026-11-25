@@ -15,6 +15,7 @@
      reserves 40px above what this page gets; the one chrome number in
      tokens.css so every full-height page subtracts the same thing. */
   height: calc(100vh - var(--shell-chrome));
+  height: calc(100dvh - var(--shell-chrome));
   min-height: 480px;
 }
 
@@ -527,7 +528,7 @@
   color: var(--amber-strong);
 }
 
-@media (max-width: 980px) {
+@media (max-width: 1023px) {
   /* Narrow viewport: panel on top (its own bounded height, still the
      single scroller for its own content), map fills what's left below --
      same split .tracking-layout uses at desktop width, just stacked

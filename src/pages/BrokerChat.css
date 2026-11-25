@@ -1,10 +1,11 @@
 .broker-chat {
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: minmax(0, 280px) minmax(0, 1fr);
   /* The one chrome number (tokens.css): topbar 52px + content padding
      40px. A hand-picked 80px here used to overflow the window by 12px
      and scroll the whole page. */
   height: calc(100vh - var(--shell-chrome));
+  height: calc(100dvh - var(--shell-chrome));
   min-height: 480px;
   background: var(--panel);
   border: 1px solid var(--border-soft);
@@ -394,13 +395,45 @@
   cursor: not-allowed;
 }
 
-@media (max-width: 800px) {
+/* Below 1024px: list or thread, one at a time. (Below 800px the list used
+   to be hidden outright, so on a phone no conversation could be picked.) */
+.bc-back {
+  display: none;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  margin: -8px 0 -8px -10px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: none;
+  color: var(--text-2);
+  cursor: pointer;
+}
+
+.bc-back:hover {
+  background: var(--panel-2);
+  border-color: var(--border-soft);
+  color: var(--text);
+}
+
+@media (max-width: 1023px) {
   .broker-chat {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .broker-chat.has-selection .bc-list,
+  .broker-chat:not(.has-selection) .bc-thread {
+    display: none;
+  }
+
+  .bc-back {
+    display: flex;
   }
 
   .bc-list {
-    display: none;
+    border-right: 0;
   }
 }
 

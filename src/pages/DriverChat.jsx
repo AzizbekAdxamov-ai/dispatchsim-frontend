@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { ChatCircle, PaperPlaneTilt } from '@phosphor-icons/react'
+import { ChatCircle, PaperPlaneTilt, CaretLeft } from '@phosphor-icons/react'
 import { listThreads, openConversation, getThread, sendMessage } from '../api/driverChat'
 import { useResource } from '../hooks/useResource'
 import { visibleMessages, showTyping } from '../utils/chatView'
@@ -33,7 +33,11 @@ function money(n) {
   return `$${Math.abs(n ?? 0).toLocaleString('en-US')}`
 }
 
-export default function DriverChat() {
+// Below 1024px the list and the thread take the screen one at a time; this
+// is the way back from a thread to the list.
+const BACK_COPY = { back: 'All drivers' }
+
+export default function DriverChat({ backCopy = BACK_COPY }) {
   const [conversationId, setConversationId] = useState(null)
   const [draft, setDraft] = useState('')
   const [sending, setSending] = useState(false)
@@ -140,7 +144,7 @@ export default function DriverChat() {
   }
 
   return (
-    <div className="dc-page">
+    <div className={'dc-page' + (conversationId ? ' has-selection' : '')}>
       <div className="dc-list">
         <div className="dc-list-head">Drivers</div>
         <div className="dc-list-body">
@@ -179,10 +183,23 @@ export default function DriverChat() {
         {conversationId && (
           <>
             <div className="dc-thread-head">
-              <div className="dc-thread-name">{driver?.name ?? '…'}</div>
-              <div className="dc-thread-sub">
-                {driver?.truckId ? `Truck ${driver.truckId}` : 'No truck assigned'}
-                {thread?.load && ` · running load ${thread.load.id}`}
+              <button
+                type="button"
+                className="dc-back"
+                aria-label={backCopy.back}
+                onClick={() => {
+                  setConversationId(null)
+                  setSendError('')
+                }}
+              >
+                <CaretLeft size={18} aria-hidden="true" />
+              </button>
+              <div className="dc-thread-head-text">
+                <div className="dc-thread-name">{driver?.name ?? '…'}</div>
+                <div className="dc-thread-sub">
+                  {driver?.truckId ? `Truck ${driver.truckId}` : 'No truck assigned'}
+                  {thread?.load && ` · running load ${thread.load.id}`}
+                </div>
               </div>
             </div>
 

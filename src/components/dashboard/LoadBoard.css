@@ -3,7 +3,15 @@
   border-collapse: collapse;
 }
 
+/* .panel clips its content; a wide table scrolls inside the panel instead
+   of losing its last columns. */
+.panel.load-board {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
 .load-board th {
+  white-space: nowrap;
   text-align: left;
   font-size: 10.5px;
   text-transform: uppercase;

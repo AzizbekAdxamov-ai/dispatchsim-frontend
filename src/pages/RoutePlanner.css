@@ -1,7 +1,8 @@
 .routes-page {
   display: grid;
-  grid-template-columns: 420px 1fr;
+  grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
   height: calc(100vh - var(--shell-chrome));
+  height: calc(100dvh - var(--shell-chrome));
   min-height: 480px;
   border: 1px solid var(--border-soft);
   border-radius: 10px;
@@ -325,9 +326,9 @@
   color: var(--text-2);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1023px) {
   .routes-page {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto 420px;
     height: auto;
   }

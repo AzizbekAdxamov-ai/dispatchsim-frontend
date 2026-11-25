@@ -16,6 +16,12 @@
   display: none;
 }
 
+@media (max-width: 767.98px) {
+  .section-tabs {
+    padding: 0 12px;
+  }
+}
+
 .section-tab {
   position: relative;
   display: flex;
