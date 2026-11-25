@@ -44,8 +44,11 @@
 
 .brand-sub {
   font-size: 10.5px;
+  line-height: 1.3;
+  letter-spacing: 0.02em;
   color: var(--text-3);
-  margin-top: 1px;
+  /* clear of the logo's own slogan */
+  margin-top: 4px;
 }
 
 .nav {
