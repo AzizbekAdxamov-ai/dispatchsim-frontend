@@ -20,7 +20,7 @@ import { useAuth } from '../../context/AuthContext'
 import { roleLabel } from '../../data/roleRoutes'
 import { locate, railLabel } from './navSections'
 import './Sidebar.css'
-import { BRAND } from '../../brand.js'
+import BrandLogo from '../BrandLogo.jsx'
 
 const DEFAULT_NAV_ITEMS = [
   { to: '/', icon: SquaresFour, label: 'Dashboard', end: true },
@@ -180,10 +180,11 @@ export default function Sidebar({ items = DEFAULT_NAV_ITEMS, sections, settings,
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           title={collapsed ? 'Expand sidebar (Ctrl+B)' : 'Collapse sidebar (Ctrl+B)'}
         >
-          <span className="brand-mark">{BRAND.shortName}</span>
+          {collapsed
+            ? <BrandLogo variant="mark" className="brand-rail-mark" />
+            : <BrandLogo className="brand-full-logo" />}
         </button>
         <div className="brand-text">
-          <div className="brand-name">{BRAND.name}</div>
           <div className="brand-sub">{brandSub}</div>
         </div>
       </div>

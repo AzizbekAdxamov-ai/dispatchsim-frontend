@@ -7,7 +7,7 @@ import { LOGIN_FEEDBACK } from '../data/loginFeedback'
 import { ApiError } from '../api/client'
 import truckBg from '../assets/truck-bg.webp'
 import './Login.css'
-import { BRAND } from '../brand.js'
+import BrandLogo from '../components/BrandLogo.jsx'
 
 function registerErrorMessage(err) {
   if (err instanceof ApiError) {
@@ -57,11 +57,7 @@ export default function Register() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, ease: 'easeOut' }}
       >
-        <div className="brand-mark">{BRAND.shortName}</div>
-        <div>
-          <div className="login-brand-text">{BRAND.name}</div>
-          <div className="login-brand-sub">{BRAND.tagline}</div>
-        </div>
+        <BrandLogo tone="dark" className="login-logo" />
       </motion.div>
 
       <motion.div

@@ -23,28 +23,23 @@
   padding: 20px 16px;
   border-bottom: 1px solid var(--border-soft);
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
 }
 
-.brand-mark {
-  width: 26px;
-  height: 26px;
-  background: var(--blue);
-  border-radius: 6px;
-  display: flex;
+.sidebar.collapsed .brand {
+  padding: 20px 10px;
   align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 13px;
-  color: var(--on-blue);
-  flex-shrink: 0;
 }
 
-.brand-name {
-  font-weight: 600;
-  font-size: 14px;
-  letter-spacing: 0.2px;
+/* Wordmark fills the expanded header; the GM mark fills the 60px rail. */
+.brand-full-logo {
+  width: 150px;
+}
+
+.brand-rail-mark {
+  width: 40px;
 }
 
 .brand-sub {
@@ -182,7 +177,7 @@
   flex-shrink: 0;
 }
 
-.brand-toggle:hover .brand-mark {
+.brand-toggle:hover .brand-logo {
   filter: brightness(1.12);
 }
 

@@ -2,7 +2,7 @@
 // repeating the literal, so a rename is a one-file change.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { readFileSync, readdirSync, statSync } from 'node:fs'
+import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { BRAND } from '../src/brand.js'
@@ -19,7 +19,7 @@ function files(dir) {
 
 // Kills: an empty constant (a blank logo/title).
 test('brand constants are filled', () => {
-  for (const k of ['name', 'shortName', 'tagline', 'logoAlt', 'favicon']) {
+  for (const k of ['name', 'shortName', 'slogan', 'tagline', 'description', 'logoAlt', 'favicon', 'favicon32', 'appleTouchIcon', 'ogImage', 'themeColor', 'logoWhite', 'logoWhite2x', 'logoDark', 'logoDark2x', 'mark']) {
     assert.ok(typeof BRAND[k] === 'string' && BRAND[k].trim(), k)
   }
 })
@@ -31,13 +31,31 @@ test('brand strings avoid the forbidden words', () => {
 
 // Kills: the name or monogram typed into a component instead of read from BRAND.
 test('no screen types the brand name or monogram', () => {
-  const found = files(join(root, 'src')).filter((f) => />(DispatchSim|DS)</.test(readFileSync(f, 'utf8')))
+  const found = files(join(root, 'src')).filter((f) => />(GrossMasters|GM)</.test(readFileSync(f, 'utf8')))
   assert.deepEqual(found, [])
 })
 
 // Kills: the page title and favicon going back to literals.
-test('index.html takes title and favicon from the brand', () => {
+test('index.html takes title, favicon and share card from the brand', () => {
   const html = readFileSync(join(root, 'index.html'), 'utf8')
   assert.ok(html.includes('%BRAND_NAME%'))
   assert.ok(html.includes('%BRAND_FAVICON%'))
+  assert.ok(html.includes('%BRAND_OG_IMAGE%'))
+  assert.ok(html.includes('%BRAND_THEME_COLOR%'))
+})
+
+// Kills: a brand path pointing at a file that was never shipped.
+test('every brand image exists in public/', () => {
+  for (const k of ['favicon', 'favicon32', 'appleTouchIcon', 'ogImage', 'logoWhite', 'logoWhite2x', 'logoDark', 'logoDark2x', 'mark']) {
+    assert.ok(existsSync(join(root, 'public', BRAND[k])), BRAND[k])
+  }
+})
+
+// Kills: the manifest drifting from the brand name or losing its icons.
+test('web manifest carries the brand name and maskable icons', () => {
+  const m = JSON.parse(readFileSync(join(root, 'public', 'manifest.webmanifest'), 'utf8'))
+  assert.equal(m.name, BRAND.name)
+  assert.equal(m.short_name, BRAND.name)
+  assert.ok(m.icons.some((i) => i.purpose === 'maskable'))
+  for (const i of m.icons) assert.ok(existsSync(join(root, 'public', i.src)), i.src)
 })

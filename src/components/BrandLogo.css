@@ -1,0 +1,46 @@
+/* Full logo: both theme images are rendered, the matching one is shown. */
+.brand-logo {
+  height: auto;
+  user-select: none;
+}
+
+.brand-logo--on-dark {
+  display: block;
+}
+
+.brand-logo--on-light {
+  display: none;
+}
+
+/* Pinned to its surface: always shown, whatever the theme. */
+img.brand-logo.brand-logo--pinned {
+  display: block;
+}
+
+:root[data-theme="light"] .brand-logo--on-dark:not(.brand-logo--pinned) {
+  display: none;
+}
+
+:root[data-theme="light"] .brand-logo--on-light:not(.brand-logo--pinned) {
+  display: block;
+}
+
+/* Mark alone. */
+.brand-logo--mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+}
+
+.brand-logo--mark img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+}
+
+:root[data-theme="light"] .brand-logo--mark {
+  background: var(--midnight);
+  padding: 6px 4px;
+}

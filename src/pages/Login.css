@@ -21,18 +21,10 @@
   gap: 10px;
 }
 
-.login-brand-text {
-  color: var(--login-ink);
-  font-weight: 600;
-  font-size: 15px;
-  letter-spacing: 0.2px;
-}
-
-.login-brand-sub {
-  color: var(--login-ink-2);
-  font-size: 10.5px;
-  opacity: 0.85;
-  margin-top: 1px;
+/* The sign-in surface is a photo under a navy scrim in both themes, so the
+   wordmark is pinned to its white variant. */
+.login-logo {
+  width: 190px;
 }
 
 .login-card {

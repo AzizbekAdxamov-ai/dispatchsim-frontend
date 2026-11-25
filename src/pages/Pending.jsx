@@ -7,7 +7,7 @@ import { ApiError } from '../api/client'
 import truckBg from '../assets/truck-bg.webp'
 import './Login.css'
 import './Pending.css'
-import { BRAND } from '../brand.js'
+import BrandLogo from '../components/BrandLogo.jsx'
 
 export default function Pending() {
   const { user, refreshUser, logout } = useAuth()
@@ -60,11 +60,7 @@ export default function Pending() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, ease: 'easeOut' }}
       >
-        <div className="brand-mark">{BRAND.shortName}</div>
-        <div>
-          <div className="login-brand-text">{BRAND.name}</div>
-          <div className="login-brand-sub">{BRAND.tagline}</div>
-        </div>
+        <BrandLogo tone="dark" className="login-logo" />
       </motion.div>
 
       <motion.div

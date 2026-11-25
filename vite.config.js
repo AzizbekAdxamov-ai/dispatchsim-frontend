@@ -2,12 +2,21 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { BRAND } from './src/brand.js'
 
-// Fills %BRAND_NAME% / %BRAND_FAVICON% in index.html from src/brand.js.
+// Fills the %BRAND_*% tokens in index.html from src/brand.js.
+const TOKENS = {
+  '%BRAND_NAME%': BRAND.name,
+  '%BRAND_SLOGAN%': BRAND.slogan,
+  '%BRAND_DESCRIPTION%': BRAND.description,
+  '%BRAND_FAVICON%': BRAND.favicon,
+  '%BRAND_FAVICON32%': BRAND.favicon32,
+  '%BRAND_APPLE_TOUCH_ICON%': BRAND.appleTouchIcon,
+  '%BRAND_OG_IMAGE%': BRAND.ogImage,
+  '%BRAND_THEME_COLOR%': BRAND.themeColor,
+}
 const brandHtml = {
   name: 'brand-html',
-  transformIndexHtml: (html) => html
-    .replaceAll('%BRAND_NAME%', BRAND.name)
-    .replaceAll('%BRAND_FAVICON%', BRAND.favicon),
+  transformIndexHtml: (html) =>
+    Object.entries(TOKENS).reduce((h, [k, v]) => h.replaceAll(k, v), html),
 }
 
 // https://vite.dev/config/

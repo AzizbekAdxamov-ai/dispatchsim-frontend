@@ -1,0 +1,47 @@
+import { BRAND } from '../brand.js'
+import './BrandLogo.css'
+
+// The product logo, read from src/brand.js.
+//   variant 'full' -- wordmark. tone 'auto' follows the theme (white wordmark
+//                     on dark, dark wordmark on light); 'dark' / 'light' pin it
+//                     to the surface it sits on (e.g. the sign-in photo card).
+//   variant 'mark' -- the GM mark alone. On the light theme it sits on a navy
+//                     tile, because lime on a pale surface is unreadable.
+// Both theme images are in the DOM and CSS picks one, so a theme switch never
+// waits on a network request or reflows the layout.
+export default function BrandLogo({ variant = 'full', tone = 'auto', className = '' }) {
+  const pinned = tone !== 'auto' ? 'brand-logo--pinned' : ''
+  const cls = (extra) => ['brand-logo', extra, pinned, className].filter(Boolean).join(' ')
+
+  if (variant === 'mark') {
+    return (
+      <span className={cls('brand-logo--mark')}>
+        <img src={BRAND.mark} alt={BRAND.logoAlt} draggable="false" />
+      </span>
+    )
+  }
+
+  const onDark = (
+    <img
+      key="on-dark"
+      className={cls('brand-logo--on-dark')}
+      src={BRAND.logoWhite}
+      srcSet={`${BRAND.logoWhite} 1x, ${BRAND.logoWhite2x} 2x`}
+      alt={BRAND.logoAlt}
+      draggable="false"
+    />
+  )
+  const onLight = (
+    <img
+      key="on-light"
+      className={cls('brand-logo--on-light')}
+      src={BRAND.logoDark}
+      srcSet={`${BRAND.logoDark} 1x, ${BRAND.logoDark2x} 2x`}
+      alt={BRAND.logoAlt}
+      draggable="false"
+    />
+  )
+  if (tone === 'dark') return onDark
+  if (tone === 'light') return onLight
+  return <>{onDark}{onLight}</>
+}
