@@ -8,7 +8,8 @@
   display: block;
 }
 
-.brand-logo--on-light {
+.brand-logo--on-light,
+.brand-logo--lockup {
   display: none;
 }
 
@@ -23,6 +24,35 @@ img.brand-logo.brand-logo--pinned {
 
 :root[data-theme="light"] .brand-logo--on-light:not(.brand-logo--pinned) {
   display: block;
+}
+
+/* Light theme lockup: navy tile with the GM mark + dark wordmark. */
+:root[data-theme="light"] .brand-logo--lockup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brand-lockup-tile {
+  flex: 0 0 44px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: var(--midnight);
+}
+
+.brand-lockup-tile img {
+  display: block;
+  width: 30px;
+  height: auto;
+}
+
+.brand-lockup-word {
+  display: block;
+  width: 124px;
+  height: auto;
 }
 
 /* Mark alone. */

@@ -21,4 +21,6 @@ export const BRAND = {
   logoDark: '/brand/logo-dark.png',
   logoDark2x: '/brand/logo-dark@2x.png',
   mark: '/brand/mark.png',
+  wordmarkDark: '/brand/wordmark-dark.png',
+  wordmarkDark2x: '/brand/wordmark-dark@2x.png',
 }

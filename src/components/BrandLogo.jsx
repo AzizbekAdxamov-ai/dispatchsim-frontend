@@ -7,6 +7,7 @@ import './BrandLogo.css'
 //                     to the surface it sits on (e.g. the sign-in photo card).
 //   variant 'mark' -- the GM mark alone. On the light theme it sits on a navy
 //                     tile, because lime on a pale surface is unreadable.
+// (The 'auto' light version is the tile + wordmark lockup.)
 // Both theme images are in the DOM and CSS picks one, so a theme switch never
 // waits on a network request or reflows the layout.
 export default function BrandLogo({ variant = 'full', tone = 'auto', className = '' }) {
@@ -33,7 +34,8 @@ export default function BrandLogo({ variant = 'full', tone = 'auto', className =
       draggable="false"
     />
   )
-  const onLight = (
+  // Pinned to a light surface: the full dark logo as-is.
+  const onLightFull = (
     <img
       key="on-light"
       className={cls('brand-logo--on-light')}
@@ -45,7 +47,26 @@ export default function BrandLogo({ variant = 'full', tone = 'auto', className =
       draggable="false"
     />
   )
+  // Light theme: lime on a pale surface is ~1.3:1, so the GM mark goes on a
+  // navy tile and the dark wordmark sits beside it. One accessible name: the
+  // tile image is decorative.
+  const lockup = (
+    <span key="lockup" className={cls('brand-logo--lockup')}>
+      <span className="brand-lockup-tile" aria-hidden="true">
+        <img src={BRAND.mark} alt="" width="512" height="220" draggable="false" />
+      </span>
+      <img
+        className="brand-lockup-word"
+        src={BRAND.wordmarkDark}
+        srcSet={`${BRAND.wordmarkDark} 1x, ${BRAND.wordmarkDark2x} 2x`}
+        alt={BRAND.logoAlt}
+        width="124"
+        height="20"
+        draggable="false"
+      />
+    </span>
+  )
   if (tone === 'dark') return onDark
-  if (tone === 'light') return onLight
-  return <>{onDark}{onLight}</>
+  if (tone === 'light') return onLightFull
+  return <>{onDark}{lockup}</>
 }
