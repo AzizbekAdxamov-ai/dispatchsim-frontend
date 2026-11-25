@@ -2,6 +2,7 @@ import { Outlet, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { GraduationCap } from '@phosphor-icons/react'
 import Sidebar from './Sidebar'
+import { SidebarProvider } from './SidebarContext'
 import Topbar from './Topbar'
 import SectionTabs from './SectionTabs'
 import LiveDataNotice from './LiveDataNotice'
@@ -29,32 +30,34 @@ export default function AppShell() {
     : titleFor(DISPATCH_SECTIONS, location.pathname, 'Dashboard')
 
   return (
-    <div className="app" style={{ position: 'relative', display: 'flex', minHeight: '100vh' }}>
-      <Sidebar sections={DISPATCH_SECTIONS} settings={DISPATCH_SETTINGS} extraBottom={extraBottom} />
-      <div className={'main'
-        + (hasSectionTabs(DISPATCH_SECTIONS, location.pathname) ? ' has-section-tabs' : '')
-        + (liveDataFailing ? ' has-live-notice' : '')} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-        <Topbar title={title} />
-        <SectionTabs sections={DISPATCH_SECTIONS} />
-        {/* Above the page, below the chrome: when the polls stop landing
-            every screen underneath is showing old data, so the notice
-            belongs to the shell rather than to any one of them. */}
-        <LiveDataNotice />
-        <div className="content" style={{ padding: '20px 24px 20px', overflowY: 'auto' }}>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={location.pathname}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.18, ease: 'easeOut' }}
-            >
-              <Outlet />
-            </motion.div>
-          </AnimatePresence>
+    <SidebarProvider>
+      <div className="app" style={{ position: 'relative', display: 'flex', minHeight: '100vh' }}>
+        <Sidebar sections={DISPATCH_SECTIONS} settings={DISPATCH_SETTINGS} extraBottom={extraBottom} />
+        <div className={'main'
+          + (hasSectionTabs(DISPATCH_SECTIONS, location.pathname) ? ' has-section-tabs' : '')
+          + (liveDataFailing ? ' has-live-notice' : '')} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+          <Topbar title={title} />
+          <SectionTabs sections={DISPATCH_SECTIONS} />
+          {/* Above the page, below the chrome: when the polls stop landing
+              every screen underneath is showing old data, so the notice
+              belongs to the shell rather than to any one of them. */}
+          <LiveDataNotice />
+          <div className="content content-tight">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={location.pathname}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.18, ease: 'easeOut' }}
+              >
+                <Outlet />
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </div>
-      </div>
 
-    </div>
+      </div>
+    </SidebarProvider>
   )
 }

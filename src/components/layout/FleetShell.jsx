@@ -2,6 +2,7 @@ import { Outlet, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Truck, Wrench, Warning, Gear, Storefront, ClipboardText } from '@phosphor-icons/react'
 import Sidebar from './Sidebar'
+import { SidebarProvider } from './SidebarContext'
 import Topbar from './Topbar'
 import LiveDataNotice from './LiveDataNotice'
 import { useLiveDataHealth } from '../../hooks/useLiveDataHealth'
@@ -32,25 +33,27 @@ export default function FleetShell() {
   const title = TITLES[location.pathname] ?? (location.pathname.startsWith('/fleet/trucks/') ? 'Truck statistics' : 'Fleet')
 
   return (
-    <div className="app" style={{ position: 'relative', display: 'flex', minHeight: '100vh' }}>
-      <Sidebar items={FLEET_NAV_ITEMS} brandSub="Fleet" />
-      <div className={'main' + (liveDataFailing ? ' has-live-notice' : '')} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-        <Topbar title={title} />
-        <LiveDataNotice />
-        <div className="content" style={{ padding: '20px 24px 60px', overflowY: 'auto' }}>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={location.pathname}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.18, ease: 'easeOut' }}
-            >
-              <Outlet />
-            </motion.div>
-          </AnimatePresence>
+    <SidebarProvider>
+      <div className="app" style={{ position: 'relative', display: 'flex', minHeight: '100vh' }}>
+        <Sidebar items={FLEET_NAV_ITEMS} brandSub="Fleet" />
+        <div className={'main' + (liveDataFailing ? ' has-live-notice' : '')} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+          <Topbar title={title} />
+          <LiveDataNotice />
+          <div className="content">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={location.pathname}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.18, ease: 'easeOut' }}
+              >
+                <Outlet />
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </div>
       </div>
-    </div>
+    </SidebarProvider>
   )
 }

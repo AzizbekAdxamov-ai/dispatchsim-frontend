@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from 'react'
-import { NavLink, useLocation } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { Link, NavLink, useLocation } from 'react-router-dom'
+import { AnimatePresence, LayoutGroup, motion, useIsPresent, useReducedMotion } from 'framer-motion'
 import {
   SquaresFour,
   Package,
@@ -15,9 +15,12 @@ import {
   ShieldCheck,
   CurrencyDollar,
   MagnifyingGlass,
+  X,
 } from '@phosphor-icons/react'
 import { useAuth } from '../../context/AuthContext'
-import { roleLabel } from '../../data/roleRoutes'
+import { roleLabel, settingsPathFor } from '../../data/roleRoutes'
+import { useFocusTrap } from '../../hooks/useFocusTrap'
+import { useSidebar } from './SidebarContext'
 import { locate, railLabel } from './navSections'
 import './Sidebar.css'
 import BrandLogo from '../BrandLogo.jsx'
@@ -38,6 +41,19 @@ const DEFAULT_NAV_ITEMS = [
   { to: '/settings', icon: Gear, label: 'Settings' },
 ]
 
+// Words the sidebar speaks that are not nav labels. Props, so a screen can
+// reword them; these are the defaults.
+export const SIDEBAR_COPY = {
+  menu: 'Menu',
+  openMenu: 'Open menu',
+  closeMenu: 'Close menu',
+  expand: 'Expand sidebar',
+  collapse: 'Collapse sidebar',
+  settings: 'Settings',
+}
+
+const DRAWER_EASE = [0.22, 1, 0.36, 1]
+
 function initials(name) {
   return name
     .split(' ')
@@ -52,13 +68,12 @@ function initials(name) {
 // opens every time; nothing depends on it.
 const COLLAPSE_KEY = 'ds.sidebar.collapsed'
 
-// No saved choice on a phone-width screen: start collapsed. The open rail is
-// 236px, which leaves a 390px screen almost no room for the page itself.
+// No saved choice: open. Narrow screens no longer fall back to collapsed
+// here -- below 1100px the layout picks the rail or the drawer by itself
+// (breakpoints.js) and never reads or writes this key.
 function readCollapsed() {
   try {
-    const saved = window.localStorage.getItem(COLLAPSE_KEY)
-    if (saved !== null) return saved === '1'
-    return window.matchMedia('(max-width: 700px)').matches
+    return window.localStorage.getItem(COLLAPSE_KEY) === '1'
   } catch {
     return false
   }
@@ -78,7 +93,7 @@ function isEditable(target) {
   return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target.isContentEditable
 }
 
-function NavEntry({ to, end, icon: Icon, label, shortLabel, badge, active, collapsed }) {
+function NavEntry({ to, end, icon: Icon, label, shortLabel, badge, active, collapsed, onNavigate }) {
   return (
     <NavLink
       to={to}
@@ -86,6 +101,7 @@ function NavEntry({ to, end, icon: Icon, label, shortLabel, badge, active, colla
       className={'nav-item' + (active ? ' active' : '')}
       aria-current={active ? 'page' : undefined}
       aria-label={collapsed ? label : undefined}
+      onClick={onNavigate}
     >
       {active && (
         <motion.div
@@ -103,17 +119,128 @@ function NavEntry({ to, end, icon: Icon, label, shortLabel, badge, active, colla
   )
 }
 
+// The inside of the sidebar -- brand, sections, bottom group, profile --
+// for both shapes it takes:
+//   'rail' -- 60px icons with a short label under each
+//   'full' -- logo and full labels (wide mode, and the drawer)
+// `brand` is the logo's button ({ label, title, expanded, onClick }), or
+// null for a plain logo (the drawer has its own close button).
+function SidebarPanel({ variant, entries, bottom, brandSub, brand, onClose, onNavigate, copy, user }) {
+  const collapsed = variant === 'rail'
+  const role = roleLabel(user?.activeRole)
+  const logo = collapsed
+    ? <BrandLogo variant="mark" className="brand-rail-mark" />
+    : <BrandLogo className="brand-full-logo" />
+
+  return (
+    <>
+      <div className="brand">
+        {brand ? (
+          <button
+            type="button"
+            className="brand-toggle"
+            onClick={brand.onClick}
+            aria-expanded={brand.expanded}
+            aria-label={brand.label}
+            title={brand.title}
+          >
+            {logo}
+          </button>
+        ) : (
+          <span className="brand-toggle brand-static">{logo}</span>
+        )}
+        <div className="brand-text">
+          <div className="brand-sub">{brandSub}</div>
+        </div>
+        {onClose && (
+          <button type="button" className="sidebar-close" onClick={onClose} aria-label={copy.closeMenu}>
+            <X size={18} aria-hidden="true" />
+          </button>
+        )}
+      </div>
+
+      <nav className="nav" aria-label="Sections">
+        {entries.map(({ key, ...entry }) => (
+          <NavEntry key={key} {...entry} collapsed={collapsed} onNavigate={onNavigate} />
+        ))}
+      </nav>
+
+      {bottom.length > 0 && (
+        <nav className="nav nav-bottom" aria-label="Settings">
+          {bottom.map(({ key, ...entry }) => (
+            <NavEntry key={key} {...entry} collapsed={collapsed} onNavigate={onNavigate} />
+          ))}
+        </nav>
+      )}
+
+      {/* The profile block opens Settings for the role you are in. Every
+          shell has it, including HR, Admin and Academy, which have no
+          Settings entry in their own menu. */}
+      <Link
+        to={settingsPathFor(user?.activeRole)}
+        className="sidebar-footer"
+        onClick={onNavigate}
+        aria-label={`${user?.name ?? '—'}, ${role}. ${copy.settings}`}
+        title={collapsed ? user?.name : undefined}
+      >
+        <div className="avatar" aria-hidden="true">{initials(user?.name ?? '')}</div>
+        <div className="sidebar-footer-text">
+          <div className="user-name">{user?.name ?? '—'}</div>
+          <div className="user-role">{role}</div>
+        </div>
+      </Link>
+    </>
+  )
+}
+
+// The menu as a dialog: slides in from the left over a scrim, traps focus,
+// closes on Esc / scrim / a link. Mounted by AnimatePresence, so it also
+// owns its exit; `isPresent` ends the focus trap the moment closing starts.
+function SidebarDrawer({ id, panelProps, onClose, copy, reduced }) {
+  const ref = useRef(null)
+  const isPresent = useIsPresent()
+  useFocusTrap(ref, isPresent, onClose)
+
+  return (
+    <motion.aside
+      ref={ref}
+      id={id}
+      className="sidebar sidebar-drawer"
+      role="dialog"
+      aria-modal="true"
+      aria-label={copy.menu}
+      initial={{ x: '-100%' }}
+      animate={{ x: 0 }}
+      exit={{ x: '-100%' }}
+      transition={{ duration: reduced ? 0 : 0.22, ease: DRAWER_EASE }}
+    >
+      {/* Own layout group: the drawer's active-row highlight must not
+          animate to or from the rail's one underneath. */}
+      <LayoutGroup id="drawer">
+        <SidebarPanel {...panelProps} variant="full" brand={null} onClose={onClose} onNavigate={onClose} />
+      </LayoutGroup>
+    </motion.aside>
+  )
+}
+
 // Two shapes of navigation:
 //   sections -- the dispatch workspace (navSections.js): one entry per
 //               section, linking to its first page; the section's other
 //               pages are tabs (SectionTabs). `settings` sits at the bottom.
 //   items    -- a flat list (Fleet, Finance, HR, Admin), unchanged.
-// Either way the logo collapses the sidebar to an icon rail and back,
-// and so does Ctrl/Cmd+B.
+// Three shapes of sidebar (breakpoints.js):
+//   wide   (>= 1100)  in the page; the logo collapses it to an icon rail
+//                     and back, and so does Ctrl/Cmd+B (remembered).
+//   rail   (768-1099) always the 60px rail, whatever was remembered (and
+//                     nothing is written); the logo and Ctrl/Cmd+B open
+//                     the menu as a drawer.
+//   drawer (< 768)    not in the page; the top bar's hamburger opens it.
 // `extraBottom`: more entries for the bottom group (the dispatch shell adds Academy).
-export default function Sidebar({ items = DEFAULT_NAV_ITEMS, sections, settings, brandSub = 'Dispatch operations', extraBottom = [] }) {
+export default function Sidebar({ items = DEFAULT_NAV_ITEMS, sections, settings, brandSub = 'Dispatch operations', extraBottom = [], copy = SIDEBAR_COPY }) {
   const { user } = useAuth()
   const { pathname } = useLocation()
+  const { mode, drawerOpen, openDrawer, closeDrawer } = useSidebar()
+  const reduced = useReducedMotion()
   const [collapsed, setCollapsed] = useState(readCollapsed)
 
   const toggle = useCallback(() => {
@@ -127,12 +254,14 @@ export default function Sidebar({ items = DEFAULT_NAV_ITEMS, sections, settings,
     function onKey(e) {
       if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.key.toLowerCase() === 'b' && !isEditable(e.target)) {
         e.preventDefault()
-        toggle()
+        if (mode === 'wide') toggle()
+        else if (drawerOpen) closeDrawer()
+        else openDrawer()
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [toggle])
+  }, [mode, drawerOpen, toggle, openDrawer, closeDrawer])
 
   const adminEntry = { to: '/admin', icon: ShieldCheck, label: 'Administration', shortLabel: 'Admin', end: true }
 
@@ -169,47 +298,56 @@ export default function Sidebar({ items = DEFAULT_NAV_ITEMS, sections, settings,
     bottom.push({ key: extra.to, ...extra, active: pathname.startsWith(extra.to) })
   }
 
+  const panelProps = { entries, bottom, brandSub, user, copy }
+
+  // Wide: the logo collapses. Rail: it opens the drawer instead.
+  const wide = mode === 'wide'
+  const railShape = wide ? collapsed : true
+  const brand = wide
+    ? {
+        onClick: toggle,
+        expanded: !collapsed,
+        label: collapsed ? copy.expand : copy.collapse,
+        title: `${collapsed ? copy.expand : copy.collapse} (Ctrl+B)`,
+      }
+    : {
+        onClick: openDrawer,
+        expanded: drawerOpen,
+        label: copy.expand,
+        title: `${copy.expand} (Ctrl+B)`,
+      }
+
   return (
-    <div className={'sidebar' + (collapsed ? ' collapsed' : '')}>
-      <div className="brand">
-        <button
-          type="button"
-          className="brand-toggle"
-          onClick={toggle}
-          aria-expanded={!collapsed}
-          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          title={collapsed ? 'Expand sidebar (Ctrl+B)' : 'Collapse sidebar (Ctrl+B)'}
-        >
-          {collapsed
-            ? <BrandLogo variant="mark" className="brand-rail-mark" />
-            : <BrandLogo className="brand-full-logo" />}
-        </button>
-        <div className="brand-text">
-          <div className="brand-sub">{brandSub}</div>
-        </div>
-      </div>
-
-      <nav className="nav" aria-label="Sections">
-        {entries.map(({ key, ...entry }) => (
-          <NavEntry key={key} {...entry} collapsed={collapsed} />
-        ))}
-      </nav>
-
-      {bottom.length > 0 && (
-        <nav className="nav nav-bottom" aria-label="Settings">
-          {bottom.map(({ key, ...entry }) => (
-            <NavEntry key={key} {...entry} collapsed={collapsed} />
-          ))}
-        </nav>
+    <>
+      {mode !== 'drawer' && (
+        <aside id="app-sidebar" className={'sidebar' + (railShape ? ' collapsed' : '')}>
+          <SidebarPanel {...panelProps} variant={railShape ? 'rail' : 'full'} brand={brand} />
+        </aside>
       )}
-
-      <div className="sidebar-footer" title={collapsed ? user?.name : undefined}>
-        <div className="avatar">{initials(user?.name ?? '')}</div>
-        <div className="sidebar-footer-text">
-          <div className="user-name">{user?.name ?? '—'}</div>
-          <div className="user-role">{roleLabel(user?.activeRole)}</div>
-        </div>
-      </div>
-    </div>
+      <AnimatePresence>
+        {drawerOpen && (
+          <motion.div
+            key="scrim"
+            className="sidebar-scrim"
+            aria-hidden="true"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: reduced ? 0 : 0.18 }}
+            onClick={closeDrawer}
+          />
+        )}
+        {drawerOpen && (
+          <SidebarDrawer
+            key="drawer"
+            id={mode === 'drawer' ? 'app-sidebar' : 'app-sidebar-drawer'}
+            panelProps={panelProps}
+            onClose={closeDrawer}
+            copy={copy}
+            reduced={reduced}
+          />
+        )}
+      </AnimatePresence>
+    </>
   )
 }

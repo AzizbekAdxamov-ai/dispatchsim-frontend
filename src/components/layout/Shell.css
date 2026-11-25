@@ -1,0 +1,25 @@
+/* The frame every shell shares. The padding lives here, not inline on
+   .content, so a media query can change it. The vertical numbers must stay
+   20 + 20 (+ the 52px topbar = --shell-chrome, tokens.css): every
+   full-height page sizes itself from that. */
+.app {
+  min-width: 0;
+}
+
+.content {
+  padding: 20px 24px 60px;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+/* Dispatch pages end at the window's edge, so no extra tail below them. */
+.content.content-tight {
+  padding-bottom: 20px;
+}
+
+@media (max-width: 767.98px) {
+  .content {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}

@@ -12,6 +12,7 @@
   position: sticky;
   top: 0;
   height: 100vh;
+  height: 100dvh;
   transition: width 0.18s ease;
 }
 
@@ -137,11 +138,23 @@
 }
 
 .sidebar-footer {
+  /* A link to Settings (the profile block). */
+  color: inherit;
+  text-decoration: none;
   padding: 12px 14px;
   border-top: 1px solid var(--border-soft);
   display: flex;
   align-items: center;
   gap: 9px;
+}
+
+.sidebar-footer:hover {
+  background: var(--panel-2);
+}
+
+.sidebar-footer:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: -2px;
 }
 
 .avatar {
@@ -244,4 +257,81 @@
   .sidebar {
     transition: none;
   }
+}
+
+/* ---- Narrow screens -------------------------------------------------
+   768-1099: always the 60px rail, whatever the saved choice (the JS side
+   renders it collapsed too; this keeps the first paint right).
+   < 768: nothing in the page -- the hamburger opens the drawer below. */
+@media (min-width: 768px) and (max-width: 1099px) {
+  .sidebar:not(.sidebar-drawer) {
+    width: 60px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .sidebar:not(.sidebar-drawer) {
+    display: none;
+  }
+}
+
+/* ---- Drawer ---------------------------------------------------------- */
+.sidebar-scrim {
+  position: fixed;
+  inset: 0;
+  background: var(--scrim);
+  z-index: 120;
+}
+
+.sidebar-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: min(280px, 85vw);
+  height: 100dvh;
+  z-index: 121;
+  box-shadow: 0 0 40px var(--shadow);
+  /* The panel animates in and out by transform; never its width. */
+  transition: none;
+}
+
+.sidebar-drawer .nav-item {
+  min-height: 44px;
+}
+
+.sidebar-drawer .brand {
+  position: relative;
+  padding-right: 56px;
+}
+
+.brand-static {
+  cursor: default;
+}
+
+.sidebar-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: none;
+  color: var(--text-2);
+  cursor: pointer;
+}
+
+.sidebar-close:hover {
+  background: var(--panel-2);
+  border-color: var(--border-soft);
+  color: var(--text);
+}
+
+/* The drawer's own scroll is the only one while it is open. */
+html.ds-scroll-locked,
+html.ds-scroll-locked body {
+  overflow: hidden;
 }
