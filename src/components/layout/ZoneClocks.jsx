@@ -23,10 +23,16 @@ export default function ZoneClocks() {
         <div
           className={'tz-item' + (z.company ? ' company' : '')}
           key={z.tz}
-          title={z.company ? 'Company time — every time in this app is on this clock' : undefined}
+          title={`${z.abbr} · ${z.city} · ${z.day}` + (z.company ? ' — company time, every time in this app is on this clock' : '')}
         >
           <span className="tz-time mono">{z.time}</span>
-          <span className="tz-zone">{z.abbr} · {z.city} · {z.day}</span>
+          {/* The abbreviation stays on a narrow bar; the city and day are
+              the part that gives way (Topbar.css), and the title above
+              always carries all of it. */}
+          <span className="tz-zone">
+            <span className="tz-abbr">{z.abbr}</span>
+            <span className="tz-meta"> · {z.city} · {z.day}</span>
+          </span>
         </div>
       ))}
     </div>

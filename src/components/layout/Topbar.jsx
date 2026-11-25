@@ -1,10 +1,11 @@
-import { Moon, Sun, MapTrifold, Package, MagnifyingGlass } from '@phosphor-icons/react'
+import { Moon, Sun, MapTrifold, Package, MagnifyingGlass, List } from '@phosphor-icons/react'
 import { NavLink } from 'react-router-dom'
 import { useTheme } from '../../theme/ThemeProvider'
 import WorkspaceSwitcher from './WorkspaceSwitcher'
 import CashChip from './CashChip'
 import AlertsBell from './AlertsBell'
 import ZoneClocks from './ZoneClocks'
+import { useSidebar } from './SidebarContext'
 // The order lives in its own plain-.js module (quickLinks.js) so
 // node:test can pin it -- node:test cannot import JSX, and an untestable
 // rule is a rule that is quietly reordered. Icons attach here, by `to`.
@@ -17,15 +18,34 @@ const LINK_ICONS = {
   '/map': MapTrifold,
 }
 
-export default function Topbar({ title }) {
+// Words on the bar that are not page titles. Props, so a screen can reword them.
+export const TOPBAR_COPY = {
+  openMenu: 'Open menu',
+  quickLinks: 'Quick links',
+  toggleTheme: 'Toggle theme',
+}
+
+export default function Topbar({ title, copy = TOPBAR_COPY }) {
   const { theme, toggleTheme } = useTheme()
+  const { drawerOpen, openDrawer } = useSidebar()
 
   return (
     <div className="topbar">
-      <div className="topbar-title">{title}</div>
+      {/* Only drawn below 768px, where the sidebar is not in the page. */}
+      <button
+        type="button"
+        className="icon-btn topbar-menu-btn"
+        aria-label={copy.openMenu}
+        aria-expanded={drawerOpen}
+        aria-controls="app-sidebar"
+        onClick={openDrawer}
+      >
+        <List size={20} aria-hidden="true" />
+      </button>
+      <div className="topbar-title" title={title}>{title}</div>
       {/* NavLink, not Link: the chip you are on reads as selected, not
           just tappable. */}
-      <nav className="topbar-links" aria-label="Quick links">
+      <nav className="topbar-links" aria-label={copy.quickLinks}>
         {QUICK_LINKS.map(({ to, label }) => {
           const Icon = LINK_ICONS[to] ?? Package
           return (
@@ -33,9 +53,11 @@ export default function Topbar({ title }) {
               key={to}
               to={to}
               className={({ isActive }) => 'topbar-link' + (isActive ? ' active' : '')}
+              aria-label={label}
+              title={label}
             >
               <Icon size={15} aria-hidden="true" />
-              <span>{label}</span>
+              <span className="topbar-link-label">{label}</span>
             </NavLink>
           )
         })}
@@ -52,7 +74,7 @@ export default function Topbar({ title }) {
       <CashChip />
       <WorkspaceSwitcher />
       <div className="topbar-icons">
-        <button className="icon-btn" onClick={toggleTheme} aria-label="Toggle theme">
+        <button className="icon-btn topbar-theme-btn" onClick={toggleTheme} aria-label={copy.toggleTheme}>
           {theme === 'dark' ? <Moon size={17} weight="fill" /> : <Sun size={17} weight="fill" />}
         </button>
         {/* The Messages button that used to sit here did nothing: no inbox

@@ -16,6 +16,10 @@ import './CashChip.css'
 // Polled, because money moves on a background tick — a load delivers and
 // fuel comes out, an invoice comes due and cash arrives — with nothing the
 // user clicked to cause it.
+// The standing, in the same words the chip prints, for the tooltip when the
+// chip itself has been narrowed to the amount (Topbar.css).
+const STATE_WORD = { over_limit: 'line used up', insolvent: 'insolvent' }
+
 function formatUsd(n) {
   if (n == null) return '—'
   const sign = n < 0 ? '-' : ''
@@ -54,7 +58,7 @@ export default function CashChip() {
   const state = data.standing?.state
 
   return (
-    <Link to="/cash" className="cash-chip" title="Company cash">
+    <Link to="/cash" className="cash-chip" title={STATE_WORD[state] ? `Company cash — ${STATE_WORD[state]}` : 'Company cash'}>
       <span className="cash-chip-label">Cash</span>
       <span className={`cash-chip-value mono ${negative ? 'neg' : ''}`}>
         {formatUsd(data.balance)}
