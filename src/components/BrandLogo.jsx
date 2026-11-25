@@ -16,7 +16,7 @@ export default function BrandLogo({ variant = 'full', tone = 'auto', className =
   if (variant === 'mark') {
     return (
       <span className={cls('brand-logo--mark')}>
-        <img src={BRAND.mark} alt={BRAND.logoAlt} draggable="false" />
+        <img src={BRAND.mark} alt={BRAND.logoAlt} width="512" height="220" draggable="false" />
       </span>
     )
   }
@@ -28,6 +28,8 @@ export default function BrandLogo({ variant = 'full', tone = 'auto', className =
       src={BRAND.logoWhite}
       srcSet={`${BRAND.logoWhite} 1x, ${BRAND.logoWhite2x} 2x`}
       alt={BRAND.logoAlt}
+      width="900"
+      height="102"
       draggable="false"
     />
   )
@@ -38,6 +40,8 @@ export default function BrandLogo({ variant = 'full', tone = 'auto', className =
       src={BRAND.logoDark}
       srcSet={`${BRAND.logoDark} 1x, ${BRAND.logoDark2x} 2x`}
       alt={BRAND.logoAlt}
+      width="900"
+      height="103"
       draggable="false"
     />
   )
