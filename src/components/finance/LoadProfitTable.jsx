@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { canOpenPath } from '../routeAccess'
 import { formatMoney, formatPlace } from '../../utils/format'
 import '../dashboard/Panel.css'
 import '../dashboard/Charts.css'
@@ -16,7 +17,7 @@ export default function LoadProfitTable({ loads }) {
   const navigate = useNavigate()
   const { user } = useAuth()
   // Load detail lives in the dispatcher workspace; finance-only users get plain rows.
-  const canOpenLoad = Boolean(user?.roles?.includes('dispatcher'))
+  const canOpenLoad = canOpenPath(user, '/loads')
 
   return (
     <div className="panel load-board">

@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowLeft, ChatCircleDots, ChalkboardTeacher, ListChecks, Moon, Notebook, Sun, X } from '@phosphor-icons/react'
 import { useTheme } from '../../theme/ThemeProvider'
 import { useAuth } from '../../context/AuthContext'
+import { canOpenPath } from '../../components/routeAccess'
 import { askAdvisor, getAcademyMe, saveProgress } from '../../api/academy'
 import { ACADEMY_COPY, canTeachClass } from '../../data/academyAccess'
 import { lessonByNo, lessonFile } from '../../data/academyLessons'
@@ -241,7 +242,9 @@ function LessonView({ lesson }) {
               </div>
               {/* All three stay mounted: the advisor's answer must survive closing the drawer. */}
               <div id="ac-drawer-task" hidden={shown !== 'task'}>
-                <Link className="ac-btn" to={lesson.simulatorPath}>{lesson.simulatorLabel}</Link>
+                {canOpenPath(user, lesson.simulatorPath) && (
+                  <Link className="ac-btn" to={lesson.simulatorPath}>{lesson.simulatorLabel}</Link>
+                )}
               </div>
               <div id="ac-drawer-advisor" hidden={shown !== 'advisor'}>
                 <Advisor lessonNo={no} state={advisor} setState={setAdvisor} />

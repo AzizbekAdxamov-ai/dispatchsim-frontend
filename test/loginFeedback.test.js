@@ -20,7 +20,7 @@ test('same-tick submits share one request; cooldown retains inputs and expires w
     inFlight, cooldownUntil, email: 'user@example.com', password: 'unchanged', remember: false,
     setError: v => state.error = v, setSubmitting: () => {}, setRemaining: v => state.remaining = v,
     login: (email, password, remember) => { calls++; assert.deepEqual([email, password, remember], ['user@example.com', 'unchanged', false]); return pending },
-    navigate: () => {}, roleHomePath: () => '/', passwordChangePath: () => '/settings', ApiError, cooldownSeconds, loginErrorMessage: e => e.message,
+    navigate: () => {}, homeFor: () => '/', passwordChangePath: () => '/settings', ApiError, cooldownSeconds, loginErrorMessage: e => e.message,
     e: { preventDefault() {} },
   }
   const run = () => new AsyncFunction(...Object.keys(env), `return (${source.slice(start, end).trim()})(e)`)(...Object.values(env))

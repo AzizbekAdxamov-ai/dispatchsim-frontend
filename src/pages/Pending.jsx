@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
-import { roleHomePath } from '../data/roleRoutes'
+import { homeFor } from '../components/routeGate'
 import { ApiError } from '../api/client'
 import truckBg from '../assets/truck-bg.webp'
 import './Login.css'
@@ -20,8 +20,8 @@ export default function Pending() {
   // the visibilitychange refresh in AuthContext keeps `user` current.
   useEffect(() => {
     if (!user) return
-    if (user.roles.length > 0) navigate(roleHomePath(user.activeRole), { replace: true })
-    else if (user.isAdmin) navigate('/admin', { replace: true })
+    const home = homeFor(user)
+    if (home !== '/pending') navigate(home, { replace: true })
   }, [user, navigate])
 
   async function handleCheckAgain() {
@@ -29,13 +29,9 @@ export default function Pending() {
     setChecking(true)
     try {
       const me = await refreshUser()
-      if (me.roles.length > 0) {
-        navigate(roleHomePath(me.activeRole))
-      } else if (me.isAdmin) {
-        navigate('/admin')
-      } else {
-        setNotice('No workspace assigned yet.')
-      }
+      const home = homeFor(me)
+      if (home !== '/pending') navigate(home)
+      else setNotice('No workspace assigned yet.')
     } catch (err) {
       if (err instanceof ApiError && err.code === 'NETWORK_ERROR') {
         setNotice('Cannot reach the server.')

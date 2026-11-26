@@ -52,6 +52,7 @@ export default function AccountSettings({
   idPrefix,
   roleText,
   passwordCopy = PASSWORD_COPY,
+  workspaceCopy = undefined,
   primaryExtra = null,
   secondaryExtra = null,
 }) {
@@ -116,7 +117,7 @@ export default function AccountSettings({
               <div className="panel-head"><div className="panel-title">{copy.workspaces}</div></div>
               <div className="settings-body">
                 {hasSeveralWorkspaces ? (
-                  <WorkspaceSwitcher />
+                  <WorkspaceSwitcher copy={workspaceCopy} />
                 ) : (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                     {sortRoles(roles).map((key) => (

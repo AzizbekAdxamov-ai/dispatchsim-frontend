@@ -3,6 +3,8 @@ import { Phone, Envelope } from '@phosphor-icons/react'
 import { FLEET_STATUS_LABEL } from '../data/fleetData'
 import { getTruck } from '../api/fleet'
 import { useResource } from '../hooks/useResource'
+import { useAuth } from '../context/AuthContext'
+import { canOpenPath } from '../components/routeAccess'
 import { driverChatPath, contactState } from '../utils/driverContact'
 import { CONTACT_INTENT } from '../data/driverContact'
 import AssignDriverPanel from '../components/fleet/AssignDriverPanel'
@@ -41,6 +43,7 @@ function Delta({ deltaPct, up, betterWhenUp = true }) {
 export default function TruckDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { user } = useAuth()
 
   const { data: truck, error, loading, refetch } = useResource((signal) => getTruck(id, signal), [id], { pollMs: 30000 })
 
@@ -111,6 +114,7 @@ export default function TruckDetail() {
             {truck.make} {truck.model} · {truck.year} · {formatMiles(truck.odometerMi)} on odometer
           </div>
         </div>
+        {canOpenPath(user, '/driver-chat') && (
         <div className="truck-detail-actions">
           <button
             type="button"
@@ -131,6 +135,7 @@ export default function TruckDetail() {
             <Phone size={14} aria-hidden="true" /> Call driver
           </button>
         </div>
+        )}
       </div>
 
       {/* A truck with nobody in it cannot move freight, and until now there

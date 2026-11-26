@@ -22,7 +22,7 @@ test('the admin panel stays admin-only', () => {
   const base = { status: 'authenticated', requireAdmin: true }
   assert.equal(routeRedirect({ ...base, user: { roles: ['dispatcher'] } }), '/')
   assert.equal(routeRedirect({ ...base, user: { roles: ['dispatcher'], academyAccess: true } }), '/')
-  assert.equal(routeRedirect({ ...base, user: { isMentor: true } }), '/pending')
+  assert.equal(routeRedirect({ ...base, user: { isMentor: true } }), '/academy')
   assert.equal(routeRedirect({ ...base, user: { isAdmin: true } }), null)
 })
 

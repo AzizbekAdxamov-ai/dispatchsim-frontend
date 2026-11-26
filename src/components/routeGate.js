@@ -1,13 +1,23 @@
 import { roleHomePath, settingsPathFor, sortRoles } from '../data/roleRoutes.js'
 import { hasAcademyAccess } from '../data/academyAccess.js'
 
+// The role a user is really working in: the active one if it is still granted,
+// else the first granted role. Null when they have none.
+export function effectiveRole(user) {
+  const roles = user?.roles ?? []
+  if (roles.length === 0) return null
+  return roles.includes(user?.activeRole) ? user.activeRole : sortRoles(roles)[0]
+}
+
 // Where a signed-in user belongs. Pure, and never '/' for someone who may not
 // open the dispatcher workspace, so a denied redirect can never loop.
 export function homeFor(user) {
   const roles = user?.roles ?? []
-  if (roles.length === 0) return user?.isAdmin ? '/admin' : '/pending'
-  const role = roles.includes(user?.activeRole) ? user.activeRole : sortRoles(roles)[0]
-  const path = roleHomePath(role)
+  if (roles.length === 0) {
+    if (user?.isAdmin) return '/admin'
+    return hasAcademyAccess(user) ? '/academy' : '/pending'
+  }
+  const path = roleHomePath(effectiveRole(user))
   if (path === '/' && !roles.includes('dispatcher')) return '/pending'
   return path
 }
@@ -20,7 +30,10 @@ export function passwordChangePath(user) {
     if (hasAcademyAccess(user)) return '/academy/settings'
     return '/pending'
   }
-  return settingsPathFor(user?.activeRole)
+  const path = settingsPathFor(effectiveRole(user))
+  // '/settings' is the dispatcher's page; anyone else is sent home instead.
+  if (path === '/settings' && !roles.includes('dispatcher')) return homeFor(user)
+  return path
 }
 
 // Where a route sends the visitor: 'wait' (auth still loading), a path to

@@ -19,7 +19,7 @@ test('requireMentor', () => {
 })
 
 test('requireAdmin and allow', () => {
-  assert.equal(routeRedirect({ status: 'authenticated', user: { isMentor: true }, requireAdmin: true }), '/pending')
+  assert.equal(routeRedirect({ status: 'authenticated', user: { isMentor: true }, requireAdmin: true }), '/academy')
   assert.equal(routeRedirect({ status: 'authenticated', user: { roles: ['hr'] }, allow: ['finance'] }), '/hr')
   assert.equal(routeRedirect({ status: 'authenticated', user: { roles: ['hr'] }, allow: ['hr'] }), null)
 })

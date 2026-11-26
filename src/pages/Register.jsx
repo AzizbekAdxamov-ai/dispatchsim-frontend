@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
-import { roleHomePath } from '../data/roleRoutes'
+import { homeFor } from '../components/routeGate'
 import { LOGIN_FEEDBACK } from '../data/loginFeedback'
 import { ApiError } from '../api/client'
 import truckBg from '../assets/truck-bg.webp'
@@ -41,7 +41,7 @@ export default function Register() {
     setSubmitting(true)
     try {
       const user = await register({ name, company, email, password, invite: invite || undefined })
-      navigate(roleHomePath(user.activeRole))
+      navigate(homeFor(user))
     } catch (err) {
       setError(registerErrorMessage(err))
     } finally {

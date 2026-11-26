@@ -20,7 +20,7 @@ test('the top bar does not render the workspace picker', () => {
 test('every Settings page is the shared account component, which offers the switch', () => {
   const shared = read('components/settings/AccountSettings.jsx')
   assert.match(shared, /import WorkspaceSwitcher from/)
-  assert.match(shared, /<WorkspaceSwitcher \/>/)
+  assert.match(shared, /<WorkspaceSwitcher[ >]/)
   for (const page of ['Settings', 'FleetSettings', 'FinanceSettings', 'HrSettings', 'AdminSettings', 'academy/AcademySettings']) {
     const src = read('pages/' + page + '.jsx')
     assert.match(src, /import AccountSettings.*from/, page)

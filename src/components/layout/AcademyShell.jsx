@@ -6,6 +6,7 @@ import { SidebarProvider } from './SidebarContext'
 import Topbar from './Topbar'
 import LiveDataNotice from './LiveDataNotice'
 import { useAuth } from '../../context/AuthContext'
+import { ACADEMY_BRAND_SUB, ACADEMY_SIDEBAR_COPY, ACADEMY_TOPBAR_COPY } from '../../data/academySettingsCopy'
 import { useLiveDataHealth } from '../../hooks/useLiveDataHealth'
 
 // One line per entry: test/railLabels.test.js reads this file as text.
@@ -53,9 +54,9 @@ export default function AcademyShell() {
   return (
     <SidebarProvider>
       <div className="app" style={{ position: 'relative', display: 'flex', minHeight: '100vh' }}>
-        <Sidebar items={items} brandSub="Academy" settingsTo="/academy/settings" />
+        <Sidebar items={items} brandSub={ACADEMY_BRAND_SUB} copy={ACADEMY_SIDEBAR_COPY} settingsTo="/academy/settings" />
         <div className={'main' + (liveDataFailing ? ' has-live-notice' : '')} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-          <Topbar title={titleFor(location.pathname)} variant="minimal" />
+          <Topbar title={titleFor(location.pathname)} variant="minimal" copy={ACADEMY_TOPBAR_COPY} />
           <LiveDataNotice />
           <div className="content">
             <AnimatePresence mode="wait">

@@ -19,6 +19,8 @@ const FINANCE_SETTINGS_COPY = {
   sub: 'Manage your profile, cost assumptions and account',
 }
 
+const ROLE_TEXT = 'Finance'
+
 const PERCENT_FACTOR = 100
 
 function money(value, suffix) {
@@ -59,5 +61,5 @@ export default function FinanceSettings() {
     </div>
   )
 
-  return <AccountSettings idPrefix="fis" copy={FINANCE_SETTINGS_COPY} secondaryExtra={costPanel} />
+  return <AccountSettings idPrefix="fis" roleText={ROLE_TEXT} copy={FINANCE_SETTINGS_COPY} secondaryExtra={costPanel} />
 }

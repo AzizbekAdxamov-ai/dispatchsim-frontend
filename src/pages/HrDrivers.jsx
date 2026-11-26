@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { canOpenPath } from '../components/routeAccess'
 import { AnimatePresence, motion } from 'framer-motion'
 import { MagnifyingGlass } from '@phosphor-icons/react'
 import { listDrivers } from '../api/drivers'
@@ -26,7 +27,7 @@ export default function HrDrivers() {
   const navigate = useNavigate()
   const { user } = useAuth()
   // The driver profile lives in the dispatcher workspace; other roles see plain names.
-  const canOpenDriver = Boolean(user?.roles?.includes('dispatcher'))
+  const canOpenDriver = canOpenPath(user, '/drivers')
   const [query, setQuery] = useState('')
 
   const { data, error, loading, refreshing } = useResource(

@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
 import { ArrowUpRight, Check, ArrowCounterClockwise } from '@phosphor-icons/react'
+import { useAuth } from '../../context/AuthContext'
+import { canOpenPath } from '../routeAccess'
 import './AlertList.css'
 
 // One shared list, used by the Alerts page and the top-bar panel.
@@ -17,6 +19,7 @@ function formatUsd(n) {
 }
 
 export default function AlertList({ alerts, onAck, onUnack, busyKey, emptyLabel }) {
+  const { user } = useAuth()
   if (alerts.length === 0) {
     return <div className="alert-list-empty">{emptyLabel}</div>
   }
@@ -35,9 +38,12 @@ export default function AlertList({ alerts, onAck, onUnack, busyKey, emptyLabel 
             {/* What is at stake, not how bad it is. */}
             {stake && <div className="alert-row-stake mono">{stake}</div>}
             <div className="alert-row-actions">
-              <Link className="alert-row-link" to={a.href} title="Open">
-                <ArrowUpRight size={15} />
-              </Link>
+              {/* No link where the target is another workspace's page. */}
+              {canOpenPath(user, a.href) && (
+                <Link className="alert-row-link" to={a.href} title="Open">
+                  <ArrowUpRight size={15} />
+                </Link>
+              )}
               {onAck && (
                 <button
                   className="alert-row-btn"

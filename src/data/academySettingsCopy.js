@@ -49,3 +49,28 @@ export const PASSWORD_COPY_UZ = {
     unknown: 'Nimadir xato ketdi. Qayta urinib ko‘ring.',
   },
 }
+
+// The workspace buttons' own words (WorkspaceSwitcher's `copy`).
+export const ACADEMY_WORKSPACE_COPY = {
+  label: 'Ish joylari',
+  notGranted: 'Bu ish joyi endi sizga berilmagan.',
+  failed: 'Ish joyini almashtirib bo‘lmadi. Qayta urinib ko‘ring.',
+}
+
+// The sidebar and top bar speak Uzbek inside the Academy.
+export const ACADEMY_SIDEBAR_COPY = {
+  menu: 'Menyu',
+  openMenu: 'Menyuni ochish',
+  closeMenu: 'Menyuni yopish',
+  expand: 'Yon panelni yoyish',
+  collapse: 'Yon panelni yig‘ish',
+  settings: 'Sozlamalar',
+}
+
+export const ACADEMY_TOPBAR_COPY = {
+  openMenu: 'Menyuni ochish',
+  quickLinks: 'Tezkor havolalar',
+  toggleTheme: 'Mavzuni almashtirish',
+}
+
+export const ACADEMY_BRAND_SUB = 'Akademiya'
