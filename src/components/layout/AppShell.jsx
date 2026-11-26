@@ -32,7 +32,7 @@ export default function AppShell() {
   return (
     <SidebarProvider>
       <div className="app" style={{ position: 'relative', display: 'flex', minHeight: '100vh' }}>
-        <Sidebar sections={DISPATCH_SECTIONS} settings={DISPATCH_SETTINGS} extraBottom={extraBottom} />
+        <Sidebar sections={DISPATCH_SECTIONS} settings={DISPATCH_SETTINGS} extraBottom={extraBottom} brandSub="Dispatch operations" />
         <div className={'main'
           + (hasSectionTabs(DISPATCH_SECTIONS, location.pathname) ? ' has-section-tabs' : '')
           + (liveDataFailing ? ' has-live-notice' : '')} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>

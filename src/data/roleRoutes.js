@@ -29,6 +29,7 @@ export const ROLE_HOME = {
 export const ROLE_SETTINGS = {
   'fleet-manager': '/fleet/settings',
   finance: '/finance/settings',
+  hr: '/hr/settings',
 }
 
 export function settingsPathFor(roleKey) {

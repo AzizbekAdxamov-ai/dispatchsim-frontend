@@ -17,15 +17,19 @@ test('the top bar does not render the workspace picker', () => {
   assert.doesNotMatch(read('components/layout/Topbar.css'), /workspace-switcher/)
 })
 
-test('all three Settings pages offer it', () => {
-  for (const page of ['Settings', 'FleetSettings', 'FinanceSettings']) {
-    assert.match(read(`pages/${page}.jsx`), /import WorkspaceSwitcher from/, page)
-    assert.match(read(`pages/${page}.jsx`), /<WorkspaceSwitcher \/>/, page)
+test('every Settings page is the shared account component, which offers the switch', () => {
+  const shared = read('components/settings/AccountSettings.jsx')
+  assert.match(shared, /import WorkspaceSwitcher from/)
+  assert.match(shared, /<WorkspaceSwitcher \/>/)
+  for (const page of ['Settings', 'FleetSettings', 'FinanceSettings', 'HrSettings', 'AdminSettings', 'academy/AcademySettings']) {
+    const src = read('pages/' + page + '.jsx')
+    assert.match(src, /import AccountSettings.*from/, page)
+    assert.match(src, /<AccountSettings/, page)
   }
 })
 
 test('the Settings copy no longer points at the top bar', () => {
-  assert.doesNotMatch(read('pages/Settings.jsx'), /top bar/i)
+  assert.doesNotMatch(read('components/settings/AccountSettings.jsx'), /top bar/i)
 })
 
 test('the switcher is a button group with a pressed state, 40px tall', () => {

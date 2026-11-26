@@ -1,6 +1,6 @@
 import { Outlet, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { UserPlus, SteeringWheel } from '@phosphor-icons/react'
+import { UserPlus, SteeringWheel, Gear } from '@phosphor-icons/react'
 import Sidebar from './Sidebar'
 import { SidebarProvider } from './SidebarContext'
 import Topbar from './Topbar'
@@ -12,6 +12,7 @@ import { useResource } from '../../hooks/useResource'
 const TITLES = {
   '/hr': 'Applicant market',
   '/hr/drivers': 'Hired drivers',
+  '/hr/settings': 'Settings',
 }
 
 export default function HrShell() {
@@ -34,6 +35,7 @@ export default function HrShell() {
   const HR_NAV_ITEMS = [
     { to: '/hr', icon: UserPlus, label: 'Applicant market', shortLabel: 'Market', end: true, badge: openCount },
     { to: '/hr/drivers', icon: SteeringWheel, label: 'Hired drivers', shortLabel: 'Drivers' },
+    { to: '/hr/settings', icon: Gear, label: 'Settings' },
   ]
 
   return (

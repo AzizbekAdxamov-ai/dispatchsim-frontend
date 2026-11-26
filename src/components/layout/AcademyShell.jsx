@@ -1,6 +1,6 @@
 import { Outlet, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { GraduationCap, UsersThree, SquaresFour } from '@phosphor-icons/react'
+import { GraduationCap, UsersThree, SquaresFour, Gear } from '@phosphor-icons/react'
 import Sidebar from './Sidebar'
 import { SidebarProvider } from './SidebarContext'
 import Topbar from './Topbar'
@@ -15,6 +15,9 @@ const STUDENT_NAV = [
 const MENTOR_NAV = [
   { to: '/academy/mentor', icon: UsersThree, label: 'Mentor' },
 ]
+const SETTINGS_NAV = [
+  { to: '/academy/settings', icon: Gear, label: 'Sozlamalar', shortLabel: 'Sozlama' },
+]
 const WORKSPACE_NAV = [
   { to: '/', icon: SquaresFour, label: 'Ish joyi', end: true },
 ]
@@ -23,6 +26,7 @@ function titleFor(pathname) {
   if (pathname.startsWith('/academy/lesson/')) return 'Dars'
   if (pathname.startsWith('/academy/mentor/students/')) return 'O‘quvchi'
   if (pathname.startsWith('/academy/mentor')) return 'Mentor'
+  if (pathname === '/academy/settings') return 'Sozlamalar'
   return 'Darslar'
 }
 
@@ -31,7 +35,9 @@ export default function AcademyShell() {
   const { user } = useAuth()
   const liveDataFailing = useLiveDataHealth().failingCount > 0
   const isMentor = user?.isMentor || user?.isAdmin
-  const items = [...STUDENT_NAV, ...(isMentor ? MENTOR_NAV : []), ...WORKSPACE_NAV]
+  // The workspace link is for people who have one; a role-less member would bounce.
+  const hasWorkspace = (user?.roles?.length ?? 0) > 0
+  const items = [...STUDENT_NAV, ...(isMentor ? MENTOR_NAV : []), ...SETTINGS_NAV, ...(hasWorkspace ? WORKSPACE_NAV : [])]
   // A lesson fills the whole window: no sidebar, topbar or page padding.
   // No transformed wrapper either, so the lesson's fixed drawer stays anchored.
   const focus = location.pathname.startsWith('/academy/lesson/')
@@ -47,7 +53,7 @@ export default function AcademyShell() {
   return (
     <SidebarProvider>
       <div className="app" style={{ position: 'relative', display: 'flex', minHeight: '100vh' }}>
-        <Sidebar items={items} brandSub="Academy" />
+        <Sidebar items={items} brandSub="Academy" settingsTo="/academy/settings" />
         <div className={'main' + (liveDataFailing ? ' has-live-notice' : '')} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
           <Topbar title={titleFor(location.pathname)} variant="minimal" />
           <LiveDataNotice />

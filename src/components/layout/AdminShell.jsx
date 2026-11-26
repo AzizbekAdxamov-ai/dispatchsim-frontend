@@ -1,6 +1,6 @@
 import { Outlet, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { UsersThree, Ticket, GraduationCap } from '@phosphor-icons/react'
+import { UsersThree, Ticket, GraduationCap, Gear } from '@phosphor-icons/react'
 import Sidebar from './Sidebar'
 import { SidebarProvider } from './SidebarContext'
 import Topbar from './Topbar'
@@ -11,11 +11,13 @@ const ADMIN_NAV_ITEMS = [
   { to: '/admin', icon: UsersThree, label: 'Users', end: true },
   { to: '/admin/invites', icon: Ticket, label: 'Invite codes', shortLabel: 'Invites' },
   { to: '/academy', icon: GraduationCap, label: 'Academy' },
+  { to: '/admin/settings', icon: Gear, label: 'Settings' },
 ]
 
 const TITLES = {
   '/admin': 'Users',
   '/admin/invites': 'Invite codes',
+  '/admin/settings': 'Settings',
 }
 
 export default function AdminShell() {
@@ -28,7 +30,7 @@ export default function AdminShell() {
   return (
     <SidebarProvider>
       <div className="app" style={{ position: 'relative', display: 'flex', minHeight: '100vh' }}>
-        <Sidebar items={ADMIN_NAV_ITEMS} brandSub="Administration" />
+        <Sidebar items={ADMIN_NAV_ITEMS} brandSub="Administration" settingsTo="/admin/settings" />
         <div className={'main' + (liveDataFailing ? ' has-live-notice' : '')} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
           <Topbar title={title} variant="minimal" />
           <LiveDataNotice />

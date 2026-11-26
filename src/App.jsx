@@ -53,6 +53,9 @@ import HrShell from './components/layout/HrShell'
 import HrApplicants from './pages/HrApplicants'
 import HrApplicantDetail from './pages/HrApplicantDetail'
 import HrDrivers from './pages/HrDrivers'
+import HrSettings from './pages/HrSettings'
+import AdminSettings from './pages/AdminSettings'
+import AcademySettings from './pages/academy/AcademySettings'
 import AcademyShell from './components/layout/AcademyShell'
 import AcademyHome from './pages/academy/AcademyHome'
 import AcademyLesson from './pages/academy/AcademyLesson'
@@ -146,6 +149,7 @@ export default function App() {
             <Route index element={<HrApplicants />} />
             <Route path="applicants/:id" element={<HrApplicantDetail />} />
             <Route path="drivers" element={<HrDrivers />} />
+            <Route path="settings" element={<HrSettings />} />
           </Route>
           <Route
             path="/admin"
@@ -157,6 +161,7 @@ export default function App() {
           >
             <Route index element={<AdminUsers />} />
             <Route path="invites" element={<AdminInvites />} />
+            <Route path="settings" element={<AdminSettings />} />
           </Route>
           <Route path="/academy/class/:no" element={<ProtectedRoute requireMentor><AcademyClass /></ProtectedRoute>} />
           <Route
@@ -169,6 +174,7 @@ export default function App() {
           >
             <Route index element={<AcademyHome />} />
             <Route path="lesson/:no" element={<AcademyLesson />} />
+            <Route path="settings" element={<AcademySettings />} />
             <Route path="mentor" element={<ProtectedRoute requireMentor><MentorDashboard /></ProtectedRoute>} />
             <Route path="mentor/students/:id" element={<ProtectedRoute requireMentor><MentorStudent /></ProtectedRoute>} />
           </Route>

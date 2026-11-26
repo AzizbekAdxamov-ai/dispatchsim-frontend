@@ -125,7 +125,7 @@ function NavEntry({ to, end, icon: Icon, label, shortLabel, badge, active, colla
 //   'full' -- logo and full labels (wide mode, and the drawer)
 // `brand` is the logo's button ({ label, title, expanded, onClick }), or
 // null for a plain logo (the drawer has its own close button).
-function SidebarPanel({ variant, entries, bottom, brandSub, brand, onClose, onNavigate, copy, user }) {
+function SidebarPanel({ variant, entries, bottom, brandSub, brand, onClose, onNavigate, copy, user, settingsTo }) {
   const collapsed = variant === 'rail'
   const role = roleLabel(user?.activeRole)
   const logo = collapsed
@@ -173,11 +173,10 @@ function SidebarPanel({ variant, entries, bottom, brandSub, brand, onClose, onNa
         </nav>
       )}
 
-      {/* The profile block opens Settings for the role you are in. Every
-          shell has it, including HR, Admin and Academy, which have no
-          Settings entry in their own menu. */}
+      {/* The profile block opens Settings: `settingsTo` when the shell names its
+          own page (Admin, Academy), else the page of the role you are in. */}
       <Link
-        to={settingsPathFor(user?.activeRole)}
+        to={settingsTo ?? settingsPathFor(user?.activeRole)}
         className="sidebar-footer"
         onClick={onNavigate}
         aria-label={`${user?.name ?? '—'}, ${role}. ${copy.settings}`}
@@ -236,7 +235,7 @@ function SidebarDrawer({ id, panelProps, onClose, copy, reduced }) {
 //                     the menu as a drawer.
 //   drawer (< 768)    not in the page; the top bar's hamburger opens it.
 // `extraBottom`: more entries for the bottom group (the dispatch shell adds Academy).
-export default function Sidebar({ items = DEFAULT_NAV_ITEMS, sections, settings, brandSub = 'Dispatch operations', extraBottom = [], copy = SIDEBAR_COPY }) {
+export default function Sidebar({ items = DEFAULT_NAV_ITEMS, sections, settings, brandSub = '', extraBottom = [], copy = SIDEBAR_COPY, settingsTo }) {
   const { user } = useAuth()
   const { pathname } = useLocation()
   const { mode, drawerOpen, openDrawer, closeDrawer } = useSidebar()
@@ -298,7 +297,7 @@ export default function Sidebar({ items = DEFAULT_NAV_ITEMS, sections, settings,
     bottom.push({ key: extra.to, ...extra, active: pathname.startsWith(extra.to) })
   }
 
-  const panelProps = { entries, bottom, brandSub, user, copy }
+  const panelProps = { entries, bottom, brandSub, user, copy, settingsTo }
 
   // Wide: the logo collapses. Rail: it opens the drawer instead.
   const wide = mode === 'wide'
