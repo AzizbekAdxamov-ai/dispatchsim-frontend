@@ -1,24 +1,114 @@
 /* Hero scene: night road, exit signs and the GrossMasters billboard.
    One shared component for every lesson. It finds `svg.scene[data-signs]`,
-   builds the whole scene on top of the static fallback markup, and leaves the
-   fallback visible if anything fails. Nothing is exposed globally. */
+   builds the whole scene on top of the static fallback markup, and brings the
+   fallback back if anything fails. Nothing is exposed globally.
+   The layout math lives in HS_PURE (no DOM) so node tests can check the geometry;
+   it is exported only where `module` exists (never in the browser). */
 (function () {
-  var root = null;
-  try {
-    var svg = document.querySelector('svg.scene[data-signs]');
-    if (!svg) return;
-    var raw = JSON.parse(svg.getAttribute('data-signs'));
-    if (!raw || !raw.length) return;
-
-    var NS = 'http://www.w3.org/2000/svg', W = 880;
-    var GAP = 52, BGAP = 100, BW = 300, EMPTY = 636;      // dynamic rhythm
-    var SGAP = 16, SBGAP = 24, MARGIN = 8;                 // tight static gaps
-    var MINW = 48, MAXW = 96, PAD = 16;
+  var HS_PURE = (function () {
+    var K = {
+      W: 880, GAP: 52, BGAP: 100, BW: 300, EMPTY: 636,       // dynamic rhythm
+      SGAP: 16, SBGAP: 24, MARGIN: 8,                          // tight static gaps
+      MINW: 48, MAXW: 96, PAD: 16, LMIN: 7, VMIN: 20, L0: 9, V0: 30,
+      NARROW_X0: 60, NARROW_X1: 680, NARROW_SCALE: 1.25, SCALE_MIN: 0.85
+    };
     var TONES = {
       good: { lit: '#DCFBE7', ink: '#14683A', glow: '#4ADE80' },
       warn: { lit: '#FFF0B8', ink: '#8A5A00', glow: '#F2B705' },
       neutral: { lit: '#FFFBE6', ink: '#111111', glow: '#F6E7A6' }
     };
+    function mod(v, m) { return ((v % m) + m) % m; }
+    function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+    function tone(value, tn) {
+      if (TONES[tn]) return tn;
+      return value.indexOf('\u2713') >= 0 ? 'good' : (/[!?]/.test(value) ? 'warn' : 'neutral');
+    }
+    function widthOf(lw, vw) { return Math.ceil(clamp(Math.max(lw, vw) + K.PAD, K.MINW, K.MAXW) * 10 - 1e-9) / 10; }   // round up: never narrower than the text
+    // measure(kind, fontSize) -> text width ('label' | 'value'); shrinks value 30 -> 20 and label 9 -> 7
+    // until text + padding fits the widest face (96). `c` is the compact variant (smallest sizes).
+    function sizeSign(measure) {
+      function m(l, v) { return { lw: measure('label', l), vw: measure('value', v) }; }
+      var lfs = K.L0, vfs = K.V0, r = m(lfs, vfs);
+      while (r.lw + K.PAD > K.MAXW && lfs > K.LMIN) { lfs -= 1; r = m(lfs, vfs); }
+      while (r.vw + K.PAD > K.MAXW && vfs > K.VMIN) { vfs -= 2; r = m(lfs, vfs); }
+      var cr = m(K.LMIN, K.VMIN);
+      return {
+        n: { lfs: lfs, vfs: vfs, w: widthOf(r.lw, r.vw), sqL: false, sqV: false },
+        c: { lfs: K.LMIN, vfs: K.VMIN, w: widthOf(cr.lw, cr.vw), sqL: false, sqV: false }
+      };
+    }
+    // moving layout: centers of the signs and the board, and the loop length
+    function cycle(ws) {
+      var l = 0, lastRight = 0, centers = [];
+      ws.forEach(function (w, i) { centers[i] = l + w / 2; lastRight = l + w; l += w + K.GAP; });
+      var bbCenter = lastRight + K.BGAP + K.BW / 2;
+      return { centers: centers, bbCenter: bbCenter, cyc: Math.round(bbCenter + K.BW / 2 + ws[0] / 2 + K.EMPTY) };
+    }
+    function positions(cy, o) {
+      return {
+        xs: cy.centers.map(function (c) { return mod(c + 900 - o, cy.cyc) - 160; }),
+        bx: mod(cy.bbCenter + 900 - o, cy.cyc) - 160
+      };
+    }
+    // places signs from `from` and the board by edge gaps, starting at 0
+    function arrange(from, gap, bgap, ws, sc) {
+      var l = 0, xs = [], lastRight = 0;
+      for (var i = from; i < ws.length; i++) { xs[i] = l + ws[i] / 2; lastRight = l + ws[i]; l += ws[i] + gap; }
+      var half = K.BW / 2 * sc;                          // gap is measured to the board's visible (scaled) edge
+      var bx = lastRight + bgap + half;
+      return { xs: xs, bx: bx, left: xs[from] - ws[from] / 2, right: bx + half };
+    }
+    // reduced motion: one still frame with every sign and the board inside the view.
+    // order: fit -> tight gaps -> tight + smaller board (down to 0.85) -> compact first sign -> drop first (last resort)
+    function staticFrame(ws, cws, narrow) {
+      var vx0 = narrow ? K.NARROW_X0 : 0, vx1 = narrow ? K.NARROW_X1 : K.W, room = vx1 - vx0 - 2 * K.MARGIN;
+      var base = narrow ? K.NARROW_SCALE : 1, n = ws.length, scales = [];
+      for (var sc = base - 0.05; sc >= K.SCALE_MIN - 1e-9; sc -= 0.05) scales.push(Math.round(sc * 100) / 100);
+      if (!scales.length || scales[scales.length - 1] > K.SCALE_MIN) scales.push(K.SCALE_MIN);
+      var kind = 'fit', board = base, w2 = ws, from = 0;
+      var a = arrange(0, K.GAP, K.BGAP, w2, board);
+      function over() { return a.right - a.left > room; }
+      if (over()) { kind = 'tight'; a = arrange(0, K.SGAP, K.SBGAP, w2, board); }
+      for (var i = 0; over() && i < scales.length; i++) {
+        kind = 'tight-board'; board = scales[i]; a = arrange(0, K.SGAP, K.SBGAP, w2, board);
+      }
+      if (over()) {
+        kind = 'compact'; board = K.SCALE_MIN; w2 = ws.slice(); w2[0] = Math.min(w2[0], cws[0]);
+        a = arrange(0, K.SGAP, K.SBGAP, w2, board);
+      }
+      if (over()) {
+        kind = 'drop-first'; w2 = ws; from = Math.min(1, n - 1);
+        for (var j = -1; j < scales.length; j++) {
+          board = j < 0 ? base : scales[j]; a = arrange(from, K.SGAP, K.SBGAP, w2, board);
+          if (!over()) break;
+        }
+      }
+      var shift = kind === 'drop-first' ? (vx1 - K.MARGIN - a.right) : (vx0 + K.MARGIN + (room - (a.right - a.left)) / 2 - a.left);
+      var xs = [];
+      for (var k = 0; k < n; k++) xs[k] = (a.xs[k] === undefined) ? null : a.xs[k] + shift;
+      return { kind: kind, board: board, xs: xs, bx: a.bx + shift, ws: w2, vx0: vx0, vx1: vx1 };
+    }
+    return { K: K, TONES: TONES, mod: mod, tone: tone, widthOf: widthOf, sizeSign: sizeSign, cycle: cycle, positions: positions, staticFrame: staticFrame };
+  })();
+
+  function run() {
+    var root = null, svg = null, fbs = [], raf = 0, dead = false, halted = false;
+    function ignore(e) { return e; }        // expected failures (hidden element has no text length)
+    function fail(e) {                       // real failures leave a trace for the check script / devtools
+      try { if (svg) svg.setAttribute('data-hs-error', String((e && e.message) || e)); } catch (_x) { ignore(_x); }
+      try { if (window.console && console.error) console.error('hero-scene:', e); } catch (_y) { ignore(_y); }
+    }
+    try {
+      svg = document.querySelector('svg.scene[data-signs]');
+      if (!svg) return;
+      var raw = JSON.parse(svg.getAttribute('data-signs'));
+      if (!raw || !raw.length) return;
+      // hide (not delete) the static fallback: it comes back if the setup fails, and goes for good after it worked
+      fbs = Array.prototype.slice.call(svg.querySelectorAll('[data-hs-fallback]'));
+      fbs.forEach(function (f) { f.style.display = 'none'; });
+
+      var HS = HS_PURE, K = HS.K, NS = 'http://www.w3.org/2000/svg', W = K.W, BW = K.BW;
+      var TONES = HS.TONES, LMIN = K.LMIN, VMIN = K.VMIN;
 
     // ---- styles (once) ----
     if (!document.getElementById('hs-style')) {
@@ -56,7 +146,6 @@
     }
     function hash(n) { var x = Math.sin(n * 127.1) * 43758.5453; return x - Math.floor(x); }
     function mod(v, m) { return ((v % m) + m) % m; }
-    function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
 
     // everything is built inside one group, so a failure can remove it and keep the fallback
     root = el('g', { 'data-hs-root': '' }, svg);
@@ -140,29 +229,27 @@
     // ---- exit signs (width follows the text) ----
     var S = el('g', {}, scene);
     var signs = raw.map(function (a) {
-      var value = String(a[1]), tn = a[2];
-      if (!TONES[tn]) tn = value.indexOf('✓') >= 0 ? 'good' : (/[!?]/.test(value) ? 'warn' : 'neutral');
-      var tone = TONES[tn];
-      var s = { label: String(a[0]), value: value, lit: tone.lit, ink: tone.ink, w: MINW, lfs: 9, vfs: 30 };
-      var g = el('g', {}, S);
+      var value = String(a[1]), tone = TONES[HS.tone(value, a[2])];
+      var s = { label: String(a[0]), value: value, lit: tone.lit, ink: tone.ink, n: null, c: null, compact: false };
+      var g = el('g', { 'data-hs-sign': '' }, S);
       s.glowEl = el('rect', { x: -24, y: 68, width: 48, height: 60, rx: 6, fill: tone.glow, opacity: 0, filter: 'url(#hs-glow)' }, g);
       s.post = el('rect', { x: -1.5, y: 126, width: 3, height: 26, fill: '#A7B0C2' }, g);
-      s.face = el('rect', { x: -24, y: 68, width: 48, height: 60, rx: 6, fill: '#C7CEDD', stroke: '#111', 'stroke-width': 3 }, g);
-      s.t1 = el('text', { x: 0, y: 83, 'text-anchor': 'middle', 'font-size': 9, 'font-weight': 800, fill: '#111', 'font-family': 'Overpass,Arial,sans-serif', 'letter-spacing': 1 }, g);
+      s.face = el('rect', { 'data-hs-face': '', x: -24, y: 68, width: 48, height: 60, rx: 6, fill: '#C7CEDD', stroke: '#111', 'stroke-width': 3 }, g);
+      s.t1 = el('text', { 'data-hs-text': '', x: 0, y: 83, 'text-anchor': 'middle', 'font-size': 9, 'font-weight': 800, fill: '#111', 'font-family': 'Overpass,Arial,sans-serif', 'letter-spacing': 1 }, g);
       s.t1.textContent = s.label;
-      s.big = el('text', { x: 0, y: 114, 'text-anchor': 'middle', 'font-size': 30, 'font-weight': 800, fill: '#111', 'font-family': 'Overpass,Arial,sans-serif' }, g);
+      s.big = el('text', { 'data-hs-text': '', x: 0, y: 114, 'text-anchor': 'middle', 'font-size': 30, 'font-weight': 800, fill: '#111', 'font-family': 'Overpass,Arial,sans-serif' }, g);
       s.big.textContent = value;
       s.g = g;
       return s;
     });
 
     // ---- GrossMasters billboard (LED bulbs + neon-style logo) ----
-    var forceLit = false, bbScale = 1;
-    var bb = el('g', {}, S);
+    var forceLit = false;
+    var bb = el('g', { 'data-hs-bb': '' }, S);
     var bbGlowRect = el('rect', { x: -150, y: 36, width: BW, height: 74, rx: 10, fill: '#B7FF3C', opacity: 0, filter: 'url(#hs-glow)' }, bb);
     el('rect', { x: -90, y: 108, width: 3, height: 44, fill: '#A7B0C2' }, bb);
     el('rect', { x: 87, y: 108, width: 3, height: 44, fill: '#A7B0C2' }, bb);
-    var bbFace = el('rect', { x: -150, y: 36, width: BW, height: 74, rx: 10, fill: '#0B1020', stroke: '#1E2742', 'stroke-width': 3 }, bb);
+    var bbFace = el('rect', { 'data-hs-face': '', x: -150, y: 36, width: BW, height: 74, rx: 10, fill: '#0B1020', stroke: '#1E2742', 'stroke-width': 3 }, bb);
     var bbRim = el('rect', { x: -143, y: 43, width: 286, height: 60, rx: 6, fill: 'none', stroke: '#B7FF3C', 'stroke-width': 1, opacity: 0 }, bb);
     var LOGO = '/brand/logo-white.png';
     var bbGlowImg = el('image', { href: LOGO, x: -136, y: 52, width: 272, height: 40, preserveAspectRatio: 'xMidYMid meet', opacity: 0, filter: 'url(#hs-glow)' }, bb);
@@ -205,68 +292,77 @@
     });
 
     // ---- layout: sign widths follow the text; positions are left-edge based ----
-    var centers = [], bbCenter = 0, CYC = 1300;
-    var measured = true, stat = { xs: [], bx: 0, kind: 'fit' };
-    var off = 0, last = 0, raf = 0, visible = true, tab = !document.hidden, reduced = false, narrow = false;
+    var cy = null, measured = true, stat = null;
+    var off = 0, last = 0, visible = true, tab = !document.hidden, reduced = false, narrow = false;
 
     function mlen(t, fs) {
       var n = 0;
-      try { n = t.getComputedTextLength(); } catch (e) { n = 0; }
-      if (!(n > 0)) { try { n = t.getBBox().width; } catch (e2) { n = 0; } }
+      try { n = t.getComputedTextLength(); } catch (_e) { ignore(_e); n = 0; }
+      if (!(n > 0)) { try { n = t.getBBox().width; } catch (_e2) { ignore(_e2); n = 0; } }
       if (!(n > 0)) { measured = false; n = t.textContent.length * fs * .62; }
       return n;
     }
+    function bw(t) { try { return t.getBBox().width; } catch (_e) { ignore(_e); return 0; } }
+    function setFace(s, w) {
+      var x = -w / 2;
+      s.face.setAttribute('x', x); s.face.setAttribute('width', w);
+      s.glowEl.setAttribute('x', x); s.glowEl.setAttribute('width', w);
+    }
+    // draws a sign in one of its two states (s.n normal, s.c compact): font sizes, face width, squeeze
+    function applyState(s, st) {
+      s.t1.setAttribute('font-size', st.lfs); s.big.setAttribute('font-size', st.vfs);
+      s.t1.removeAttribute('textLength'); s.big.removeAttribute('textLength');
+      s.t1.removeAttribute('lengthAdjust'); s.big.removeAttribute('lengthAdjust');
+      setFace(s, st.w);
+      if (st.sqL) { s.t1.setAttribute('textLength', st.w - 4); s.t1.setAttribute('lengthAdjust', 'spacingAndGlyphs'); }
+      if (st.sqV) { s.big.setAttribute('textLength', st.w - 4); s.big.setAttribute('lengthAdjust', 'spacingAndGlyphs'); }
+    }
     function fit(s) {
-      var lfs = 9, vfs = 30, lw, vw;
-      s.t1.setAttribute('font-size', lfs);
-      s.big.setAttribute('font-size', vfs);
-      lw = mlen(s.t1, lfs);
-      while (lw + PAD > MAXW && lfs > 7) { lfs -= 1; s.t1.setAttribute('font-size', lfs); lw = mlen(s.t1, lfs); }
-      vw = mlen(s.big, vfs);
-      while (vw + PAD > MAXW && vfs > 20) { vfs -= 2; s.big.setAttribute('font-size', vfs); vw = mlen(s.big, vfs); }
-      s.lfs = lfs; s.vfs = vfs;
-      s.w = Math.round(clamp(Math.max(lw, vw) + PAD, MINW, MAXW) * 10) / 10;
-      var x = -s.w / 2;
-      s.face.setAttribute('x', x); s.face.setAttribute('width', s.w);
-      s.glowEl.setAttribute('x', x); s.glowEl.setAttribute('width', s.w);
+      var r = HS.sizeSign(function (kind, fs) {
+        var t = kind === 'label' ? s.t1 : s.big;
+        t.setAttribute('font-size', fs); t.removeAttribute('textLength'); t.removeAttribute('lengthAdjust');
+        return mlen(t, fs);
+      });
+      s.n = r.n; s.c = r.c;
     }
-
-    // places signs from `from` and the board by edge gaps, starting at 0; returns the layout
-    function arrange(from, gap, bgap) {
-      var l = 0, xs = [], n = signs.length, i, lastRight = 0;
-      for (i = from; i < n; i++) { xs[i] = l + signs[i].w / 2; lastRight = l + signs[i].w; l += signs[i].w + gap; }
-      var half = BW / 2 * bbScale;                       // gap is measured to the board's visible (scaled) edge
-      var bx = lastRight + bgap + half;
-      return { xs: xs, bx: bx, left: xs[from] - signs[from].w / 2, right: bx + half };
-    }
-    // reduced motion: compute a still frame with every sign and the board inside the view
-    function staticLayout() {
-      var vx0 = narrow ? 60 : 0, vx1 = narrow ? 680 : 880, room = vx1 - vx0 - 2 * MARGIN;
-      var kind = 'fit', a = arrange(0, GAP, BGAP);
-      if (a.right - a.left > room) {
-        kind = 'tight'; a = arrange(0, SGAP, SBGAP);
-        if (a.right - a.left > room) { kind = 'drop-first'; a = arrange(Math.min(1, signs.length - 1), SGAP, SBGAP); }
+    // after layout: every text must sit inside its face (getBBox, svg units); otherwise shrink one more step.
+    // Runs for the normal and for the compact state. Last resort: squeeze the glyphs (the check script counts it).
+    function verifyOne(s, st) {
+      for (var round = 0; round < 8; round++) {
+        applyState(s, st);
+        var room = st.w - 2, lo = !st.sqL && bw(s.t1) > room, vo = !st.sqV && bw(s.big) > room;
+        if (!lo && !vo) return;
+        if (vo && st.vfs > VMIN) st.vfs -= 2;
+        else if (lo && st.lfs > LMIN) st.lfs -= 1;
+        else if (vo) st.sqV = true;
+        else st.sqL = true;
       }
-      var shift = kind === 'drop-first' ? (vx1 - MARGIN - a.right) : (vx0 + MARGIN + (room - (a.right - a.left)) / 2 - a.left);
-      var xs = [];
-      for (var k = 0; k < signs.length; k++) xs[k] = (a.xs[k] === undefined) ? null : a.xs[k] + shift;
-      stat = { xs: xs, bx: a.bx + shift, kind: kind };
-      svg.setAttribute('data-hs-static', kind);
+      applyState(s, st);
+    }
+    // static frame: the first sign may be drawn compact (smallest text, narrowest face)
+    function setCompact(s, on) {
+      if (s.compact === on) return;
+      s.compact = on;
+      applyState(s, on ? s.c : s.n);
+    }
+    function baseScale() { return narrow ? K.NARROW_SCALE : 1; }
+    function staticLayout() {
+      stat = HS.staticFrame(signs.map(function (s) { return s.n.w; }), signs.map(function (s) { return s.c.w; }), narrow);
+      svg.setAttribute('data-hs-static', stat.kind);
+      svg.setAttribute('data-hs-board', String(stat.board));
     }
     function layout() {
       measured = true;
       signs.forEach(fit);
-      var l = 0, lastRight = 0;
-      signs.forEach(function (s, i) { centers[i] = l + s.w / 2; lastRight = l + s.w; l += s.w + GAP; });
-      bbCenter = lastRight + BGAP + BW / 2;
-      CYC = Math.round(bbCenter + BW / 2 + signs[0].w / 2 + EMPTY);
-      svg.setAttribute('data-hs-widths', signs.map(function (s) { return s.w; }).join(','));
-      svg.setAttribute('data-hs-fonts', signs.map(function (s) { return s.vfs; }).join(','));
+      signs.forEach(function (s) { verifyOne(s, s.c); verifyOne(s, s.n); s.compact = false; });
+      cy = HS.cycle(signs.map(function (s) { return s.n.w; }));
+      svg.setAttribute('data-hs-widths', signs.map(function (s) { return s.n.w; }).join(','));
+      svg.setAttribute('data-hs-fonts', signs.map(function (s) { return s.n.vfs; }).join(','));
       staticLayout();
     }
 
     // ---- painting ----
-    function paint(xs, bx, o2) {
+    function paint(xs, bx, o2, scale) {
       signs.forEach(function (d, i) {
         var x = xs[i];
         if (x === null || x === undefined) { d.g.setAttribute('transform', 'translate(-2000,0)'); return; }
@@ -277,7 +373,7 @@
         d.glowEl.setAttribute('opacity', (p * .55).toFixed(2));
       });
       // scale around the billboard's own centre (0,73) so it stays on the same road line
-      bb.setAttribute('transform', 'translate(' + bx.toFixed(1) + ',73) scale(' + bbScale + ') translate(0,-73)');
+      bb.setAttribute('transform', 'translate(' + bx.toFixed(1) + ',73) scale(' + scale + ') translate(0,-73)');
       if (bx < -170 || bx > 1050) return;
       var u = forceLit ? 1 : Math.max(0, Math.min(1, (640 - bx) / 130));
       var k = u;
@@ -301,27 +397,47 @@
       L3.setAttribute('transform', 'translate(' + (-mod(o2 * .6, W)) + ',0)');
       P.setAttribute('transform', 'translate(' + (-mod(o2, 440)) + ',0)');
       D.setAttribute('transform', 'translate(' + (-mod(o2, 56)) + ',0)');
-      if (reduced) { paint(stat.xs, stat.bx, o2); return; }
-      paint(centers.map(function (c) { return mod(c + 900 - o2, CYC) - 160; }), mod(bbCenter + 900 - o2, CYC) - 160, o2);
+      if (reduced) {
+        signs.forEach(function (s, i) { setCompact(s, i === 0 && stat.kind === 'compact'); });
+        paint(stat.xs, stat.bx, o2, stat.board); return;
+      }
+      signs.forEach(function (s) { setCompact(s, false); });
+      var p = HS.positions(cy, o2);
+      paint(p.xs, p.bx, o2, baseScale());
     }
 
     // ---- loop: runs only while the hero is on screen, the tab is visible and motion is allowed ----
     var SPEED = 90;
     function cur() { return reduced ? (narrow ? 760 : 510) : off; }   // backdrop position (still frame when reduced)
+    // a frame error must not repeat 60 times a second: stop the loop and leave the current frame on screen
+    function halt() {
+      halted = true;
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+      try { svg.classList.add('hs-paused'); } catch (_e) { ignore(_e); }
+    }
     function sync() {
+      if (dead || halted) return;
       var on = visible && tab && !reduced;
       svg.classList.toggle('hs-paused', !on);
       if (on) { if (!raf) { last = 0; raf = requestAnimationFrame(tick); } }
       else if (raf) { cancelAnimationFrame(raf); raf = 0; }
     }
     function tick(ts) {
-      raf = 0; if (!(visible && tab) || reduced) return;
-      var dt = last ? Math.min(.05, (ts - last) / 1000) : 0; last = ts;
-      off += SPEED * dt; frame(off); raf = requestAnimationFrame(tick);
+      raf = 0;
+      if (dead || halted || !(visible && tab) || reduced) return;
+      try {
+        var dt = last ? Math.min(.05, (ts - last) / 1000) : 0; last = ts;
+        off += SPEED * dt; frame(off); raf = requestAnimationFrame(tick);
+      } catch (_e) { fail(_e); halt(); }
     }
 
     var mq = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
-    function setReduced(v) { reduced = v; forceLit = v; if (!v) off = 0; frame(cur()); sync(); }
+    function setReduced(v) {
+      if (dead || halted) return;
+      reduced = v; forceLit = v; if (!v) off = 0;
+      try { frame(cur()); } catch (_e) { fail(_e); halt(); return; }
+      sync();
+    }
     if (mq) {
       var onMq = function (e) { setReduced(e.matches); };
       if (mq.addEventListener) mq.addEventListener('change', onMq); else if (mq.addListener) mq.addListener(onMq);
@@ -329,11 +445,14 @@
     // phones: crop the scene so the truck, signs and logo read at 390px wide
     var nq = window.matchMedia && window.matchMedia('(max-width: 560px)');
     function applyNarrow(v) {
-      narrow = v; bbScale = v ? 1.25 : 1;
+      narrow = v;
       svg.setAttribute('viewBox', v ? '60 0 620 200' : '0 0 880 200');
     }
     if (nq) {
-      var onNq = function (e) { applyNarrow(e.matches); staticLayout(); frame(cur()); };
+      var onNq = function (e) {
+        if (dead || halted) return;
+        try { applyNarrow(e.matches); staticLayout(); frame(cur()); } catch (_e) { fail(_e); halt(); }
+      };
       if (nq.addEventListener) nq.addEventListener('change', onNq); else if (nq.addListener) nq.addListener(onNq);
       applyNarrow(nq.matches);
     }
@@ -341,25 +460,50 @@
     reduced = !!(mq && mq.matches); forceLit = reduced;
     layout();
     frame(cur());
-    // the scene is ready: drop the static fallback
-    var fb = svg.querySelectorAll('[data-hs-fallback]');
-    for (var f = 0; f < fb.length; f++) fb[f].parentNode.removeChild(fb[f]);
 
     // fonts change the text widths: measure again once they are loaded
-    function relayout() { try { layout(); frame(cur()); } catch (e) { } }
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(relayout);
+    function relayout() {
+      if (dead || halted) return;
+      try { layout(); frame(cur()); } catch (_e) { fail(_e); halt(); }
+    }
+    // web fonts load lazily: measure again when they are ready, when more arrive, and once the page is loaded
+    if (document.fonts) {
+      if (document.fonts.ready) document.fonts.ready.then(relayout);
+      if (document.fonts.load) {
+        try { document.fonts.load('800 30px Overpass', '0').then(relayout, function () { }); } catch (_e) { ignore(_e); }
+      }
+      if (document.fonts.addEventListener) document.fonts.addEventListener('loadingdone', relayout);
+    }
+    window.addEventListener('load', relayout);
 
+    var seen = false;
     var hero = svg.closest ? svg.closest('.hero') : null;
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(function (es) {
+        if (dead) return;
         visible = es[es.length - 1].isIntersecting;
-        if (visible && !measured) relayout();   // first layout ran while hidden: widths were estimated
+        if (visible && (!seen || !measured)) relayout();   // measure again on the first view (it may have been hidden or 0-wide)
+        if (visible) seen = true;
         sync();
       }, { threshold: .05 }).observe(hero || svg);
     }
     document.addEventListener('visibilitychange', function () { tab = !document.hidden; sync(); });
     sync();
-  } catch (e) {
-    try { if (root && root.parentNode) root.parentNode.removeChild(root); } catch (e2) { }
+    // everything worked: now the static fallback can go
+    fbs.forEach(function (f) { if (f.parentNode) f.parentNode.removeChild(f); });
+    fbs = [];
+    } catch (_e) {
+      // setup failed: stop, drop the half-built scene, bring back the static fallback and the full view
+      dead = true; fail(_e);
+      try {
+        if (raf) { cancelAnimationFrame(raf); raf = 0; }
+        if (root && root.parentNode) root.parentNode.removeChild(root);
+        if (svg) svg.setAttribute('viewBox', '0 0 880 200');
+        fbs.forEach(function (f) { f.style.display = ''; });
+      } catch (_e2) { ignore(_e2); }
+    }
   }
+
+  if (typeof document !== 'undefined') run();
+  if (typeof module === 'object' && module.exports) module.exports = HS_PURE;
 })();
