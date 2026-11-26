@@ -26,7 +26,9 @@ function formatUsd(n) {
   return `${sign}$${Math.abs(n).toLocaleString()}`
 }
 
-export default function CashChip() {
+// `to` is where the chip leads; null (a user who cannot open that page) draws the
+// same chip as plain text.
+export default function CashChip({ to = '/cash' }) {
   const fetchCash = useCallback(async (signal) => await getCashOverview(signal), [])
   const { data, loading } = useResource(fetchCash, [], { pollMs: 20000 })
 
@@ -56,9 +58,11 @@ export default function CashChip() {
   // liabilities exceed assets. A dispatcher about to book a load needs to
   // know which one, and the balance alone does not say.
   const state = data.standing?.state
+  const Wrapper = to ? Link : 'span'
+  const wrapperProps = to ? { to } : {}
 
   return (
-    <Link to="/cash" className="cash-chip" title={STATE_WORD[state] ? `Company cash — ${STATE_WORD[state]}` : 'Company cash'}>
+    <Wrapper {...wrapperProps} className="cash-chip" title={STATE_WORD[state] ? `Company cash — ${STATE_WORD[state]}` : 'Company cash'}>
       <span className="cash-chip-label">Cash</span>
       <span className={`cash-chip-value mono ${negative ? 'neg' : ''}`}>
         {formatUsd(data.balance)}
@@ -81,6 +85,6 @@ export default function CashChip() {
           insolvent
         </span>
       )}
-    </Link>
+    </Wrapper>
   )
 }

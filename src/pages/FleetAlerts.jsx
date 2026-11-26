@@ -1,4 +1,5 @@
 import AlertsBoard from '../components/alerts/AlertsBoard'
+import { FLEET_ALERT_FAMILIES } from '../data/alertFamilies'
 
 // The fleet manager's board.
 //
@@ -12,14 +13,13 @@ import AlertsBoard from '../components/alerts/AlertsBoard'
 //
 // So the page shows the fleet conditions the data can actually answer, and
 // says which ones it cannot.
-const FLEET_FAMILIES = ['driver.idle', 'driver.no-truck', 'driver.pay-overdue', 'listing.leaving']
 
 export default function FleetAlerts() {
   return (
     <AlertsBoard
       title="Alerts"
       sub="Fleet conditions that are true right now."
-      families={FLEET_FAMILIES}
+      families={FLEET_ALERT_FAMILIES}
       // Was "nothing updates them while the simulator runs": a banned word,
       // and no longer true -- fuel and tire wear move with every run since
       // migration 032 (alerts.catalog.js). What is still true: no alert

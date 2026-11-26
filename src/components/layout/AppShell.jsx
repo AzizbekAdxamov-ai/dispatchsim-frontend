@@ -36,7 +36,7 @@ export default function AppShell() {
         <div className={'main'
           + (hasSectionTabs(DISPATCH_SECTIONS, location.pathname) ? ' has-section-tabs' : '')
           + (liveDataFailing ? ' has-live-notice' : '')} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-          <Topbar title={title} />
+          <Topbar title={title} variant="dispatch" />
           <SectionTabs sections={DISPATCH_SECTIONS} />
           {/* Above the page, below the chrome: when the polls stop landing
               every screen underneath is showing old data, so the notice

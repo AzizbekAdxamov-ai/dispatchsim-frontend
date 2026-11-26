@@ -41,7 +41,7 @@ export default function HrShell() {
       <div className="app" style={{ position: 'relative', display: 'flex', minHeight: '100vh' }}>
         <Sidebar items={HR_NAV_ITEMS} brandSub="HR" />
         <div className={'main' + (liveDataFailing ? ' has-live-notice' : '')} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-          <Topbar title={title} onPhoneClick={() => {}} />
+          <Topbar title={title} variant="minimal" />
           <LiveDataNotice />
           <div className="content">
             <AnimatePresence mode="wait">

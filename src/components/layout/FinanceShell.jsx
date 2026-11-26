@@ -45,7 +45,7 @@ export default function FinanceShell() {
       <div className="app" style={{ position: 'relative', display: 'flex', minHeight: '100vh' }}>
         <Sidebar items={FINANCE_NAV_ITEMS} brandSub="Accounting" />
         <div className={'main' + (liveDataFailing ? ' has-live-notice' : '')} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-          <Topbar title={title} onPhoneClick={() => {}} />
+          <Topbar title={title} variant="finance" />
           <LiveDataNotice />
           <div className="content">
             <AnimatePresence mode="wait">

@@ -236,6 +236,11 @@
     display: none;
   }
 
+  /* A bar with nothing else on it keeps its one control. */
+  .topbar-minimal .topbar-theme-btn {
+    display: flex;
+  }
+
   .topbar-links {
     margin-left: 0;
     gap: 4px;

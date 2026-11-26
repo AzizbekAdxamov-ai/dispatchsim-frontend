@@ -1,6 +1,7 @@
 import { Moon, Sun, MapTrifold, Package, MagnifyingGlass, List } from '@phosphor-icons/react'
 import { NavLink } from 'react-router-dom'
 import { useTheme } from '../../theme/ThemeProvider'
+import { useAuth } from '../../context/AuthContext'
 import CashChip from './CashChip'
 import AlertsBell from './AlertsBell'
 import ZoneClocks from './ZoneClocks'
@@ -9,6 +10,8 @@ import { useSidebar } from './SidebarContext'
 // node:test can pin it -- node:test cannot import JSX, and an untestable
 // rule is a rule that is quietly reordered. Icons attach here, by `to`.
 import { QUICK_LINKS } from './quickLinks'
+// What each workspace's bar shows lives in topbarVariants.js (testable).
+import { topbarParts, TOPBAR_VARIANTS } from './topbarVariants'
 import './Topbar.css'
 
 const LINK_ICONS = {
@@ -24,12 +27,16 @@ export const TOPBAR_COPY = {
   toggleTheme: 'Toggle theme',
 }
 
-export default function Topbar({ title, copy = TOPBAR_COPY }) {
+// `variant` picks the parts: dispatch | fleet | finance | minimal (default, so a
+// new shell never shows links its users cannot open).
+export default function Topbar({ title, variant = 'minimal', copy = TOPBAR_COPY }) {
+  const { user } = useAuth()
+  const parts = topbarParts(variant, user?.roles ?? [])
   const { theme, toggleTheme } = useTheme()
   const { drawerOpen, openDrawer } = useSidebar()
 
   return (
-    <div className="topbar">
+    <div className={'topbar' + (variant === 'minimal' || !(variant in TOPBAR_VARIANTS) ? ' topbar-minimal' : '')}>
       {/* Only drawn below 768px, where the sidebar is not in the page. */}
       <button
         type="button"
@@ -44,6 +51,7 @@ export default function Topbar({ title, copy = TOPBAR_COPY }) {
       <div className="topbar-title" title={title}>{title}</div>
       {/* NavLink, not Link: the chip you are on reads as selected, not
           just tappable. */}
+      {parts.quickLinks && (
       <nav className="topbar-links" aria-label={copy.quickLinks}>
         {QUICK_LINKS.map(({ to, label }) => {
           const Icon = LINK_ICONS[to] ?? Package
@@ -61,16 +69,17 @@ export default function Topbar({ title, copy = TOPBAR_COPY }) {
           )
         })}
       </nav>
+      )}
       <div className="topbar-spacer"></div>
       {/* Back on 2026-10-01, with the day and the right daylight-time
           names -- see utils/zoneClocks.js for why they left and why they
           came back. On the right, so the quick links keep their place. */}
-      <ZoneClocks />
+      {parts.clocks && <ZoneClocks />}
       {/* Back after a day out: the balance is the one number this project
           insists stays in front of whoever is spending it, and CashChip's
           own header says why. Leaving it out made the component dead code
           and took the number off every page at the same time. */}
-      <CashChip />
+      {parts.cash && <CashChip to={parts.cashTo} />}
       <div className="topbar-icons">
         <button className="icon-btn topbar-theme-btn" onClick={toggleTheme} aria-label={copy.toggleTheme}>
           {theme === 'dark' ? <Moon size={17} weight="fill" /> : <Sun size={17} weight="fill" />}
@@ -80,7 +89,7 @@ export default function Topbar({ title, copy = TOPBAR_COPY }) {
             the student to distrust the rest of the toolbar. Removed rather
             than left in place, the same way LoadDetail's dead "Message
             driver" and "Call broker" buttons were. */}
-        <AlertsBell />
+        {parts.bell && <AlertsBell seeAllTo={parts.alertsTo} families={parts.families} />}
       </div>
     </div>
   )

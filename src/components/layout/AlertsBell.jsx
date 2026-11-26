@@ -14,7 +14,9 @@ import './AlertsBell.css'
 // the count is the number of conditions that are actually true.
 const PANEL_LIMIT = 6
 
-export default function AlertsBell() {
+// `seeAllTo` is the full board for this workspace; `families` narrows the list to
+// what that workspace acts on (null = everything).
+export default function AlertsBell({ seeAllTo = '/alerts', families = null }) {
   const [open, setOpen] = useState(false)
   const [busyKey, setBusyKey] = useState(null)
   const wrapRef = useRef(null)
@@ -38,7 +40,8 @@ export default function AlertsBell() {
     }
   }, [open])
 
-  const alerts = data?.alerts ?? []
+  const allAlerts = data?.alerts ?? []
+  const alerts = families ? allAlerts.filter((a) => families.includes(a.family)) : allAlerts
   const degraded = data?.meta?.degraded ?? []
   const count = alerts.length
 
@@ -71,7 +74,7 @@ export default function AlertsBell() {
         <div className="alerts-bell-panel">
           <div className="alerts-bell-head">
             <span>{count === 0 ? 'Nothing to report' : `${count} active`}</span>
-            <Link to="/alerts" onClick={() => setOpen(false)}>
+            <Link to={seeAllTo} onClick={() => setOpen(false)}>
               See all
             </Link>
           </div>
@@ -90,7 +93,7 @@ export default function AlertsBell() {
           />
 
           {count > PANEL_LIMIT && (
-            <Link className="alerts-bell-more" to="/alerts" onClick={() => setOpen(false)}>
+            <Link className="alerts-bell-more" to={seeAllTo} onClick={() => setOpen(false)}>
               {count - PANEL_LIMIT} more
             </Link>
           )}

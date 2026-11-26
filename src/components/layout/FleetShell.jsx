@@ -37,7 +37,7 @@ export default function FleetShell() {
       <div className="app" style={{ position: 'relative', display: 'flex', minHeight: '100vh' }}>
         <Sidebar items={FLEET_NAV_ITEMS} brandSub="Fleet" />
         <div className={'main' + (liveDataFailing ? ' has-live-notice' : '')} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-          <Topbar title={title} />
+          <Topbar title={title} variant="fleet" />
           <LiveDataNotice />
           <div className="content">
             <AnimatePresence mode="wait">
