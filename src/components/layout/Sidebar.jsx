@@ -19,6 +19,8 @@ import {
 } from '@phosphor-icons/react'
 import { useAuth } from '../../context/AuthContext'
 import { roleLabel, settingsPathFor } from '../../data/roleRoutes'
+import { effectiveRole } from '../routeGate'
+import { hasAcademyAccess, canTeachClass } from '../../data/academyAccess'
 import { useFocusTrap } from '../../hooks/useFocusTrap'
 import { useSidebar } from './SidebarContext'
 import { locate, railLabel } from './navSections'
@@ -50,6 +52,19 @@ export const SIDEBAR_COPY = {
   expand: 'Expand sidebar',
   collapse: 'Collapse sidebar',
   settings: 'Settings',
+  roleAdmin: 'Administrator',
+  roleMentor: 'Mentor',
+  roleStudent: 'Student',
+}
+
+// The line under the name. A user with no workspace role is not "No workspace"
+// when they are an administrator or an Academy member.
+function roleText(user, copy) {
+  const key = effectiveRole(user)
+  if (key) return roleLabel(key)
+  if (user?.isAdmin) return copy.roleAdmin
+  if (hasAcademyAccess(user)) return canTeachClass(user) ? copy.roleMentor : copy.roleStudent
+  return roleLabel(null)
 }
 
 const DRAWER_EASE = [0.22, 1, 0.36, 1]
@@ -127,7 +142,7 @@ function NavEntry({ to, end, icon: Icon, label, shortLabel, badge, active, colla
 // null for a plain logo (the drawer has its own close button).
 function SidebarPanel({ variant, entries, bottom, brandSub, brand, onClose, onNavigate, copy, user, settingsTo }) {
   const collapsed = variant === 'rail'
-  const role = roleLabel(user?.activeRole)
+  const role = roleText(user, copy)
   const logo = collapsed
     ? <BrandLogo variant="mark" className="brand-rail-mark" />
     : <BrandLogo className="brand-full-logo" />

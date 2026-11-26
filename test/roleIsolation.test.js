@@ -120,3 +120,9 @@ test('canOpenPath follows the same guards', () => {
   assert.equal(canOpenPath(USERS.mentor, '/load-board'), false)
   assert.equal(canOpenPath(USERS.multi, '/loads'), true)
 })
+
+test('the sidebar names a role-less administrator or Academy member instead of "No workspace"', () => {
+  const sidebar = read('../src/components/layout/Sidebar.jsx')
+  assert.match(sidebar, /if \(user\?\.isAdmin\) return copy\.roleAdmin/)
+  assert.match(sidebar, /canTeachClass\(user\) \? copy\.roleMentor : copy\.roleStudent/)
+})

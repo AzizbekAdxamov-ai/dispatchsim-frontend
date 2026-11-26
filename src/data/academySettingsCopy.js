@@ -65,6 +65,9 @@ export const ACADEMY_SIDEBAR_COPY = {
   expand: 'Yon panelni yoyish',
   collapse: 'Yon panelni yig‘ish',
   settings: 'Sozlamalar',
+  roleAdmin: 'Administrator',
+  roleMentor: 'Mentor',
+  roleStudent: 'O‘quvchi',
 }
 
 export const ACADEMY_TOPBAR_COPY = {
