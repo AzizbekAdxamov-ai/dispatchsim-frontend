@@ -409,13 +409,6 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
 .hero .lead{color:rgba(255,255,255,.84);max-width:56ch}
 .hero .chip{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.26);color:#fff}
 .scene{display:block;width:100%;height:auto;margin-top:6px}
-.scene .lane{animation:lane 1s linear infinite}
-@keyframes lane{to{stroke-dashoffset:-56}}
-.scene .rig{animation:bob 1.7s ease-in-out infinite}
-@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.5px)}}
-.scene .twinkle{animation:tw 3s ease-in-out infinite}
-@keyframes tw{0%,100%{opacity:.9}50%{opacity:.25}}
-@media (prefers-reduced-motion:reduce){.scene .lane,.scene .rig,.scene .twinkle{animation:none}}
 @media (max-width:520px){.hero-top{padding:24px 20px 4px}}
 
 /* exit signs */
@@ -565,10 +558,10 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
       <path d="M82 12h18l12 11v11H82z" fill="#1B2338"/>
       <path d="M100 15h-12v8h21z" fill="#C9D6EE"/>
       <rect x="80" y="30" width="34" height="5" fill="#151C2F"/>
-      <circle cx="18" cy="38" r="6" fill="#111"/><circle cx="18" cy="38" r="2.4" fill="#A7B0C2"/>
-      <circle cx="34" cy="38" r="6" fill="#111"/><circle cx="34" cy="38" r="2.4" fill="#A7B0C2"/>
-      <circle cx="92" cy="38" r="6" fill="#111"/><circle cx="92" cy="38" r="2.4" fill="#A7B0C2"/>
-      <circle cx="106" cy="38" r="6" fill="#111"/><circle cx="106" cy="38" r="2.4" fill="#A7B0C2"/>
+      <circle cx="18" cy="38" r="6" fill="#111"/><path d="M13.4 38h9.2M18 33.4v9.2" stroke="var(--muted)" stroke-width="1" fill="none"/><circle cx="18" cy="38" r="2.4" fill="#A7B0C2"/>
+      <circle cx="34" cy="38" r="6" fill="#111"/><path d="M29.4 38h9.2M34 33.4v9.2" stroke="var(--muted)" stroke-width="1" fill="none"/><circle cx="34" cy="38" r="2.4" fill="#A7B0C2"/>
+      <circle cx="92" cy="38" r="6" fill="#111"/><path d="M87.4 38h9.2M92 33.4v9.2" stroke="var(--muted)" stroke-width="1" fill="none"/><circle cx="92" cy="38" r="2.4" fill="#A7B0C2"/>
+      <circle cx="106" cy="38" r="6" fill="#111"/><path d="M101.4 38h9.2M106 33.4v9.2" stroke="var(--muted)" stroke-width="1" fill="none"/><circle cx="106" cy="38" r="2.4" fill="#A7B0C2"/>
     </symbol>
     <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3 2.5 20h19L12 3z"/><path d="M12 10v5M12 17.5v.5"/></symbol>
     <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
@@ -616,18 +609,10 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
       <h1 id="h1">Xavfsiz va qonuniy</h1>
       <p class="lead">Driverning vaqti cheksiz emas. Federal qoidalar u qancha haydashi va qachon dam olishi kerakligini belgilaydi, ELD esa har daqiqani yozib boradi. Bugun HOS soatlarini o‘qishni, reja tuzishni va driverni qoidani buzishga undamaslikni o‘rganasiz.</p>
     </div>
-    <svg class="scene" viewBox="0 0 880 200" aria-hidden="true">
-      <defs><linearGradient id="beam" x1="0" x2="1"><stop offset="0" stop-color="#F6E7A6" stop-opacity=".55"/><stop offset="1" stop-color="#F6E7A6" stop-opacity="0"/></linearGradient></defs>
-      <g fill="#fff"><circle class="twinkle" cx="560" cy="22" r="1.6"/><circle class="twinkle" cx="640" cy="46" r="1.2" style="animation-delay:.8s"/><circle class="twinkle" cx="710" cy="18" r="1.5" style="animation-delay:1.4s"/><circle class="twinkle" cx="470" cy="40" r="1.1" style="animation-delay:2s"/><circle class="twinkle" cx="840" cy="30" r="1.3" style="animation-delay:.4s"/></g>
-      <circle cx="778" cy="48" r="20" fill="#F6E7A6" opacity=".92"/><circle cx="786" cy="42" r="18" fill="#151C2F" opacity=".55"/>
-      <path d="M0 138C90 108 170 118 260 132S430 94 540 120S740 98 880 124V200H0z" fill="rgba(0,0,0,.20)"/>
-      <path d="M0 160C120 138 230 150 330 156S560 132 680 150S820 140 880 148V200H0z" fill="rgba(0,0,0,.28)"/>
-      <path d="M20 152l9-30 9 30z M22 140l7-22 7 22z" fill="rgba(0,0,0,.34)"/><path d="M52 152l9-30 9 30z M54 140l7-22 7 22z" fill="rgba(0,0,0,.34)"/><path d="M330 152l9-30 9 30z M332 140l7-22 7 22z" fill="rgba(0,0,0,.34)"/><path d="M372 152l9-30 9 30z M374 140l7-22 7 22z" fill="rgba(0,0,0,.34)"/><path d="M404 152l9-30 9 30z M406 140l7-22 7 22z" fill="rgba(0,0,0,.34)"/><path d="M780 152l9-30 9 30z M782 140l7-22 7 22z" fill="rgba(0,0,0,.34)"/><path d="M818 152l9-30 9 30z M820 140l7-22 7 22z" fill="rgba(0,0,0,.34)"/><path d="M850 152l9-30 9 30z M852 140l7-22 7 22z" fill="rgba(0,0,0,.34)"/>
-      <rect y="148" width="880" height="52" fill="#0B1020"/><rect y="148" width="880" height="3" fill="rgba(255,255,255,.18)"/>
-      <path class="lane" d="M0 178H880" stroke="#B7FF3C" stroke-width="3" stroke-dasharray="30 26" fill="none"/>
-      <g transform="translate(470,68)"><rect x="-1.5" y="58" width="3" height="26" fill="#A7B0C2"/><rect x="-24" y="0" width="48" height="60" rx="6" fill="#fff" stroke="#111" stroke-width="3"/><text x="0" y="15" text-anchor="middle" font-size="8" font-weight="800" fill="#111" font-family="Overpass,Arial,sans-serif" letter-spacing="1">HAYDASH</text><text x="0" y="48" text-anchor="middle" font-size="32" font-weight="800" fill="#111" font-family="Overpass,Arial,sans-serif">11</text></g><g transform="translate(580,68)"><rect x="-1.5" y="58" width="3" height="26" fill="#A7B0C2"/><rect x="-24" y="0" width="48" height="60" rx="6" fill="#fff" stroke="#111" stroke-width="3"/><text x="0" y="15" text-anchor="middle" font-size="8" font-weight="800" fill="#111" font-family="Overpass,Arial,sans-serif" letter-spacing="1">OYNA</text><text x="0" y="48" text-anchor="middle" font-size="32" font-weight="800" fill="#111" font-family="Overpass,Arial,sans-serif">14</text></g><g transform="translate(690,68)"><rect x="-1.5" y="58" width="3" height="26" fill="#A7B0C2"/><rect x="-24" y="0" width="48" height="60" rx="6" fill="#fff" stroke="#111" stroke-width="3"/><text x="0" y="15" text-anchor="middle" font-size="8" font-weight="800" fill="#111" font-family="Overpass,Arial,sans-serif" letter-spacing="1">HAFTA</text><text x="0" y="48" text-anchor="middle" font-size="32" font-weight="800" fill="#111" font-family="Overpass,Arial,sans-serif">70</text></g>
-      <g class="rig"><path d="M204 152L340 138V170L204 160z" fill="url(#beam)"/><use href="#truck" x="76" y="110" width="132" height="51"/></g>
+    <svg class="scene" id="hs" viewBox="0 0 880 200" aria-hidden="true" data-signs='[["HAYDASH","11"],["OYNA","14"],["HAFTA","70"]]'>
+      <g data-hs-fallback><rect y="148" width="880" height="52" fill="#0B1020"/><rect y="148" width="880" height="3" fill="rgba(255,255,255,.18)"/><path d="M0 178H880" stroke="#B7FF3C" stroke-width="3" stroke-dasharray="30 26" fill="none"/><circle cx="778" cy="48" r="20" fill="#F6E7A6" opacity=".92"/></g>
     </svg>
+    <script defer src="/course/shared/hero-scene.js"></script>
   </section>
 
   <section class="sec" id="s-story" data-sec="story">
@@ -966,10 +951,6 @@ html.ds-present .ask .lbl { font-size: 14px; }
   .finish { position: relative; overflow: hidden; }
   .ds-confetti i { position: absolute; width: 7px; height: 7px; border-radius: 2px; pointer-events: none; }
 
-  .ds-spoke { transform-box: fill-box; transform-origin: center; animation: ds-spin .7s linear infinite; }
-  @keyframes ds-spin { to { transform: rotate(360deg); } }
-  html.ds-scene-off .ds-spoke,
-  .scene.ds-paused * { animation-play-state: paused !important; }
 }
 
 /* Academy brand layer (brand v1): Midnight/Graphite surfaces, Electric Lime
@@ -1161,51 +1142,6 @@ html.ds-present .ask .lbl { font-size: 14px; }
         if (ic) play(ic, [{ scale: 1, opacity: 0.6 }, { scale: 1.12, opacity: 1, offset: 0.5 }, { scale: 1, opacity: 1 }], { duration: 500, easing: E })
       })
     })
-  }
-
-  // 3. Hero: the truck drifts, the exit signs breathe, the wheels turn.
-  var sceneAnims = []
-  var scene = document.querySelector('.scene')
-  if (scene) {
-    qa('.rig', scene).forEach(function (rig) {
-      var a = play(rig, [{ translate: '0 0' }, { translate: (40 * K) + 'px 0' }],
-        { duration: 7000, direction: 'alternate', iterations: Infinity, easing: 'ease-in-out' })
-      if (a) sceneAnims.push(a)
-    })
-    Array.prototype.filter.call(scene.children, function (g) {
-      return g.tagName.toLowerCase() === 'g' && g.hasAttribute('transform') && !g.classList.contains('rig')
-    }).forEach(function (g, i) {
-      var a = play(g, [{ opacity: 0.8 }, { opacity: 1 }, { opacity: 0.8 }],
-        { duration: 2400, delay: i * 400, iterations: Infinity })
-      if (a) sceneAnims.push(a)
-    })
-    // Spokes live in the shared truck symbol so every <use> copy gets them.
-    qa('#truck circle[r="6"]').forEach(function (wheel) {
-      var cx = Number(wheel.getAttribute('cx'))
-      var cy = Number(wheel.getAttribute('cy'))
-      var spoke = document.createElementNS(wheel.namespaceURI, 'path')
-      spoke.setAttribute('class', 'ds-spoke')
-      spoke.setAttribute('d', 'M' + (cx - 4.6) + ' ' + cy + 'h9.2M' + cx + ' ' + (cy - 4.6) + 'v9.2')
-      spoke.setAttribute('stroke', 'var(--muted)')
-      spoke.setAttribute('stroke-width', '1')
-      spoke.setAttribute('fill', 'none')
-      wheel.parentNode.insertBefore(spoke, wheel.nextSibling)
-    })
-    var inView = true
-    var tabOn = !document.hidden
-    var applyScene = function () {
-      var on = inView && tabOn
-      sceneAnims.forEach(function (a) { if (on) a.play(); else a.pause() })
-      scene.classList.toggle('ds-paused', !on)
-      root.classList.toggle('ds-scene-off', !on)
-    }
-    if ('IntersectionObserver' in window) {
-      new IntersectionObserver(function (entries) {
-        inView = entries[entries.length - 1].isIntersecting
-        applyScene()
-      }).observe(scene)
-    }
-    document.addEventListener('visibilitychange', function () { tabOn = !document.hidden; applyScene() })
   }
 
   // 4. Numbers count up when first seen and glide when the lesson rewrites them.
