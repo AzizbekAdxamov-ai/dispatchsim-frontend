@@ -20,8 +20,4 @@
   .finish { position: relative; overflow: hidden; }
   .ds-confetti i { position: absolute; width: 7px; height: 7px; border-radius: 2px; pointer-events: none; }
 
-  .ds-spoke { transform-box: fill-box; transform-origin: center; animation: ds-spin .7s linear infinite; }
-  @keyframes ds-spin { to { transform: rotate(360deg); } }
-  html.ds-scene-off .ds-spoke,
-  .scene.ds-paused * { animation-play-state: paused !important; }
 }

@@ -49,51 +49,6 @@
     })
   }
 
-  // 3. Hero: the truck drifts, the exit signs breathe, the wheels turn.
-  var sceneAnims = []
-  var scene = document.querySelector('.scene')
-  if (scene) {
-    qa('.rig', scene).forEach(function (rig) {
-      var a = play(rig, [{ translate: '0 0' }, { translate: (40 * K) + 'px 0' }],
-        { duration: 7000, direction: 'alternate', iterations: Infinity, easing: 'ease-in-out' })
-      if (a) sceneAnims.push(a)
-    })
-    Array.prototype.filter.call(scene.children, function (g) {
-      return g.tagName.toLowerCase() === 'g' && g.hasAttribute('transform') && !g.classList.contains('rig')
-    }).forEach(function (g, i) {
-      var a = play(g, [{ opacity: 0.8 }, { opacity: 1 }, { opacity: 0.8 }],
-        { duration: 2400, delay: i * 400, iterations: Infinity })
-      if (a) sceneAnims.push(a)
-    })
-    // Spokes live in the shared truck symbol so every <use> copy gets them.
-    qa('#truck circle[r="6"]').forEach(function (wheel) {
-      var cx = Number(wheel.getAttribute('cx'))
-      var cy = Number(wheel.getAttribute('cy'))
-      var spoke = document.createElementNS(wheel.namespaceURI, 'path')
-      spoke.setAttribute('class', 'ds-spoke')
-      spoke.setAttribute('d', 'M' + (cx - 4.6) + ' ' + cy + 'h9.2M' + cx + ' ' + (cy - 4.6) + 'v9.2')
-      spoke.setAttribute('stroke', 'var(--muted)')
-      spoke.setAttribute('stroke-width', '1')
-      spoke.setAttribute('fill', 'none')
-      wheel.parentNode.insertBefore(spoke, wheel.nextSibling)
-    })
-    var inView = true
-    var tabOn = !document.hidden
-    var applyScene = function () {
-      var on = inView && tabOn
-      sceneAnims.forEach(function (a) { if (on) a.play(); else a.pause() })
-      scene.classList.toggle('ds-paused', !on)
-      root.classList.toggle('ds-scene-off', !on)
-    }
-    if ('IntersectionObserver' in window) {
-      new IntersectionObserver(function (entries) {
-        inView = entries[entries.length - 1].isIntersecting
-        applyScene()
-      }).observe(scene)
-    }
-    document.addEventListener('visibilitychange', function () { tabOn = !document.hidden; applyScene() })
-  }
-
   // 4. Numbers count up when first seen and glide when the lesson rewrites them.
   var NUM = /^([^\d]*?)([\d,]+(?:\.\d+)?)([^\d]*)$/
   function parse(text) {
