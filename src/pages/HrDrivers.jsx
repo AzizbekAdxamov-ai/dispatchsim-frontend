@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import { AnimatePresence, motion } from 'framer-motion'
 import { MagnifyingGlass } from '@phosphor-icons/react'
 import { listDrivers } from '../api/drivers'
@@ -23,6 +24,9 @@ function initials(name) {
 
 export default function HrDrivers() {
   const navigate = useNavigate()
+  const { user } = useAuth()
+  // The driver profile lives in the dispatcher workspace; other roles see plain names.
+  const canOpenDriver = Boolean(user?.roles?.includes('dispatcher'))
   const [query, setQuery] = useState('')
 
   const { data, error, loading, refreshing } = useResource(
@@ -101,20 +105,22 @@ export default function HrDrivers() {
               <AnimatePresence initial={false}>
                 {filtered.map((driver) => (
                   <motion.tr
-                    className="row"
+                    className={canOpenDriver ? 'row' : undefined}
                     key={driver.id}
                     layout
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.18, ease: 'easeOut' }}
-                    onClick={() => navigate('/drivers/' + driver.id)}
+                    onClick={canOpenDriver ? () => navigate('/drivers/' + driver.id) : undefined}
                   >
                     <td>
                       <div className="drivers-name-chip">
                         <span className="loads-driver-dot">{initials(driver.name)}</span>
                         <div>
-                          <Link to={'/drivers/' + driver.id} className="drivers-name row-primary-link">{driver.name}</Link>
+                          {canOpenDriver
+                            ? <Link to={'/drivers/' + driver.id} className="drivers-name row-primary-link">{driver.name}</Link>
+                            : <span className="drivers-name">{driver.name}</span>}
                           <div className="drivers-name-sub">{driver.cdlClass ? `CDL-${driver.cdlClass} · ${driver.cdlNumber}` : '—'}</div>
                         </div>
                       </div>

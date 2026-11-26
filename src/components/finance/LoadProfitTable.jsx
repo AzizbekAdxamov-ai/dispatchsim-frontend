@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
 import { formatMoney, formatPlace } from '../../utils/format'
 import '../dashboard/Panel.css'
 import '../dashboard/Charts.css'
@@ -13,6 +14,9 @@ import '../dashboard/LoadBoard.css'
 
 export default function LoadProfitTable({ loads }) {
   const navigate = useNavigate()
+  const { user } = useAuth()
+  // Load detail lives in the dispatcher workspace; finance-only users get plain rows.
+  const canOpenLoad = Boolean(user?.roles?.includes('dispatcher'))
 
   return (
     <div className="panel load-board">
@@ -42,9 +46,9 @@ export default function LoadProfitTable({ loads }) {
             const cost = Math.round(load.driverPayUsd + load.fuelCostUsd + load.otherCostUsd)
             return (
               <tr
-                className="row"
+                className={canOpenLoad ? 'row' : undefined}
                 key={load.loadId}
-                onClick={() => navigate('/loads/' + load.loadId)}
+                onClick={canOpenLoad ? () => navigate('/loads/' + load.loadId) : undefined}
               >
                 <td className="load-id mono">#{load.loadId}</td>
                 <td><div className="route">{formatPlace(load.originCity, load.originState)} <span className="arrow">→</span> {formatPlace(load.destinationCity, load.destinationState)}</div></td>

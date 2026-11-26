@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
-import { roleHomePath, settingsPathFor } from '../data/roleRoutes'
+import { roleHomePath } from '../data/roleRoutes'
+import { passwordChangePath } from '../components/routeGate'
 import { ApiError } from '../api/client'
 import { LOGIN_FEEDBACK, cooldownSeconds } from '../data/loginFeedback'
 import truckBg from '../assets/truck-bg.webp'
@@ -91,7 +92,7 @@ export default function Login() {
     try {
       const user = await login(email, password, remember)
       // A temporary password (set by an administrator) must be replaced first.
-      navigate(user.mustChangePassword ? settingsPathFor(user.activeRole) : roleHomePath(user.activeRole))
+      navigate(user.mustChangePassword ? passwordChangePath(user) : roleHomePath(user.activeRole))
     } catch (err) {
       if (err instanceof ApiError && err.code === 'RATE_LIMITED') {
         const seconds = cooldownSeconds(err.details)

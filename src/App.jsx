@@ -71,7 +71,7 @@ export default function App() {
           <Route
             path="/"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allow={['dispatcher']}>
                 <AppShell />
               </ProtectedRoute>
             }
