@@ -301,13 +301,20 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
 .hero .lead{color:rgba(255,255,255,.84);max-width:56ch}
 .hero .chip{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.26);color:#fff}
 .scene{display:block;width:100%;height:auto;margin-top:6px}
-.scene .lane{animation:lane 1s linear infinite}
-@keyframes lane{to{stroke-dashoffset:-56}}
-.scene .rig{animation:bob 1.7s ease-in-out infinite}
-@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.5px)}}
+.scene .wheel{animation:spin .55s linear infinite;transform-box:fill-box;transform-origin:center}
+@keyframes spin{to{transform:rotate(360deg)}}
+.scene .rig{animation:bob2 1.3s ease-in-out infinite}
+@keyframes bob2{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.6px)}}
+.scene .beam{animation:flick 3.4s ease-in-out infinite}
+@keyframes flick{0%,100%{opacity:1}45%{opacity:.86}50%{opacity:.95}55%{opacity:.82}}
 .scene .twinkle{animation:tw 3s ease-in-out infinite}
 @keyframes tw{0%,100%{opacity:.9}50%{opacity:.25}}
-@media (prefers-reduced-motion:reduce){.scene .lane,.scene .rig,.scene .twinkle{animation:none}}
+.scene .puff{opacity:0;animation:puff 3.2s ease-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes puff{0%{opacity:0;transform:translate(0,0) scale(.5)}15%{opacity:.5}100%{opacity:0;transform:translate(-46px,-22px) scale(2.6)}}
+.scene .shoot{opacity:0;animation:shoot 11s linear infinite}
+@keyframes shoot{0%,90%{opacity:0;transform:translate(0,0)}91%{opacity:1}100%{opacity:0;transform:translate(-120px,60px)}}
+.scene.hs-paused *{animation-play-state:paused}
+@media (prefers-reduced-motion:reduce){.scene .wheel,.scene .rig,.scene .beam,.scene .puff,.scene .shoot,.scene .twinkle{animation:none}}
 @media (max-width:520px){.hero-top{padding:24px 20px 4px}}
 
 /* exit signs */
@@ -458,10 +465,10 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
       <path d="M82 12h18l12 11v11H82z" fill="#1B2338"/>
       <path d="M100 15h-12v8h21z" fill="#C9D6EE"/>
       <rect x="80" y="30" width="34" height="5" fill="#151C2F"/>
-      <circle cx="18" cy="38" r="6" fill="#111"/><circle cx="18" cy="38" r="2.4" fill="#A7B0C2"/>
-      <circle cx="34" cy="38" r="6" fill="#111"/><circle cx="34" cy="38" r="2.4" fill="#A7B0C2"/>
-      <circle cx="92" cy="38" r="6" fill="#111"/><circle cx="92" cy="38" r="2.4" fill="#A7B0C2"/>
-      <circle cx="106" cy="38" r="6" fill="#111"/><circle cx="106" cy="38" r="2.4" fill="#A7B0C2"/>
+      <circle cx="18" cy="38" r="6" fill="#111"/><path d="M13.4 38h9.2M18 33.4v9.2" stroke="var(--muted)" stroke-width="1" fill="none"/><circle cx="18" cy="38" r="2.4" fill="#A7B0C2"/>
+      <circle cx="34" cy="38" r="6" fill="#111"/><path d="M29.4 38h9.2M34 33.4v9.2" stroke="var(--muted)" stroke-width="1" fill="none"/><circle cx="34" cy="38" r="2.4" fill="#A7B0C2"/>
+      <circle cx="92" cy="38" r="6" fill="#111"/><path d="M87.4 38h9.2M92 33.4v9.2" stroke="var(--muted)" stroke-width="1" fill="none"/><circle cx="92" cy="38" r="2.4" fill="#A7B0C2"/>
+      <circle cx="106" cy="38" r="6" fill="#111"/><path d="M101.4 38h9.2M106 33.4v9.2" stroke="var(--muted)" stroke-width="1" fill="none"/><circle cx="106" cy="38" r="2.4" fill="#A7B0C2"/>
     </symbol>
   
     <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3 2.5 20h19L12 3z"/><path d="M12 10v5M12 17.5v.5"/></symbol>
@@ -512,18 +519,198 @@ body{background-image:radial-gradient(1100px 520px at 50% -240px,rgba(183,255,60
       <h1 id="h1">Bitta yuk — bir jamoa</h1>
       <p class="lead">AQSh logistikasida yukni kim jo‘natadi, kim tashkil qiladi, kim tashiydi va kim kuzatadi. Bugun bitta yukni Dallasdan Atlantaga birga olib borasiz va har bosqichda kim nima qilishini ko‘rasiz.</p>
     </div>
-    <svg class="scene" viewBox="0 0 880 200" aria-hidden="true">
-      <defs><linearGradient id="beam" x1="0" x2="1"><stop offset="0" stop-color="#F6E7A6" stop-opacity=".55"/><stop offset="1" stop-color="#F6E7A6" stop-opacity="0"/></linearGradient></defs>
-      <g fill="#fff"><circle class="twinkle" cx="560" cy="22" r="1.6"/><circle class="twinkle" cx="640" cy="46" r="1.2" style="animation-delay:.8s"/><circle class="twinkle" cx="710" cy="18" r="1.5" style="animation-delay:1.4s"/><circle class="twinkle" cx="470" cy="40" r="1.1" style="animation-delay:2s"/><circle class="twinkle" cx="840" cy="30" r="1.3" style="animation-delay:.4s"/></g>
-      <circle cx="778" cy="48" r="20" fill="#F6E7A6" opacity=".92"/><circle cx="786" cy="42" r="18" fill="#151C2F" opacity=".55"/>
-      <path d="M0 138C90 108 170 118 260 132S430 94 540 120S740 98 880 124V200H0z" fill="rgba(0,0,0,.20)"/>
-      <path d="M0 160C120 138 230 150 330 156S560 132 680 150S820 140 880 148V200H0z" fill="rgba(0,0,0,.28)"/>
-      <path d="M20 152l9-30 9 30zM52 152l9-30 9 30zM330 152l9-30 9 30zM372 152l9-30 9 30zM780 152l9-30 9 30zM818 152l9-30 9 30z" fill="rgba(0,0,0,.34)"/>
-      <rect y="148" width="880" height="52" fill="#0B1020"/><rect y="148" width="880" height="3" fill="rgba(255,255,255,.18)"/>
-      <path class="lane" d="M0 178H880" stroke="#B7FF3C" stroke-width="3" stroke-dasharray="30 26" fill="none"/>
-      <g transform="translate(470,68)"><rect x="-1.5" y="58" width="3" height="26" fill="#A7B0C2"/><rect x="-24" y="0" width="48" height="60" rx="6" fill="#fff" stroke="#111" stroke-width="3"/><text x="0" y="15" text-anchor="middle" font-size="8" font-weight="800" fill="#111" font-family="Overpass,Arial,sans-serif" letter-spacing="1">ROL</text><text x="0" y="46" text-anchor="middle" font-size="30" font-weight="800" fill="#111" font-family="Overpass,Arial,sans-serif">7</text></g><g transform="translate(580,68)"><rect x="-1.5" y="58" width="3" height="26" fill="#A7B0C2"/><rect x="-24" y="0" width="48" height="60" rx="6" fill="#fff" stroke="#111" stroke-width="3"/><text x="0" y="15" text-anchor="middle" font-size="8" font-weight="800" fill="#111" font-family="Overpass,Arial,sans-serif" letter-spacing="1">FAKT</text><text x="0" y="46" text-anchor="middle" font-size="30" font-weight="800" fill="#111" font-family="Overpass,Arial,sans-serif">✓</text></g><g transform="translate(690,68)"><rect x="-1.5" y="58" width="3" height="26" fill="#A7B0C2"/><rect x="-24" y="0" width="48" height="60" rx="6" fill="#fff" stroke="#111" stroke-width="3"/><text x="0" y="15" text-anchor="middle" font-size="8" font-weight="800" fill="#111" font-family="Overpass,Arial,sans-serif" letter-spacing="1">TAXMIN</text><text x="0" y="46" text-anchor="middle" font-size="30" font-weight="800" fill="#111" font-family="Overpass,Arial,sans-serif">?</text></g>
-      <g class="rig"><path d="M204 152L340 138V170L204 160z" fill="url(#beam)"/><use href="#truck" x="76" y="110" width="132" height="51"/></g>
+    <svg class="scene" id="hs-scene" viewBox="0 0 880 200" aria-hidden="true">
+      <defs>
+        <linearGradient id="hs-beam" x1="0" x2="1"><stop offset="0" stop-color="#FFF1B8" stop-opacity=".62"/><stop offset=".55" stop-color="#F6E7A6" stop-opacity=".22"/><stop offset="1" stop-color="#F6E7A6" stop-opacity="0"/></linearGradient>
+        <radialGradient id="hs-pool"><stop offset="0" stop-color="#FFF1B8" stop-opacity=".34"/><stop offset="1" stop-color="#FFF1B8" stop-opacity="0"/></radialGradient>
+        <radialGradient id="hs-halo"><stop offset="0" stop-color="#F6E7A6" stop-opacity=".30"/><stop offset="1" stop-color="#F6E7A6" stop-opacity="0"/></radialGradient>
+        <linearGradient id="hs-roadG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#121A2E"/><stop offset="1" stop-color="#070B16"/></linearGradient>
+        <filter id="hs-glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="5"/></filter>
+        <clipPath id="hs-clipS"><rect width="880" height="200"/></clipPath>
+      </defs>
+      <g clip-path="url(#hs-clipS)">
+        <g fill="#fff" id="hs-stars"></g>
+        <path class="shoot" d="M690 24l-26 -2" stroke="#fff" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+        <circle cx="778" cy="48" r="46" fill="url(#hs-halo)"/>
+        <circle cx="778" cy="48" r="20" fill="#F6E7A6" opacity=".95"/><circle cx="786" cy="42" r="18" fill="#151C2F" opacity=".55"/>
+        <g id="hs-L1"></g><g id="hs-L2"></g><g id="hs-L3"></g>
+        <rect y="148" width="880" height="52" fill="url(#hs-roadG)"/>
+        <rect y="148" width="880" height="3" fill="rgba(255,255,255,.18)"/>
+        <rect y="186" width="880" height="1.5" fill="rgba(255,255,255,.07)"/>
+        <g id="hs-dashes"></g>
+        <ellipse cx="330" cy="160" rx="150" ry="11" fill="url(#hs-pool)"/>
+        <g id="hs-poles"></g>
+        <g id="hs-signs"></g>
+        <g class="beam"><path d="M200 143L440 118V168L200 148z" fill="url(#hs-beam)"/></g>
+        <g class="rig">
+          <g transform="translate(76,110) scale(1.1)">
+            <rect x="2" y="4" width="78" height="30" rx="2" fill="#EEF1F7" stroke="#A7B0C2"/>
+            <path d="M16 6v26M30 6v26M44 6v26M58 6v26M72 6v26" stroke="#D3D9E6" stroke-width=".8"/>
+            <text x="41" y="24" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#1B2338">DS-1001</text>
+            <rect x="0" y="26" width="3" height="4" rx="1" fill="#FF5A4E"/>
+            <path d="M82 12h18l12 11v11H82z" fill="#1B2338"/>
+            <path d="M100 15h-12v8h21z" fill="#BFD2F2"/>
+            <path d="M100 15h-6l-3 8h6z" fill="#FFF6D0" opacity=".55"/>
+            <rect x="80" y="30" width="34" height="5" fill="#151C2F"/>
+            <rect x="83" y="2" width="3" height="12" rx="1" fill="#2A344D"/>
+            <circle cx="111" cy="29" r="2.6" fill="#FFF3B0"/>
+            <g class="wheel"><circle cx="18" cy="38" r="6" fill="#111"/><circle cx="18" cy="38" r="2.4" fill="#A7B0C2"/><path d="M13.4 38h9.2M18 33.4v9.2" stroke="#6B7690" stroke-width="1"/></g>
+            <g class="wheel"><circle cx="34" cy="38" r="6" fill="#111"/><circle cx="34" cy="38" r="2.4" fill="#A7B0C2"/><path d="M29.4 38h9.2M34 33.4v9.2" stroke="#6B7690" stroke-width="1"/></g>
+            <g class="wheel"><circle cx="92" cy="38" r="6" fill="#111"/><circle cx="92" cy="38" r="2.4" fill="#A7B0C2"/><path d="M87.4 38h9.2M92 33.4v9.2" stroke="#6B7690" stroke-width="1"/></g>
+            <g class="wheel"><circle cx="106" cy="38" r="6" fill="#111"/><circle cx="106" cy="38" r="2.4" fill="#A7B0C2"/><path d="M101.4 38h9.2M106 33.4v9.2" stroke="#6B7690" stroke-width="1"/></g>
+          </g>
+          <circle class="puff" cx="168" cy="110" r="4" fill="#9AA6C2"/>
+          <circle class="puff" cx="168" cy="110" r="4" fill="#9AA6C2" style="animation-delay:1.05s"/>
+          <circle class="puff" cx="168" cy="110" r="4" fill="#9AA6C2" style="animation-delay:2.1s"/>
+        </g>
+      </g>
     </svg>
+    <script>
+    (function(){
+      try{
+        var svg=document.getElementById('hs-scene');
+        if(!svg)return;
+        var NS='http://www.w3.org/2000/svg', W=880;
+        function el(tag,attrs,parent){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e}
+        function rng(seed){return function(){seed=(seed*16807)%2147483647;return(seed-1)/2147483646}}
+
+        // stars
+        var st=document.getElementById('hs-stars'),r=rng(7);
+        for(var i=0;i<16;i++){var c=el('circle',{cx:Math.round(r()*860+10),cy:Math.round(r()*70+8),r:(r()*1+.8).toFixed(1),class:'twinkle'},st);c.style.animationDelay=(r()*3).toFixed(1)+'s';c.setAttribute('opacity',(.5+r()*.5).toFixed(2))}
+
+        // seamless hills (integer number of cycles over 880)
+        function hills(g,base,amp,cyc,fill,seed){
+          var rr=rng(seed),ph=[rr()*6,rr()*6],d;
+          var pts=[];for(var x=0;x<=W*2;x+=20){var y=base-amp*(Math.sin(x/W*Math.PI*2*cyc+ph[0])*.6+Math.sin(x/W*Math.PI*2*(cyc*2+1)+ph[1])*.4);pts.push(x+' '+y.toFixed(1))}
+          d='M'+pts.join('L')+'V200H0z';el('path',{d:d,fill:fill},g)}
+        var L1=document.getElementById('hs-L1'),L2=document.getElementById('hs-L2'),L3=document.getElementById('hs-L3');
+        hills(L1,128,16,1,'rgba(0,0,0,.20)',11);
+        hills(L2,146,10,2,'rgba(0,0,0,.30)',23);
+        // pine tree line (near, darkest); built with an exact 880 period so the loop is seamless
+        (function(){var rr=rng(5),xs=[];for(var x=10;x<W-20;x+=26+rr()*30)xs.push([x,22+rr()*18]);
+          [0,W].forEach(function(o){xs.forEach(function(t){var x=t[0]+o,h=t[1],w=h*.34;el('path',{d:'M'+x+' 152l'+w+' -'+h+' '+w+' '+h+'z',fill:'rgba(0,0,0,.42)'},L3)})})})();
+
+        // lane dashes (period 56)
+        var D=document.getElementById('hs-dashes');
+        for(var x=0;x<W+112;x+=56)el('rect',{x:x,y:177,width:30,height:3,rx:1,fill:'#B7FF3C'},D);
+
+        // poles with wire (period 440)
+        var P=document.getElementById('hs-poles');
+        for(var t=0;t<3;t++){var o=t*440;
+          el('path',{d:'M'+o+' 112Q'+(o+110)+' 134 '+(o+220)+' 112Q'+(o+330)+' 134 '+(o+440)+' 112',stroke:'rgba(255,255,255,.14)','stroke-width':1,fill:'none'},P);
+          [0,220].forEach(function(dx){var px=o+dx;el('rect',{x:px-1.5,y:108,width:3,height:44,fill:'#0A0F1E'},P);el('rect',{x:px-9,y:112,width:18,height:2.4,fill:'#0A0F1E'},P)})}
+
+        // signs
+        var S=document.getElementById('hs-signs'),defs=[
+          {a:'ROL',b:'7',lit:'#FFFBE6',ink:'#111',glow:'#F6E7A6'},
+          {a:'FAKT',b:'✓',lit:'#DCFBE7',ink:'#14683A',glow:'#4ADE80'},
+          {a:'TAXMIN',b:'?',lit:'#FFF0B8',ink:'#8A5A00',glow:'#F2B705'}].map(function(d){
+          var g=el('g',{},S);
+          d.glowEl=el('rect',{x:-24,y:68,width:48,height:60,rx:6,fill:d.glow,opacity:0,filter:'url(#hs-glow)'},g);
+          el('rect',{x:-1.5,y:126,width:3,height:26,fill:'#A7B0C2'},g);
+          d.face=el('rect',{x:-24,y:68,width:48,height:60,rx:6,fill:'#C7CEDD',stroke:'#111','stroke-width':3},g);
+          var t1=el('text',{x:0,y:83,'text-anchor':'middle','font-size':8,'font-weight':800,fill:'#111','font-family':'Overpass,Arial,sans-serif','letter-spacing':1},g);t1.textContent=d.a;
+          d.big=el('text',{x:0,y:114,'text-anchor':'middle','font-size':30,'font-weight':800,fill:'#111','font-family':'Overpass,Arial,sans-serif'},g);d.big.textContent=d.b;
+          d.g=g;return d});
+        function hex(c){return[1,3,5].map(function(i){return parseInt(c.substr(i,2),16)})}
+        function mix(a,b,t){var A=hex(a),B=hex(b);return'rgb('+A.map(function(v,i){return Math.round(v+(B[i]-v)*t)}).join(',')+')'}
+
+        // ---- logo billboard (LED bulbs + neon-style logo) ----
+        var POS=[0,130,260,490],CYC=1300,forceLit=false,bbScale=1;
+        var bb=el('g',{},S),bbGlowRect=el('rect',{x:-150,y:36,width:300,height:74,rx:10,fill:'#B7FF3C',opacity:0,filter:'url(#hs-glow)'},bb);
+        el('rect',{x:-90,y:108,width:3,height:44,fill:'#A7B0C2'},bb);el('rect',{x:87,y:108,width:3,height:44,fill:'#A7B0C2'},bb);
+        var bbFace=el('rect',{x:-150,y:36,width:300,height:74,rx:10,fill:'#0B1020',stroke:'#1E2742','stroke-width':3},bb);
+        var bbRim=el('rect',{x:-143,y:43,width:286,height:60,rx:6,fill:'none',stroke:'#B7FF3C','stroke-width':1,opacity:0},bb);
+        var bbGlowImg=el('image',{href:'/brand/logo-white.png',x:-136,y:52,width:272,height:40,preserveAspectRatio:'xMidYMid meet',opacity:0,filter:'url(#hs-glow)'},bb);
+        var bbImg=el('image',{href:'/brand/logo-white.png',x:-136,y:52,width:272,height:40,preserveAspectRatio:'xMidYMid meet',opacity:.28},bb);
+        var bulbs=[];(function(){var pts=[],stepL=13,w=300,h=74,x0=-150,y0=36;
+          for(var x=x0+8;x<x0+w-4;x+=stepL)pts.push([x,y0]);
+          for(var y=y0+8;y<y0+h-4;y+=stepL)pts.push([x0+w,y]);
+          for(var x2=x0+w-8;x2>x0+4;x2-=stepL)pts.push([x2,y0+h]);
+          for(var y2=y0+h-8;y2>y0+4;y2-=stepL)pts.push([x0,y2]);
+          pts.forEach(function(p){bulbs.push(el('circle',{cx:p[0],cy:p[1],r:2.1,fill:'#2A344D'},bb))})})();
+        function hash(n){var x=Math.sin(n*127.1)*43758.5453;return x-Math.floor(x)}
+        function mod(v,m){return((v%m)+m)%m}
+        function place(off){
+          defs.forEach(function(d,i){
+            var x=mod(POS[i]+900-off,CYC)-160;
+            var p=forceLit?1:Math.max(0,Math.min(1,(430-x)/90))*(1-Math.max(0,Math.min(1,(130-x)/70)));
+            d.g.setAttribute('transform','translate('+x.toFixed(1)+',0)');
+            d.face.setAttribute('fill',mix('#C7CEDD',d.lit,p));
+            d.big.setAttribute('fill',mix('#111111',d.ink,p));
+            d.glowEl.setAttribute('opacity',(p*.55).toFixed(2));
+          });
+          var bx=mod(POS[3]+900-off,CYC)-160;
+          // scale around the billboard's own centre (0,73) so it stays on the same road line
+          bb.setAttribute('transform','translate('+bx.toFixed(1)+',73) scale('+bbScale+') translate(0,-73)');
+          if(bx<-170||bx>1050)return;
+          var u=forceLit?1:Math.max(0,Math.min(1,(640-bx)/130));
+          var k=u;
+          if(u>0&&u<1)k=u*(hash(Math.floor(off/5))>.42?1:.3);            // neon warm-up flicker
+          else if(u===1&&!forceLit)k=hash(Math.floor(off/40))>.97?.82:1; // rare steady-state buzz
+          bbImg.setAttribute('opacity',(.28+.72*k).toFixed(2));
+          bbGlowImg.setAttribute('opacity',(k*.85).toFixed(2));
+          bbGlowRect.setAttribute('opacity',(k*.30).toFixed(2));
+          bbRim.setAttribute('opacity',(k*.9).toFixed(2));
+          bbFace.setAttribute('stroke',mix('#1E2742','#B7FF3C',k));
+          var ph=Math.floor(off/7);
+          bulbs.forEach(function(c,i){
+            var on=forceLit?true:(k>.5&&((i+ph)%3!==0));
+            c.setAttribute('fill',on?'#FFF1B8':(k>.2?'#4A5576':'#2A344D'));
+            c.setAttribute('opacity',on?1:.8)})}
+        function frame(off){
+          L1.setAttribute('transform','translate('+(-mod(off*.09,W))+',0)');
+          L2.setAttribute('transform','translate('+(-mod(off*.25,W))+',0)');
+          L3.setAttribute('transform','translate('+(-mod(off*.6,W))+',0)');
+          P.setAttribute('transform','translate('+(-mod(off,440))+',0)');
+          D.setAttribute('transform','translate('+(-mod(off,56))+',0)');
+          place(off)}
+
+        var off=0,last=0,raf=0,visible=true,tab=!document.hidden,reduced=false,narrow=false;
+        var SPEED=90;
+        // rAF runs only while the hero is on screen, the tab is visible and motion is allowed;
+        // otherwise the hs-paused class also freezes the CSS animations (wheels, smoke, stars).
+        function sync(){
+          var on=visible&&tab&&!reduced;
+          svg.classList.toggle('hs-paused',!on);
+          if(on){if(!raf){last=0;raf=requestAnimationFrame(tick)}}
+          else if(raf){cancelAnimationFrame(raf);raf=0}}
+        function tick(ts){
+          raf=0;if(!(visible&&tab)||reduced)return;
+          var dt=last?Math.min(.05,(ts-last)/1000):0;last=ts;off+=SPEED*dt;frame(off);raf=requestAnimationFrame(tick)}
+        // static frame for reduced motion: every sign and the billboard lit and fully in view
+        // narrow crop shows x 60..680: 760 puts the 1.25x billboard (centre 470) fully inside it, 510 would cut it off
+        function staticOff(){return narrow?760:510}
+
+        var mq=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)');
+        function setReduced(v){
+          reduced=v;forceLit=v;
+          if(v){off=staticOff();frame(off)}else{off=0;frame(0)}
+          sync()}
+        if(mq){var onMq=function(e){setReduced(e.matches)};
+          if(mq.addEventListener)mq.addEventListener('change',onMq);else if(mq.addListener)mq.addListener(onMq)}
+
+        // phones: crop the scene so the truck, signs and logo read at 390px wide
+        var nq=window.matchMedia&&window.matchMedia('(max-width: 560px)');
+        function applyNarrow(v){
+          narrow=v;bbScale=v?1.25:1;
+          svg.setAttribute('viewBox',v?'60 0 620 200':'0 0 880 200')}
+        if(nq){
+          var onNq=function(e){applyNarrow(e.matches);frame(reduced?staticOff():off)};
+          if(nq.addEventListener)nq.addEventListener('change',onNq);else if(nq.addListener)nq.addListener(onNq);
+          applyNarrow(nq.matches)}
+
+        reduced=!!(mq&&mq.matches);forceLit=reduced;
+        if(reduced)off=staticOff();
+        frame(off);
+
+        var hero=svg.closest?svg.closest('.hero'):null;
+        if('IntersectionObserver' in window)new IntersectionObserver(function(es){visible=es[es.length-1].isIntersecting;sync()},{threshold:.05}).observe(hero||svg);
+        document.addEventListener('visibilitychange',function(){tab=!document.hidden;sync()});
+        sync();
+      }catch(e){}
+    })();
+    </script>
   </section>
 
   <section class="sec" id="s-story" data-sec="story">
@@ -890,10 +1077,6 @@ html.ds-present .ask .lbl { font-size: 14px; }
   .finish { position: relative; overflow: hidden; }
   .ds-confetti i { position: absolute; width: 7px; height: 7px; border-radius: 2px; pointer-events: none; }
 
-  .ds-spoke { transform-box: fill-box; transform-origin: center; animation: ds-spin .7s linear infinite; }
-  @keyframes ds-spin { to { transform: rotate(360deg); } }
-  html.ds-scene-off .ds-spoke,
-  .scene.ds-paused * { animation-play-state: paused !important; }
 }
 
 /* Academy brand layer (brand v1): Midnight/Graphite surfaces, Electric Lime
@@ -1085,51 +1268,6 @@ html.ds-present .ask .lbl { font-size: 14px; }
         if (ic) play(ic, [{ scale: 1, opacity: 0.6 }, { scale: 1.12, opacity: 1, offset: 0.5 }, { scale: 1, opacity: 1 }], { duration: 500, easing: E })
       })
     })
-  }
-
-  // 3. Hero: the truck drifts, the exit signs breathe, the wheels turn.
-  var sceneAnims = []
-  var scene = document.querySelector('.scene')
-  if (scene) {
-    qa('.rig', scene).forEach(function (rig) {
-      var a = play(rig, [{ translate: '0 0' }, { translate: (40 * K) + 'px 0' }],
-        { duration: 7000, direction: 'alternate', iterations: Infinity, easing: 'ease-in-out' })
-      if (a) sceneAnims.push(a)
-    })
-    Array.prototype.filter.call(scene.children, function (g) {
-      return g.tagName.toLowerCase() === 'g' && g.hasAttribute('transform') && !g.classList.contains('rig')
-    }).forEach(function (g, i) {
-      var a = play(g, [{ opacity: 0.8 }, { opacity: 1 }, { opacity: 0.8 }],
-        { duration: 2400, delay: i * 400, iterations: Infinity })
-      if (a) sceneAnims.push(a)
-    })
-    // Spokes live in the shared truck symbol so every <use> copy gets them.
-    qa('#truck circle[r="6"]').forEach(function (wheel) {
-      var cx = Number(wheel.getAttribute('cx'))
-      var cy = Number(wheel.getAttribute('cy'))
-      var spoke = document.createElementNS(wheel.namespaceURI, 'path')
-      spoke.setAttribute('class', 'ds-spoke')
-      spoke.setAttribute('d', 'M' + (cx - 4.6) + ' ' + cy + 'h9.2M' + cx + ' ' + (cy - 4.6) + 'v9.2')
-      spoke.setAttribute('stroke', 'var(--muted)')
-      spoke.setAttribute('stroke-width', '1')
-      spoke.setAttribute('fill', 'none')
-      wheel.parentNode.insertBefore(spoke, wheel.nextSibling)
-    })
-    var inView = true
-    var tabOn = !document.hidden
-    var applyScene = function () {
-      var on = inView && tabOn
-      sceneAnims.forEach(function (a) { if (on) a.play(); else a.pause() })
-      scene.classList.toggle('ds-paused', !on)
-      root.classList.toggle('ds-scene-off', !on)
-    }
-    if ('IntersectionObserver' in window) {
-      new IntersectionObserver(function (entries) {
-        inView = entries[entries.length - 1].isIntersecting
-        applyScene()
-      }).observe(scene)
-    }
-    document.addEventListener('visibilitychange', function () { tabOn = !document.hidden; applyScene() })
   }
 
   // 4. Numbers count up when first seen and glide when the lesson rewrites them.
