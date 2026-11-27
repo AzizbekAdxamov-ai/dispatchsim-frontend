@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { getAcademyMe } from '../../api/academy'
+import { signalAcademyReady } from '../../components/academy/academyIntroSignal'
 import { useAuth } from '../../context/AuthContext'
 import { ACADEMY_COPY, academyLoadError, canTeachClass } from '../../data/academyAccess'
 import { ACADEMY_LESSONS, EXITS_PER_LESSON, LESSON_COUNT, WEEK_COUNT } from '../../data/academyLessons'
@@ -49,6 +50,11 @@ export default function AcademyHome() {
       })
     return () => controller.abort()
   }, [])
+
+  // First data (or a failure) is something to look at: the entrance can lift.
+  useEffect(() => {
+    if (me || load) signalAcademyReady()
+  }, [me, load])
 
   const byNo = new Map((me?.lessons ?? []).map((l) => [l.lessonNo, l]))
   const doneOf = (no) => byNo.get(no)?.exitsCount ?? 0

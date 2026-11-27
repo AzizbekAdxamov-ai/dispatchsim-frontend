@@ -1,0 +1,68 @@
+/* Academy entrance overlay. Ported from the approved film-opening demo;
+   sizes, timings and keyframes are unchanged. Colours: --intro-* tokens. */
+.gm-intro {
+  position: fixed; inset: 0; z-index: 1000; overflow: hidden;
+  background: radial-gradient(110% 80% at 50% 40%, var(--intro-bg-a) 0%, var(--intro-bg-b) 55%, var(--intro-bg-c) 100%);
+  opacity: 0; visibility: hidden; pointer-events: none;
+  box-sizing: border-box;
+}
+.gm-intro *, .gm-intro *::before, .gm-intro *::after { box-sizing: border-box; }
+.gm-intro.gm-intro-on { visibility: visible; pointer-events: all; opacity: 1; animation: gm-intro-in .25s ease-out; }
+.gm-intro.gm-intro-out { opacity: 0; transition: opacity .55s ease-in; pointer-events: none; }
+@keyframes gm-intro-in { from { opacity: 0 } to { opacity: 1 } }
+
+.gm-intro-vis { position: absolute; inset: 0; }
+.gm-intro-dots { position: absolute; inset: 0; width: 100%; height: 100%; }
+.gm-intro-stage { position: absolute; left: 50%; top: 42%; width: min(62vw, 460px); aspect-ratio: 942/449; transform: translate(-50%, -50%); }
+.gm-intro-stage svg { width: 100%; height: 100%; overflow: visible; display: block; }
+.gm-intro-outline { fill: none; stroke: var(--intro-outline); stroke-width: 5; stroke-linejoin: round; stroke-linecap: round; filter: drop-shadow(0 0 6px var(--intro-lime)) drop-shadow(0 0 16px var(--intro-glow-out)); }
+.gm-intro-fill { --intro-ca: 0px; fill: var(--intro-lime); opacity: 0; filter: drop-shadow(0 0 14px var(--intro-glow-a)) drop-shadow(0 0 42px var(--intro-glow-b)); }
+.gm-intro-fill.gm-intro-ca { filter: drop-shadow(var(--intro-ca) 0 0 var(--intro-ca-red)) drop-shadow(calc(var(--intro-ca) * -1) 0 0 var(--intro-ca-blue)) drop-shadow(0 0 16px var(--intro-glow-a)) drop-shadow(0 0 42px var(--intro-glow-b)); }
+.gm-intro-spark { opacity: 0; fill: var(--intro-shine); filter: drop-shadow(0 0 8px var(--intro-shine)) drop-shadow(0 0 20px var(--intro-lime)); }
+.gm-intro-shock { position: absolute; left: 50%; top: 50%; width: 60px; height: 60px; margin: -30px; border-radius: 50%; border: 2px solid var(--intro-shock); opacity: 0; }
+.gm-intro-tag {
+  position: absolute; left: 50%; top: calc(42% + min(31vw, 230px) * .477 + 34px); transform: translateX(-50%);
+  white-space: nowrap; font-family: var(--font-body); font-weight: 700; letter-spacing: .5em; font-size: clamp(11px, 2.2vw, 18px);
+  color: var(--intro-lime); text-shadow: 0 0 12px var(--intro-tag-glow); clip-path: inset(0 100% 0 0); padding-left: .5em;
+}
+.gm-intro-line { position: absolute; left: 0; right: 0; height: 2px; top: calc(42% + min(31vw, 230px) * .477 + 92px); background: linear-gradient(90deg, transparent, var(--intro-line) 20%, var(--intro-line) 80%, transparent); opacity: 0; }
+.gm-intro-truck { position: absolute; width: 190px; left: 0; top: calc(42% + min(31vw, 230px) * .477 + 92px - 52px); opacity: 0; will-change: transform; }
+.gm-intro-truck svg { width: 100%; display: block; overflow: visible; }
+.gm-intro-wheel { animation: gm-intro-spin .3s linear infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes gm-intro-spin { to { transform: rotate(360deg) } }
+.gm-intro-cam { position: absolute; inset: 0; transform-origin: 50% 42%; will-change: transform; }
+.gm-intro-box { position: absolute; left: 0; right: 0; height: 0; background: var(--intro-black); z-index: 6; }
+.gm-intro-box-top { top: 0; }
+.gm-intro-box-bottom { bottom: 0; }
+.gm-intro-vig { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(120% 100% at 50% 45%, transparent 50%, var(--intro-vignette) 100%); z-index: 4; }
+.gm-intro-grain { position: absolute; inset: -50%; pointer-events: none; opacity: .10; z-index: 4; mix-blend-mode: overlay; }
+.gm-intro-flare {
+  position: absolute; left: -10vw; right: -10vw; top: 42%; height: 4px; margin-top: -2px; pointer-events: none; opacity: 0; transform: scaleX(0);
+  background: linear-gradient(90deg, transparent, var(--intro-flare) 50%, transparent); filter: blur(1px) drop-shadow(0 0 14px var(--intro-flare-glow)); z-index: 3;
+}
+.gm-intro-bar { position: absolute; z-index: 7; left: 50%; bottom: 9vh; width: 120px; height: 3px; margin-left: -60px; background: var(--intro-bar-bg); border-radius: 2px; overflow: hidden; opacity: 0; transition: opacity .2s; }
+.gm-intro-bar i { display: block; height: 100%; width: 40%; background: var(--intro-lime); animation: gm-intro-slide 1s ease-in-out infinite; }
+.gm-intro.gm-intro-wait .gm-intro-bar { opacity: 1; }
+@keyframes gm-intro-slide { 0% { transform: translateX(-100%) } 100% { transform: translateX(300%) } }
+
+/* Reduced motion: only a short fade of the lit logo. */
+.gm-intro-rm.gm-intro-on { animation-duration: .15s; }
+.gm-intro-rm.gm-intro-out { transition-duration: .15s; }
+.gm-intro-rm .gm-intro-outline, .gm-intro-rm .gm-intro-tag, .gm-intro-rm .gm-intro-spark { display: none; }
+.gm-intro-rm .gm-intro-fill { opacity: 1 !important; }
+
+.gm-intro-mute {
+  position: absolute; z-index: 8; top: 12px; right: 12px; width: 36px; height: 36px; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+  background: transparent; color: var(--intro-lime); border: 1px solid var(--intro-line); border-radius: 50%;
+}
+.gm-intro-mute:hover { background: var(--intro-bar-bg); }
+.gm-intro-mute:focus-visible { outline: 2px solid var(--intro-lime); outline-offset: 2px; }
+.gm-intro-sr {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+@media (max-width: 760px) {
+  .gm-intro-truck { width: 130px; top: calc(42% + min(31vw, 230px) * .477 + 92px - 36px); }
+}

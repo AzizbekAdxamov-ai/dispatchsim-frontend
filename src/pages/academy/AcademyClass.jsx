@@ -3,6 +3,7 @@ import { Link, Navigate, useParams } from 'react-router-dom'
 import {
   ArrowCounterClockwise, ArrowLeft, CaretLeft, CaretRight, CornersIn, CornersOut, MoonStars, Pause, Play, Sun,
 } from '@phosphor-icons/react'
+import { signalAcademyReady } from '../../components/academy/academyIntroSignal'
 import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../theme/ThemeProvider'
 import { lessonByNo, lessonFile } from '../../data/academyLessons'
@@ -20,6 +21,8 @@ export default function AcademyClass() {
   const no = /^\d+$/.test(params.no ?? '') ? Number(params.no) : 0
   const lesson = lessonByNo(no)
   const { user } = useAuth()
+  // This page renders at once, so the entrance can lift.
+  useEffect(() => { signalAcademyReady() }, [])
   if (!lesson) return <Navigate to="/academy" replace />
   if (!(user?.isMentor || user?.isAdmin)) return <Navigate to={`/academy/lesson/${no}`} replace />
   // key: switching lessons starts a clean instance.

@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { GraduationCap, UsersThree, SquaresFour, Gear } from '@phosphor-icons/react'
@@ -8,6 +9,7 @@ import LiveDataNotice from './LiveDataNotice'
 import { useAuth } from '../../context/AuthContext'
 import { ACADEMY_BRAND_SUB, ACADEMY_SIDEBAR_COPY, ACADEMY_TOPBAR_COPY } from '../../data/academySettingsCopy'
 import { useLiveDataHealth } from '../../hooks/useLiveDataHealth'
+import { signalAcademyReady } from '../academy/academyIntroSignal'
 
 // One line per entry: test/railLabels.test.js reads this file as text.
 const STUDENT_NAV = [
@@ -42,6 +44,12 @@ export default function AcademyShell() {
   // A lesson fills the whole window: no sidebar, topbar or page padding.
   // No transformed wrapper either, so the lesson's fixed drawer stays anchored.
   const focus = location.pathname.startsWith('/academy/lesson/')
+
+  // Every academy page except the home renders at once; the home signals itself
+  // when its data arrives.
+  useEffect(() => {
+    if (location.pathname.replace(/\/+$/, '') !== '/academy') signalAcademyReady()
+  }, [location.pathname])
 
   if (focus) {
     return (

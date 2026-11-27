@@ -62,11 +62,14 @@ import AcademyLesson from './pages/academy/AcademyLesson'
 import AcademyClass from './pages/academy/AcademyClass'
 import MentorDashboard from './pages/academy/MentorDashboard'
 import MentorStudent from './pages/academy/MentorStudent'
+import AcademyIntro from './components/academy/AcademyIntro'
+import { ACADEMY_INTRO_COPY } from './data/academyIntroCopy'
 
 export default function App() {
   return (
     <MotionConfig reducedMotion="user">
       <AuthProvider>
+        <AcademyIntro copy={ACADEMY_INTRO_COPY} />
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

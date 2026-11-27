@@ -34,6 +34,36 @@
   --login-field-focus: rgba(11, 16, 32, 0.7);
   --login-divider: rgba(126, 135, 153, 0.35);
 
+  /* Academy entrance overlay: a night-blue film opening with a lime logo.
+     One look in both themes, so none of these follow the theme. */
+  --intro-navy: #0B1020;
+  --intro-lime: #C8FF1F;
+  --intro-outline: #eaff8a;
+  --intro-bg-a: #12204a;
+  --intro-bg-b: #0B1020;
+  --intro-bg-c: #04060f;
+  --intro-glow-a: rgba(200, 255, 31, 0.6);
+  --intro-glow-b: rgba(200, 255, 31, 0.35);
+  --intro-glow-out: rgba(200, 255, 31, 0.7);
+  --intro-shock: rgba(200, 255, 31, 0.8);
+  --intro-tag-glow: rgba(200, 255, 31, 0.5);
+  --intro-dot: #96b4ff;
+  --intro-flare: rgba(150, 210, 255, 0.9);
+  --intro-flare-glow: #7ad0ff;
+  --intro-line: #2c3a7a;
+  --intro-bar-bg: #1c2650;
+  --intro-truck-body: #121a3c;
+  --intro-truck-cab: #1b2a63;
+  --intro-truck-glass: #9fd0ff;
+  --intro-truck-wheel: #05070f;
+  --intro-truck-rim: #8a93b8;
+  --intro-truck-beam: #fff6c8;
+  --intro-shine: #ffffff;
+  --intro-black: #000000;
+  --intro-vignette: rgba(0, 0, 0, 0.7);
+  --intro-ca-red: rgba(255, 0, 90, 0.6);
+  --intro-ca-blue: rgba(0, 200, 255, 0.6);
+
   --font-display: 'Space Grotesk Variable', 'Inter Variable', 'Inter', sans-serif;
   --font-body: 'Inter Variable', 'Inter', sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
