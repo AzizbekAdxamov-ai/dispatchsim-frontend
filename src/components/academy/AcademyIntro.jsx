@@ -137,14 +137,19 @@ export default function AcademyIntro({ copy = ACADEMY_INTRO_COPY }) {
   const navType = useNavigationType()
   const prevRef = useRef(null)
   const [session, setSession] = useState(null)
+  const [seenPath, setSeenPath] = useState(pathname)
+
+  // Left the academy while the overlay shows: drop it in the same render.
+  if (pathname !== seenPath) {
+    setSeenPath(pathname)
+    if (shouldDropIntro(pathname)) setSession(null)
+  }
 
   useEffect(() => {
     const prevPath = prevRef.current
     prevRef.current = pathname
     if (shouldDropIntro(pathname)) {
-      // Left the academy while the overlay shows: remove it and stop its sound.
-      closeAudioNow()
-      setSession(null)
+      closeAudioNow() // the overlay itself is dropped during render
       return
     }
     if (!shouldPlayIntro({ prevPath, nextPath: pathname, navigationType: navType })) return
